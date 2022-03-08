@@ -610,15 +610,15 @@ void ParseFaceData( s_source_t *psource, int material, s_face_t *pFace )
 		{
 			int k;
 			int ctr = 0;
-			char *token;
+			char *tok;
 			for (k = 0; k < 18; k++)
 			{
 				while (g_szLine[ctr] == ' ')
 				{
 					ctr++;
 				}
-				token = strtok( &g_szLine[ctr], " " );
-				ctr += strlen( token ) + 1;
+				tok = strtok( &g_szLine[ctr], " " );
+				ctr += strlen(tok) + 1;
 			}
 			for (k = 4; k < iCount && k < MAXSTUDIOSRCBONES; k++)
 			{
@@ -626,15 +626,15 @@ void ParseFaceData( s_source_t *psource, int material, s_face_t *pFace )
 				{
 					ctr++;
 				}
-				token = strtok( &g_szLine[ctr], " " );
-				ctr += strlen( token ) + 1;
+				tok = strtok( &g_szLine[ctr], " " );
+				ctr += strlen(tok) + 1;
 
-				bones[k] = atoi(token);
+				bones[k] = atoi(tok);
 
-				token = strtok( &g_szLine[ctr], " " );
-				ctr += strlen( token ) + 1;
+				tok = strtok( &g_szLine[ctr], " " );
+				ctr += strlen(tok) + 1;
 			
-				weights[k] = atof(token);
+				weights[k] = atof(tok);
 			}
 			// vprint( 0, "%d ", iCount );
 

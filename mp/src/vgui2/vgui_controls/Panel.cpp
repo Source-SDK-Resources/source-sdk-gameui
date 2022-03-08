@@ -1274,13 +1274,13 @@ void Panel::PaintTraverse( bool repaint, bool allowForce )
 			for (int i=0; i < controlGroup->Size(); ++i)
 			{
 				// outline all selected panels 
-				CUtlVector<PHandle> *controlGroup = _buildGroup->GetControlGroup();
-				for (int i=0; i < controlGroup->Size(); ++i)
-				{
+				//CUtlVector<PHandle> *controlGroup = _buildGroup->GetControlGroup();
+				//for (int j=0; j < controlGroup->Size(); ++j)
+				//{
 					surface()->PushMakeCurrent( ((*controlGroup)[i].Get())->GetVPanel(), false );
 					((*controlGroup)[i].Get())->PaintBuildOverlay();
 					surface()->PopMakeCurrent( ((*controlGroup)[i].Get())->GetVPanel() );
-				}	
+				//}	
 			
 				_buildGroup->DrawRulers();						
 			}
@@ -6983,8 +6983,8 @@ void Panel::OnFinishDragging( bool mousereleased, MouseCode code, bool abort /*=
 				if ( pHover )
 				{
 					// Figure out if it's a menu item...
-					int c = menu->GetItemCount();
-					for ( int i = 0; i < c; ++i )
+					int itemc = menu->GetItemCount();
+					for ( int i = 0; i < itemc; ++i )
 					{
 						int id = menu->GetMenuID( i );
 						MenuItem *item = menu->GetMenuItem( id );
@@ -7386,8 +7386,8 @@ VPANEL CDragDropHelperPanel::IsWithinTraverse(int x, int y, bool traversePopups)
 
 void CDragDropHelperPanel::PostChildPaint()
 {
-	int c = m_PaintList.Count();
-	for ( int i = c - 1; i >= 0 ; --i )
+	int pc = m_PaintList.Count();
+	for ( int i = pc - 1; i >= 0 ; --i )
 	{
 		DragHelperPanel_t& data = m_PaintList[ i ];
 
@@ -7408,13 +7408,12 @@ void CDragDropHelperPanel::PostChildPaint()
 			else
 			{
 				CUtlVector< Panel * > temp;
-				CUtlVector< PHandle >& data = panel->GetDragDropInfo()->m_DragPanels;
+				CUtlVector< PHandle >& data_ = panel->GetDragDropInfo()->m_DragPanels;
 				CUtlVector< KeyValues * >& msglist = panel->GetDragDropInfo()->m_DragData;
-				int i, c;
-				c = data.Count();
-				for ( i = 0; i < c ; ++i )
+				int di, dc = data_.Count();
+				for ( di = 0; di < dc ; ++di )
 				{
-					Panel *pPanel = data[ i ].Get();
+					Panel *pPanel = data_[ di ].Get();
 					if ( pPanel )
 					{
 						temp.AddToTail( pPanel );
@@ -7426,7 +7425,7 @@ void CDragDropHelperPanel::PostChildPaint()
 		}
 	}
 
-	if ( c == 0 )
+	if ( pc == 0 )
 	{
 		MarkForDeletion();
 	}

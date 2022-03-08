@@ -1285,7 +1285,7 @@ void EndBSPFile (void)
 	DiscoverMacroTextures();
 
 	char fileName[1024];
-	V_strncpy( fileName, source, sizeof( fileName ) );
+	V_strncpy( fileName, g_source, sizeof( fileName ) );
 	V_DefaultExtension( fileName, ".bsp", sizeof( fileName ) );
 	Msg ("Writing %s\n", fileName);
 	WriteBSPFile (fileName);

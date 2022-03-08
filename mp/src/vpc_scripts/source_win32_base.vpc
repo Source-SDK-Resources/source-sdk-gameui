@@ -13,6 +13,7 @@ $Configuration
 		$PlatformToolset "v110" [$VS2012 && $ANALYZE] // VS 2012 for /analyze
 		$PlatformToolset "v120_xp" [$VS2013 && !$ANALYZE] // VS 2013 targeting Windows XP - http://msdn.microsoft.com/en-us/library/vstudio/jj851139.aspx
 		$PlatformToolset "v120" [$VS2013 && $ANALYZE] // VS 2013 for /analyze
+		$PlatformToolset "v143" [$VS2022]
 	}
 
 	$General
@@ -50,9 +51,9 @@ $Configuration
 		// reduces the client.dll size by about 1.14%. When linker optimizations are disabled this has no
 		// effect. This option does not show up in the IDE so we need to add it in $AdditionalOptions.
 		// http://blogs.msdn.com/b/vcblog/archive/2013/09/11/introducing-gw-compiler-switch.aspx
-		$AdditionalOptions	"$BASE /Gw" [$VS2013]
+		$AdditionalOptions	"$BASE /Gw" [$VS2013 || $VS2022]
 		// Strip unreferenced inline functions from object files to shrink .obj files and .lib files,
 		// improve linker speed, and improve conformance. Requires VS 2013 Update 3
-		$AdditionalOptions	"$BASE /Zc:inline" [$VS2013]
+		$AdditionalOptions	"$BASE /Zc:inline" [$VS2013 || $VS2022]
 	}
 }

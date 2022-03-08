@@ -299,7 +299,6 @@ LightForTexture
 */
 void LightForTexture( const char *name, Vector& result )
 {
-	int		i;
 
 	result[ 0 ] = result[ 1 ] = result[ 2 ] = 0;
 
@@ -340,7 +339,7 @@ void LightForTexture( const char *name, Vector& result )
 		}
 	}
 
-	for (i=0 ; i<num_texlights ; i++)
+	for (int i=0 ; i<num_texlights ; i++)
 	{
 		if (!Q_strcasecmp (name, texlights[i].name))
 		{
@@ -1652,13 +1651,12 @@ BounceLight
 */
 void BounceLight (void)
 {
-	unsigned i;
 	Vector	added;
 	char		name[64];
 	qboolean	bouncing = numbounce > 0;
 
 	unsigned int uiPatchCount = g_Patches.Size();
-	for (i=0 ; i<uiPatchCount; i++)
+	for (unsigned i=0 ; i<uiPatchCount; i++)
 	{
 		// totallight has a copy of the direct lighting.  Move it to the emitted light and zero it out (to integrate bounces only)
 		VectorCopy( g_Patches[i].totallight.light[0], emitlight[i] );
@@ -1700,12 +1698,11 @@ void BounceLight (void)
 	}
 #endif
 
-	i = 0;
-	while ( bouncing )
+	for (unsigned i = 0; bouncing; )
 	{
 		// transfer light from to the leaf patches from other patches via transfers
 		// this moves shooter->emitlight to receiver->addlight
-		unsigned int uiPatchCount = g_Patches.Size();
+		uiPatchCount = g_Patches.Size();
 		RunThreadsOn (uiPatchCount, true, GatherLight);
 		// move newly received light (addlight) to light to be sent out (emitlight)
 		// start at children and pull light up to parents

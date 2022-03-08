@@ -505,21 +505,20 @@ void CBaseTrigger::EndTouch(CBaseEntity *pOther)
 		int iSize = m_hTouchingEntities.Count();
 		for ( int i = iSize-1; i >= 0; i-- )
 		{
-			EHANDLE hOther;
-			hOther = m_hTouchingEntities[i];
+			EHANDLE hOtherTouching = m_hTouchingEntities[i];
 
-			if ( !hOther )
+			if ( !hOtherTouching )
 			{
 				m_hTouchingEntities.Remove( i );
 			}
-			else if ( hOther->IsPlayer() && !hOther->IsAlive() )
+			else if ( hOtherTouching->IsPlayer() && !hOtherTouching->IsAlive() )
 			{
 #ifdef STAGING_ONLY
 				if ( !HushAsserts() )
 				{
-					AssertMsg( false, "Dead player [%s] is still touching this trigger at [%f %f %f]", hOther->GetEntityName().ToCStr(), XYZ( hOther->GetAbsOrigin() ) );
+					AssertMsg( false, "Dead player [%s] is still touching this trigger at [%f %f %f]", hOtherTouching->GetEntityName().ToCStr(), XYZ(hOtherTouching->GetAbsOrigin() ) );
 				}
-				Warning( "Dead player [%s] is still touching this trigger at [%f %f %f]", hOther->GetEntityName().ToCStr(), XYZ( hOther->GetAbsOrigin() ) );
+				Warning( "Dead player [%s] is still touching this trigger at [%f %f %f]", hOtherTouching->GetEntityName().ToCStr(), XYZ( hOtherTouching->GetAbsOrigin() ) );
 #endif
 				m_hTouchingEntities.Remove( i );
 			}

@@ -45,6 +45,8 @@ $Configuration
 	$Linker
 	{
 		$AdditionalDependencies				"$BASE shell32.lib user32.lib advapi32.lib gdi32.lib comdlg32.lib ole32.lib" [$WIN32||$WIN64]
+		$AdditionalDependencies				"$BASE legacy_stdio_definitions.lib" [$VS2022]
+		
 		$TargetMachine						"MachineX86 (/MACHINE:X86)"	[$WIN32]
 		$TargetMachine						"MachineX64 (/MACHINE:X64)"	[$WIN64]
 		// Suppress this pointless warning using the undocumented /ignore linker switch
@@ -114,7 +116,8 @@ $Project
 				$CustomBuildStep
 				{
 					// General
-					$CommandLine				"$QUOTE$(VCInstallDir)bin\ml.exe$QUOTE /safeseh /c /Cp /Zi /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE$(InputPath)$QUOTE"
+					$CommandLine				"$QUOTE$(VCInstallDir)bin\ml.exe$QUOTE /safeseh /c /Cp /Zi /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE$(InputPath)$QUOTE" [!$VS2022]
+					$CommandLine				"$QUOTE$(VC_ExecutablePath_x86)\ml.exe$QUOTE /safeseh /c /Cp /Zi /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE$(InputPath)$QUOTE" [$VS2022]
 					$Description				"Compiling pointeroverride.asm"
 					$Outputs					"$(IntDir)\$(InputName).obj"
 				}		
