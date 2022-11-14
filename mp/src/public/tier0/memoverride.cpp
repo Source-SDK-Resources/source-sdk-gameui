@@ -304,6 +304,9 @@ ALLOC_CALL void * __cdecl _recalloc ( void * memblock, size_t count, size_t size
 }
 
 size_t _msize_base( void *pMem )
+#ifdef _CRT_NOEXCEPT
+_CRT_NOEXCEPT 
+#endif
 {
 	return g_pMemAlloc->GetSize(pMem);
 }
