@@ -62,8 +62,8 @@
 
 #if defined( SWARM_DLL )
 
-#include "swarm/basemodpanel.h"
-#include "swarm/basemodui.h"
+#include "mod/basemodpanel.h"
+#include "mod/basemodui.h"
 typedef BaseModUI::CBaseModPanel UI_BASEMOD_PANEL_CLASS;
 inline UI_BASEMOD_PANEL_CLASS & GetUiBaseModPanelClass() { return UI_BASEMOD_PANEL_CLASS::GetSingleton(); }
 inline UI_BASEMOD_PANEL_CLASS & ConstructUiBaseModPanelClass() { return * new UI_BASEMOD_PANEL_CLASS(); }

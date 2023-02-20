@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "swarm/basemodpanel.h"
+#include "mod/basemodpanel.h"
 inline BaseModUI::CBaseModPanel * BasePanel() { return &BaseModUI::CBaseModPanel::GetSingleton(); }
 
 #endif // BASEPANEL_H
