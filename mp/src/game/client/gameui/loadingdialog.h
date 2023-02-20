@@ -42,7 +42,6 @@ protected:
 	virtual void OnThink();
 	virtual void OnClose();
 	virtual void OnKeyCodePressed(vgui::KeyCode code);
-	virtual void PaintBackground( void );
 	
 private:
 	void SetupControlSettings( bool bForceShowProgressText );
@@ -62,7 +61,6 @@ private:
 	float	m_flSecondaryProgressStartTime;
 	bool	m_bShowingVACInfo;
 	bool	m_bCenter;
-	bool	m_bConsoleStyle;
 	float	m_flProgressFraction;	
 
 	CPanelAnimationVar( int, m_iAdditionalIndentX, "AdditionalIndentX", "0" );

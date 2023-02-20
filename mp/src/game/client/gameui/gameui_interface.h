@@ -75,7 +75,6 @@ public:
  	bool IsInLevel();
  	bool IsInBackgroundLevel();
  	bool IsInMultiplayer();
- 	bool IsConsoleUI();
  	bool HasSavedThisMenuSession();
  	void SetSavedThisMenuSession( bool bState );
  
@@ -103,7 +102,6 @@ private:
 
 	bool m_bTryingToLoadFriends : 1;
 	bool m_bActivatedUI : 1;
-	bool m_bIsConsoleUI : 1;
 	bool m_bHasSavedThisMenuSession : 1;
 	bool m_bOpenProgressOnStart : 1;
 

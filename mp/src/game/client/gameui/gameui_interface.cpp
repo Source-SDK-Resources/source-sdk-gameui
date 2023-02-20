@@ -138,7 +138,6 @@ CGameUI::CGameUI()
 	m_iGameQueryPort = 0;
 	m_bActivatedUI = false;
 	m_szPreviousStatusText[0] = 0;
-	m_bIsConsoleUI = false;
 	m_bHasSavedThisMenuSession = false;
 	m_bOpenProgressOnStart = false;
 	m_iPlayGameStartupSound = 0;
@@ -170,9 +169,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 	SteamAPI_InitSafe();
 	steamapicontext->Init();
-
-	ConVarRef var( "gameui_xbox" );
-	m_bIsConsoleUI = var.IsValid() && var.GetBool();
 
 	vgui::VGui_InitInterfacesList( "GameUI", &factory, 1 );
 	vgui::VGui_InitMatSysInterfacesList( "GameUI", &factory, 1 );
@@ -887,14 +883,6 @@ bool CGameUI::IsInBackgroundLevel()
 bool CGameUI::IsInMultiplayer()
 {
 	return (IsInLevel() && engine->GetMaxClients() > 1);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: returns true if we're console ui
-//-----------------------------------------------------------------------------
-bool CGameUI::IsConsoleUI()
-{
-	return m_bIsConsoleUI;
 }
 
 //-----------------------------------------------------------------------------
