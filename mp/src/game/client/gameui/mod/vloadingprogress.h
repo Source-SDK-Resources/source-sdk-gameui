@@ -97,7 +97,6 @@ private:
 
 	char				m_szGameMode[MAX_PATH];
 
-	CLoadingTipPanel			*m_pTipPanel;
 };
 
 };

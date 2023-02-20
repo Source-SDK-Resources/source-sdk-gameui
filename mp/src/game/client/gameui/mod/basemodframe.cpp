@@ -586,7 +586,7 @@ void CBaseModFrame::LoadControlSettings( const char *dialogResourceName, const c
 
 		// check the skins directory first, if an explicit pathID hasn't been set
 		bool bSuccess = false;
-		if ( !IsX360() && !pathID )
+		if ( !pathID )
 		{
 			bSuccess = rDat->LoadFromFile( g_pFullFileSystem, dialogResourceName, "SKIN" );
 		}
@@ -596,10 +596,6 @@ void CBaseModFrame::LoadControlSettings( const char *dialogResourceName, const c
 		}
 		if ( bSuccess )
 		{
-			if ( IsX360() )
-			{
-				rDat->ProcessResolutionKeys( surface()->GetResolutionKey() );
-			}
 			if ( pConditions && pConditions->GetFirstSubKey() )
 			{
 				GetBuildGroup()->ProcessConditionalKeys( rDat, pConditions );
@@ -986,18 +982,8 @@ void CBaseModFrame::DrawDialogBackground( const char *pMajor, const wchar_t *pMa
 
 	if ( pMetrics )
 	{
-		if ( IsX360() )
-		{
-			int panelX, panelY;
-			GetPos( panelX, panelY );
-			pMetrics->titleY = panelY;
-			pMetrics->titleHeight = titleTall;
-		}
-		else
-		{
-			pMetrics->titleY = m_iHeaderY;
-			pMetrics->titleHeight = m_iHeaderTall;
-		}
+		pMetrics->titleY = m_iHeaderY;
+		pMetrics->titleHeight = m_iHeaderTall;
 	}
 
 	Color bgColor( 0, 0, 0, 200 );

@@ -989,36 +989,6 @@ void BaseModHybridButton::OnKeyCodePressed( vgui::KeyCode code )
 		}
 	}
 
-	if ( IsX360() && m_nStyle == BUTTON_GAMEMODE )
-	{
-		GameModes *pGameModes = dynamic_cast< GameModes * >( GetParent() );
-		if ( pGameModes )
-		{
-			switch ( localCode )
-			{
-			case KEY_XBUTTON_A:
-				if ( pGameModes->IsScrollBusy() )
-				{
-					// swallow it
-					return;
-				}
-				break;
-
-			case KEY_XBUTTON_LEFT:
-			case KEY_XSTICK1_LEFT:
-			case KEY_XSTICK2_LEFT:
-				pGameModes->ScrollLeft();
-				break;
-
-			case KEY_XBUTTON_RIGHT:
-			case KEY_XSTICK1_RIGHT:
-			case KEY_XSTICK2_RIGHT:
-				pGameModes->ScrollRight();
-				break;
-			}
-		}
-	}
-
 	BaseClass::OnKeyCodePressed( code );
 }
 

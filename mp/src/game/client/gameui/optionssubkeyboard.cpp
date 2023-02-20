@@ -52,20 +52,17 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : EditablePanel(pa
 	m_nSplitScreenUser = 0;
 
 	// For joystick buttons, controls which user are binding/unbinding
-	if ( !IsX360() )
-	{
-		//HACK HACK:  Probably the entire gameui needs to have a splitscrene context for which player the settings apply to, but this is only
-		// on the PC...
-		static ConVarRef in_forceuser( "in_forceuser" );
+	//HACK HACK:  Probably the entire gameui needs to have a splitscrene context for which player the settings apply to, but this is only
+	// on the PC...
+	static ConVarRef in_forceuser( "in_forceuser" );
 
-		if ( in_forceuser.IsValid() )
-		{
-			m_nSplitScreenUser = clamp( in_forceuser.GetInt(), 0, 1 );
-		}
-		else
-		{
-			m_nSplitScreenUser = MAX( 0, engine->GetActiveSplitScreenPlayerSlot() );
-		}
+	if ( in_forceuser.IsValid() )
+	{
+		m_nSplitScreenUser = clamp( in_forceuser.GetInt(), 0, 1 );
+	}
+	else
+	{
+		m_nSplitScreenUser = MAX( 0, engine->GetActiveSplitScreenPlayerSlot() );
 	}
 
 	// create the key bindings list

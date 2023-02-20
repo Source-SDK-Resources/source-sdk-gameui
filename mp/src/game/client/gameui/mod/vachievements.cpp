@@ -150,9 +150,6 @@ void AchievementListItem::SetGamerScore(int score)
 
 	V_snwprintf( num, sizeof(num), L"%d", m_GamerScore );
 	g_pVGuiLocalize->ConstructString( buffer, sizeof( buffer ), g_pVGuiLocalize->FindSafe( "#L4D360UI_Gamerscore_Progress" ), 1, num );
-
-	m_LblGamerscore->SetText( buffer );
-	m_LblGamerscore->SetVisible( IsX360() && (score>0) );
 }
 
 //=============================================================================
@@ -462,40 +459,17 @@ BaseClass(parent, panelName, false, true)
 	m_iStartingUserSlot = CBaseModPanel::GetSingleton().GetLastActiveUserId();
 
 	memset( m_wAchievementsTitle, 0, sizeof( m_wAchievementsTitle ) );
-	if ( IsX360() )
-	{
-		// Set the name of the dialog, adding the handle of the initiating user
-		const wchar_t *pwcTemplate = g_pVGuiLocalize->Find("#L4D360UI_My_Achievements_User");
-		int iActiveController = XBX_GetUserId( m_iStartingUserSlot );
-
-		const char *pszPlayerName = BaseModUI::CUIGameData::Get()->GetLocalPlayerName( iActiveController );
-
-		wchar_t wGamerTag[32];
-		g_pVGuiLocalize->ConvertANSIToUnicode( pszPlayerName, wGamerTag, sizeof( wGamerTag ) );
-		g_pVGuiLocalize->ConstructString( m_wAchievementsTitle, sizeof( m_wAchievementsTitle ), pwcTemplate, 1, wGamerTag );
-	}
 
 	SetDeleteSelfOnClose(true);
 	SetProportional( true );
 
 	m_LblComplete = new Label(this, "LblComplete", ""); 
-	m_LblGamerscore = new Label(this, "LblGamerscore", ""); 
 	m_GplAchievements = new AchievementGenericPanelList( this, "GplAchievements", GenericPanelList::ISM_ELEVATOR, m_iStartingUserSlot );
 	m_GplAchievements->ShowScrollProgress( true );
 	m_GplAchievements->SetScrollBarVisible( IsPC() );
 	m_GplAchievements->SetBgColor( Color( 0, 0, 0, 0 ) );
 
-	if ( IsX360() )
-	{
-		m_GplAwards = new AchievementGenericPanelList( this, "GplAwards", GenericPanelList::ISM_ELEVATOR, m_iStartingUserSlot );
-		m_GplAwards->ShowScrollProgress( true );
-		m_GplAwards->SetScrollBarVisible( false );
-		m_GplAwards->SetBgColor( Color( 0, 0, 0, 0 ) );
-	}
-	else
-	{
-		m_GplAwards = NULL;
-	}
+	m_GplAwards = NULL;
 
 	m_pProgressBar = new ContinuousProgressBar( this, "ProTotalProgress" );
 	m_pProgressBar->SetImage( "progressbar", PROGRESS_TEXTURE_FG );
@@ -577,52 +551,9 @@ void Achievements::Activate()
 		}
 	} 
 
-	// Populate the awards list.
-	int awardIncompleteCount= 0;
-	if ( IsX360() )
-	{
-		m_GplAwards->RemoveAllPanelItems();
-
-		for ( int i = 0; i < achievementmgr->GetAchievementCount(); i++ )
-		{
-			IAchievement* achievement = achievementmgr->GetAchievementByIndex( i, m_iStartingUserSlot );
-			if ( achievement && achievement->IsAchieved() )
-			{
-				AchievementListItem *panelItem = new AchievementListItem( achievement );
-				if ( panelItem )
-				{
-					m_GplAchievements->AddPanelItem( panelItem, true );
-				}
-
-				gamerScore += achievement->GetPointValue();
-				++m_iAwardCompleteCount;
-			}
-		}
-
-		for( int i = 0; i < achievementmgr->GetAchievementCount(); i++ )
-		{
-			IAchievement* achievement = achievementmgr->GetAchievementByIndex( i, m_iStartingUserSlot );
-			if ( achievement && !achievement->IsAchieved() )
-			{
-				AchievementListItem *panelItem = new AchievementListItem( achievement );
-				if ( panelItem )
-				{
-					m_GplAchievements->AddPanelItem( panelItem, true );
-				}
-
-				++awardIncompleteCount;
-			}
-		} 
-	}
-	if ( m_GplAwards )
-	{
-		m_GplAwards->SetVisible( false );
-	}
-
 	//
 	// Update achievement and gamerscore progress
 	//
-	wchar_t localizedGamerscoreProgress[128]; 
 	char buffer[64];
 	wchar_t wNumAchieved[64];
 	wchar_t wTotalAchievements[64];
@@ -636,12 +567,6 @@ void Achievements::Activate()
 	g_pVGuiLocalize->ConstructString( m_wAchievementsProgress, sizeof( m_wAchievementsProgress ), g_pVGuiLocalize->Find( "#L4D360UI_Achievement_Progress" ), 2, wNumAchieved, wTotalAchievements );
 	m_LblComplete->SetText( m_wAchievementsProgress );
 
-	// Construct gamerscore progress string
-	itoa( gamerScore, buffer, 10 );
-	V_UTF8ToUnicode( buffer, wGamerscore, sizeof( wGamerscore ) );
-	g_pVGuiLocalize->ConstructString( localizedGamerscoreProgress, sizeof( localizedGamerscoreProgress ), g_pVGuiLocalize->Find( "#L4D360UI_Gamerscore_Progress" ), 1, wGamerscore );
-	m_LblGamerscore->SetText( localizedGamerscoreProgress );
-
 	// Focus on the first item in the list
 	m_GplAchievements->NavigateTo();
 	m_GplAchievements->SelectPanelItem( 0 );
@@ -650,8 +575,6 @@ void Achievements::Activate()
 	m_flTotalProgress = static_cast<float>(m_iAchCompleteCount) / static_cast<float>(achievementmgr->GetAchievementCount());
 
 	UpdateFooter();
-
-	ToggleDisplayType( m_bShowingAssets );
 }
 
 void Achievements::UpdateFooter()
@@ -689,63 +612,7 @@ void Achievements::OnKeyCodePressed(KeyCode code)
 //	int iUserSlot = GetJoystickForCode( code );
 //	CBaseModPanel::GetSingleton().SetLastActiveUserId( iUserSlot );
 
-	switch( GetBaseButtonCode( code ) )
-	{
-	case KEY_XBUTTON_Y:
-		ToggleDisplayType( !m_bShowingAssets );
-		break;
-	}
-
 	BaseClass::OnKeyCodePressed(code);
-}
-
-//=============================================================================
-void Achievements::ToggleDisplayType( bool bDisplayType )
-{
-	if ( IsPC() )
-		return;
-
-	m_bShowingAssets = bDisplayType;
-
-	if ( m_bShowingAssets )
-	{
-		m_GplAwards->SetVisible( true );
-		m_GplAchievements->SetVisible( false );
-		m_LblGamerscore->SetVisible( false );
-
-		m_GplAwards->NavigateTo();
-		m_GplAwards->SelectPanelItem( 0 );
-
-		m_ActiveControl = m_GplAwards;
-	}
-	else
-	{
-		m_GplAwards->SetVisible( false );
-		m_GplAchievements->SetVisible( true );
-		m_LblGamerscore->SetVisible( true );
-
-		m_GplAchievements->NavigateTo();
-		m_GplAchievements->SelectPanelItem( 0 );
-
-		m_ActiveControl = m_GplAchievements;
-	}
-
-	m_ActiveControl->SetBgColor( Color( 0, 0, 0, 0 ) );
-
-	char buffer[64];
-	wchar_t wNumAchieved[64];
-	wchar_t wTotalAchievements[64];
-
-	itoa( achievementmgr->GetAchievementCount(), buffer, 10 );
-	V_UTF8ToUnicode( buffer, wTotalAchievements, sizeof( wNumAchieved ) );
-	itoa( m_bShowingAssets ? m_iAwardCompleteCount : m_iAchCompleteCount, buffer, 10 );
-	V_UTF8ToUnicode( buffer, wNumAchieved, sizeof( wTotalAchievements ) );
-	g_pVGuiLocalize->ConstructString( m_wAchievementsProgress, sizeof( m_wAchievementsProgress ), g_pVGuiLocalize->Find( "#L4D360UI_Achievement_Progress" ), 2, wNumAchieved, wTotalAchievements );
-	m_LblComplete->SetText( m_wAchievementsProgress );
-	m_flTotalProgress = static_cast<float>(m_bShowingAssets ? m_iAwardCompleteCount : m_iAchCompleteCount) / static_cast<float>(achievementmgr->GetAchievementCount());
-	m_pProgressBar->SetProgress( m_flTotalProgress );
-
-	UpdateFooter();
 }
 
 //=============================================================================
@@ -757,10 +624,6 @@ void Achievements::ApplySchemeSettings(vgui::IScheme *pScheme)
 	SetupAsDialogStyle();
 
 	m_pProgressBar->SetProgress( m_flTotalProgress );
-	if ( IsX360() )
-	{
-		m_pProgressBar->SetVisible( false );
-	}
 }
 
 

@@ -85,8 +85,8 @@ public:
 	unsigned short GetLastItemAdded();
 
 	int GetFirstVisibleItemNumber( bool bRequireFullyVisible = false ); //returns -1 if it can't find one
-	int GetLastVisibleItemNumber( bool bRequireFullyVisible = IsX360() );  //returns -1 if it can't find one
-	bool IsPanelItemVisible( Panel *pPanelItem, bool bRequireFullyVisible = IsX360() );
+	int GetLastVisibleItemNumber( bool bRequireFullyVisible = false );  //returns -1 if it can't find one
+	bool IsPanelItemVisible( Panel *pPanelItem, bool bRequireFullyVisible = false );
 
 	MESSAGE_FUNC_CHARPTR( OnItemSelected, "OnItemSelected", panelName );
 	MESSAGE_FUNC_CHARPTR( OnItemAdded, "OnItemAdded", panelName );

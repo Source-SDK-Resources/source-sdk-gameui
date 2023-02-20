@@ -799,7 +799,7 @@ void CBaseModPanel::OnGameUIActivated()
 	{
 		return;
 	}
-	else if ( !IsX360() && WT_LOADINGPROGRESS == GetActiveWindowType() )
+	else if ( WT_LOADINGPROGRESS == GetActiveWindowType() )
 	{
 		// Ignore UI activations when loading poster is up
 		return;
@@ -955,31 +955,6 @@ void CBaseModPanel::RunFrame()
 		engine->SetBlurFade( m_flBlurScale );
 	}
 
-	if ( IsX360() && m_ExitingFrameCount )
-	{
-		CTransitionScreen *pTransitionScreen = static_cast< CTransitionScreen* >( GetWindow( WT_TRANSITIONSCREEN ) );
-		if ( pTransitionScreen && pTransitionScreen->IsTransitionComplete() )
-		{
-			if ( m_ExitingFrameCount > 1 )
-			{
-				m_ExitingFrameCount--;
-				if ( m_ExitingFrameCount == 1 )
-				{
-					// enough frames have transpired, send the single shot quit command
-					if ( m_bWarmRestartMode )
-					{
-						// restarts self, skips any intros
-						engine->ClientCmd_Unrestricted( "quit_x360 restart\n" );
-					}
-					else
-					{
-						// cold restart, quits to any startup app
-						engine->ClientCmd_Unrestricted( "quit_x360\n" );
-					}
-				}
-			}
-		}
-	}
 }
 
 
@@ -1979,37 +1954,30 @@ void CBaseModPanel::OnCommand(const char *command)
 {
 	if ( !Q_stricmp( command, "QuitRestartNoConfirm" ) )
 	{
-		if ( IsX360() )
-		{
-			StartExitingProcess( false );
-		}
 	}
 	else if ( !Q_stricmp( command, "RestartWithNewLanguage" ) )
 	{
-		if ( !IsX360() )
+		const char *pUpdatedAudioLanguage = Audio::GetUpdatedAudioLanguage();
+
+		if ( pUpdatedAudioLanguage[ 0 ] != '\0' )
 		{
-			const char *pUpdatedAudioLanguage = Audio::GetUpdatedAudioLanguage();
+			char szSteamURL[50];
+			char szAppId[50];
 
-			if ( pUpdatedAudioLanguage[ 0 ] != '\0' )
-			{
-				char szSteamURL[50];
-				char szAppId[50];
+			// hide everything while we quit
+			SetVisible( false );
+			vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
+			engine->ClientCmd_Unrestricted( "quit\n" );
 
-				// hide everything while we quit
-				SetVisible( false );
-				vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
-				engine->ClientCmd_Unrestricted( "quit\n" );
+			// Construct Steam URL. Pattern is steam://run/<appid>/<language>. (e.g. Ep1 In French ==> steam://run/380/french)
+			Q_strcpy(szSteamURL, "steam://run/");
+			itoa( engine->GetAppID(), szAppId, 10 );
+			Q_strcat( szSteamURL, szAppId, sizeof( szSteamURL ) );
+			Q_strcat( szSteamURL, "/", sizeof( szSteamURL ) );
+			Q_strcat( szSteamURL, pUpdatedAudioLanguage, sizeof( szSteamURL ) );
 
-				// Construct Steam URL. Pattern is steam://run/<appid>/<language>. (e.g. Ep1 In French ==> steam://run/380/french)
-				Q_strcpy(szSteamURL, "steam://run/");
-				itoa( engine->GetAppID(), szAppId, 10 );
-				Q_strcat( szSteamURL, szAppId, sizeof( szSteamURL ) );
-				Q_strcat( szSteamURL, "/", sizeof( szSteamURL ) );
-				Q_strcat( szSteamURL, pUpdatedAudioLanguage, sizeof( szSteamURL ) );
-
-				// Set Steam URL for re-launch in registry. Launcher will check this registry key and exec it in order to re-load the game in the proper language
-				vgui::system()->SetRegistryString("HKEY_CURRENT_USER\\Software\\Valve\\Source\\Relaunch URL", szSteamURL );
-			}
+			// Set Steam URL for re-launch in registry. Launcher will check this registry key and exec it in order to re-load the game in the proper language
+			vgui::system()->SetRegistryString("HKEY_CURRENT_USER\\Software\\Valve\\Source\\Relaunch URL", szSteamURL );
 		}
 	}
 	else
@@ -2052,43 +2020,6 @@ void CBaseModPanel::PlayUISound( UISound_t UISound )
 	{
 		vgui::surface()->PlaySound( pSound );
 	}
-}
-
-//=============================================================================
-// Start system shutdown. Cannot be stopped.
-// A Restart is cold restart, plays the intro movie again.
-//=============================================================================
-void CBaseModPanel::StartExitingProcess( bool bWarmRestart )
-{
-	if ( !IsX360() )
-	{
-		// xbox only
-		Assert( 0 );
-		return;
-	}
-
-	if ( m_ExitingFrameCount )
-	{
-		// already fired
-		return;
-	}
-
-	// cold restart or warm
-	m_bWarmRestartMode = bWarmRestart;
-
-	// the exiting screen will transition to obscure all the game and UI
-	OpenWindow( WT_TRANSITIONSCREEN, 0, false );
-
-	// must let a non trivial number of screen swaps occur to stabilize image
-	// ui runs in a constrained state, while shutdown is occurring
-	m_ExitingFrameCount = 15;
-
-	// exiting cannot be stopped
-	// do not allow any input to occur
-	g_pInputSystem->DetachFromWindow();
-
-	// start shutting down systems
-	engine->StartXboxExitingProcess();
 }
 
 void CBaseModPanel::OnSetFocus()

@@ -159,7 +159,6 @@ namespace BaseModUI
 		bool IsReadyToWriteConfig( void );
 		const char *GetUISoundName(  UISound_t uiSound );
 		void PlayUISound( UISound_t uiSound );
-		void StartExitingProcess( bool bWarmRestart );
 
 		CBaseModFooterPanel* GetFooterPanel();
 		void SetLastActiveUserId( int userId );

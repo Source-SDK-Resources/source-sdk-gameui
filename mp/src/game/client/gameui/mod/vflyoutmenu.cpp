@@ -369,20 +369,13 @@ void FlyoutMenu::LoadControlSettings( const char *dialogResourceName, const char
 		rDat = new KeyValues( dialogResourceName );
 
 		bool bSuccess = false;
-		if ( !IsX360() && !pathID )
+		if ( !pathID )
 		{
 			bSuccess = rDat->LoadFromFile(g_pFullFileSystem, szLoadFile, "SKIN");
 		}
 		if ( !bSuccess )
 		{
 			bSuccess = rDat->LoadFromFile(g_pFullFileSystem, szLoadFile, pathID);
-		}
-		if ( bSuccess )
-		{
-			if ( IsX360() )
-			{
-				rDat->ProcessResolutionKeys( surface()->GetResolutionKey() );
-			}
 		}
 
 

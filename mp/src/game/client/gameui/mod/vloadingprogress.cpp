@@ -89,12 +89,6 @@ LoadingProgress::LoadingProgress(Panel *parent, const char *panelName, LoadingWi
 		m_pDefaultPosterDataKV->deleteThis();
 		m_pDefaultPosterDataKV = NULL;
 	}
-
-	m_pTipPanel = NULL;
-	if ( IsX360() )
-	{
-		m_pTipPanel = new CLoadingTipPanel( this );
-	}
 }
 
 //=============================================================================
@@ -221,11 +215,6 @@ void LoadingProgress::SetProgress( float progress )
 		m_pProTotalProgress->SetProgress( m_flPeakProgress );
 	}
 	
-	if ( m_pTipPanel )
-	{
-		m_pTipPanel->NextTip();
-	}
-
 	UpdateWorkingAnim();
 }
 

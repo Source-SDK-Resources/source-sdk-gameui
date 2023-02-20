@@ -151,11 +151,6 @@ void CBaseModFooterPanel::UpdateHelp()
 		// Center about either the wrapping width or the string width (whichever is smaller)
 		int helpX, helpY;
 		pLblHelpText->GetPos( helpX, helpY );
-		
-		if ( IsX360() )
-		{
-			helpY = vgui::scheme()->GetProportionalScaledValue( 25 );
-		}
 
 		pLblHelpText->SetPos( ( wide - MIN( iPanelWide, textWide ) )/2, helpY );
 
@@ -253,12 +248,6 @@ bool CBaseModFooterPanel::HasContent( void )
 	if ( bHasVisibleHelp )
 		return true;
 
-	if ( IsX360() )
-	{
-		if ( m_Buttons )
-			return true;
-	}
-
 	if ( IsPC() )
 	{
 		vgui::Panel *pCloudLabel = FindChildByName( "UsesCloudLabel" );
@@ -281,48 +270,7 @@ void CBaseModFooterPanel::PaintBackground()
 
 	y = 0;
 
-	if ( IsX360() )
-	{
-		vgui::Label *pLblHelpText = dynamic_cast< vgui::Label* >( FindChildByName( "LblHelpText" ) );
-		bool bHasVisibleHelp = pLblHelpText && pLblHelpText->IsVisible();
-
-		if ( !bHasVisibleHelp )
-		{
-			// shrink and move the footer down
-			y = tall * ( 1.0f - MINIMAL_FOOTER_SCALE );
-			tall = tall * MINIMAL_FOOTER_SCALE;
-		}
-	}
-
 	DrawSmearBackground( 0, y, wide, tall, true );
-
-	if ( IsX360() )
-	{
-		buttonLayout_t *pLayout = &g_ButtonLayouts[m_Format];
-
-		int yOffset = IsX360() ? 8 : 0;
-
-		if ( m_Buttons & FB_ABUTTON )
-		{
-			DrawButtonAndText( pLayout->A_rAlight, pLayout->A_x, pLayout->A_y + yOffset, "#GameUI_Icons_A_3DButton", m_AButtonText );
-		}
-		if ( m_Buttons & FB_BBUTTON )
-		{
-			DrawButtonAndText( pLayout->B_rAlight, pLayout->B_x, pLayout->B_y + yOffset, "#GameUI_Icons_B_3DButton", m_BButtonText );
-		}
-		if ( m_Buttons & FB_XBUTTON )
-		{
-			DrawButtonAndText( pLayout->X_rAlight, pLayout->X_x, pLayout->X_y + yOffset, "#GameUI_Icons_X_3DButton", m_XButtonText );
-		}
-		if ( m_Buttons & FB_YBUTTON )
-		{
-			DrawButtonAndText( pLayout->Y_rAlight, pLayout->Y_x, pLayout->Y_y + yOffset, "#GameUI_Icons_Y_3DButton", m_YButtonText );
-		}
-		if ( m_Buttons & FB_DPAD )
-		{
-			DrawButtonAndText( pLayout->DPad_rAlight, pLayout->DPad_x, pLayout->DPad_y + yOffset, "#GameUI_Icons_CENTER_DPAD", m_DPadButtonText );
-		}
-	}
 
 	UpdateHelp();
 }

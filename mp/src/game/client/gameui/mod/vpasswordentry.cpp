@@ -200,10 +200,7 @@ void PasswordEntry::LoadLayout()
 	// In the Xbox, OK/Cancel xbox buttons use the same font and are the same size, use the OK button
 	int buttonWide = 0;
 	int buttonTall = 0;
-	if ( IsX360() )
-	{
-		m_pLblOkButton->GetContentSize( buttonWide, buttonTall );
-	}
+
 	// On the PC, the buttons will be the same size, use the OK button
 	vgui::Button *pOkButton = NULL;
 	vgui::Button *pCancelButton = NULL;

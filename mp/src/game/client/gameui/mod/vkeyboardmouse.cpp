@@ -391,10 +391,6 @@ void KeyboardMouse::OnCommand(const char *command)
 			{
 				engine->ClientCmd_Unrestricted( "exec 360controller_pc.cfg" );
 			}
-			else if ( IsX360() )
-			{
-				engine->ClientCmd_Unrestricted( "exec 360controller_xbox.cfg" );
-			}
 		}
 
 		joystick.SetValue( true );

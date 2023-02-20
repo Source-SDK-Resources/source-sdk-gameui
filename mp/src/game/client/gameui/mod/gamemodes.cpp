@@ -91,11 +91,6 @@ void GameModes::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 void GameModes::OnKeyCodePressed( vgui::KeyCode code )
 {
-	if ( IsX360() )
-	{
-		return BaseClass::OnKeyCodeTyped( code );
-	}
-
 	bool bHandled = false;
 
 	switch( code )
@@ -255,11 +250,6 @@ void GameModes::ApplySettings( KeyValues *pInResourceData )
 		pKV->SetInt( "visible", 0 );
 		pKV->SetInt( "enabled", m_GameModeInfos[iIndex].m_bEnabled );
 		pKV->SetInt( "tabPosition", 0 );
-		if ( IsX360() )
-		{
-			pKV->SetString( "navUp", pNavUp );
-			pKV->SetString( "navDown", pNavDown );
-		}
 		pKV->SetString( "tooltiptext", m_GameModeInfos[iIndex].m_HintText );
 		pKV->SetString( "disabled_tooltiptext", m_GameModeInfos[iIndex].m_HintTextDisabled );
 		pKV->SetString( "style", "GameModeButton" );
@@ -618,13 +608,11 @@ void GameModes::PaintBackground()
 	if ( m_nSubPics )
 	{
 		// pc always shows the arrows because mouse can move over them at any time
-		// xbox hides the arrows when the control does not have focus
-		if ( IsPC() || ( IsX360() && bHasFocus && !bIsOpen ) )
+		if ( IsPC() )
 		{
-			// xbox highlight when scroll active
-			bool bLeftHighlight = IsX360() && m_startScrollTime && !m_bLeftScroll;
-			bool bRightHightlight = IsX360() && m_startScrollTime && m_bLeftScroll;
-
+			bool bLeftHighlight = false;
+			bool bRightHightlight = false;
+			
 			// pc highlights when mouse over
 			if ( IsPC() && !m_startScrollTime )
 			{

@@ -318,22 +318,12 @@ void MainMenu::OnCommand( const char *command )
 	}
 	else if ( !Q_strcmp( command, "FlmExtrasFlyoutCheck" ) )
 	{
-		if ( IsX360() && CUIGameData::Get()->SignedInToLive() )
-			OnCommand( "FlmExtrasFlyout_Live" );
-		else
-			OnCommand( "FlmExtrasFlyout_Simple" );
+		OnCommand( "FlmExtrasFlyout_Simple" );
 		return;
 	}
 	else if ( char const *szInviteType = StringAfterPrefix( command, "InviteUI_" ) )
 	{
-		if ( IsX360() )
-		{
-			CUIGameData::Get()->OpenInviteUI( szInviteType );
-		}
-		else
-		{
-			CUIGameData::Get()->ExecuteOverlayCommand( "LobbyInvite" );
-		}
+		CUIGameData::Get()->ExecuteOverlayCommand( "LobbyInvite" );
 	}
 	else if (!Q_strcmp(command, "Game"))
 	{
@@ -413,11 +403,6 @@ void MainMenu::OnCommand( const char *command )
 
 			NavigateFrom();
 		}
-
-		if ( IsX360() )
-		{
-			engine->ExecuteClientCmd( "demo_exit" );
-		}
 	}
 	else if ( !Q_stricmp( command, "QuitGame_NoConfirm" ) )
 	{
@@ -464,17 +449,7 @@ void MainMenu::OnCommand( const char *command )
 	}
 	else if (!Q_strcmp(command, "ActivateAttractScreen"))
 	{
-		if ( IsX360() )
-		{
-			Close();
-			CBaseModPanel::GetSingleton().CloseAllWindows();
-			CAttractScreen::SetAttractMode( CAttractScreen::ATTRACT_GAMESTART );
-			CBaseModFrame *pWnd = CBaseModPanel::GetSingleton().OpenWindow( WT_ATTRACTSCREEN, NULL, true );
-			if ( pWnd )
-			{
-				pWnd->PostMessage( pWnd, new KeyValues( "ChangeGamers" ) );
-			}
-		}		
+		
 	}
 	else if (!Q_strcmp(command, "Audio"))
 	{
@@ -961,24 +936,6 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 	}
 
 	SetFooterState();
-
-	if ( IsX360() )
-	{		
-		GameModes *pGameModes =  dynamic_cast< GameModes* >( FindChildByName( "BtnGameModes" ) );	
-		if ( pGameModes )
-		{
-			char lastActive[MAX_PATH];
-			if ( pGameModes->GetLastActiveNameId( lastActive, sizeof( lastActive ) ) )
-			{
-				pGameModes->SetActive( lastActive, true );
-			}
-			else
-			{
-				pGameModes->SetActive( "BtnPlaySolo", true );
-			}
-			m_ActiveControl = pGameModes;
-		}
-	}
 
 	if ( IsPC() )
 	{

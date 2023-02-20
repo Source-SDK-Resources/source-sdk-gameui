@@ -181,11 +181,6 @@ void GameSettings::Activate()
 	bool showServerType = false; //!Q_stricmp( "LIVE", szNetwork );
 	bool showGameAccess = !Q_stricmp( "LIVE", szNetwork );
 	
-	// On X360 we cannot allow selecting server type until the
-	// session is actually created
-	if ( IsX360() && showServerType )
-		showServerType = IsEditingExistingLobby();
-
 	//bool showSearchControls = IsCustomMatchSearchCriteria();
 
 	bool showSinglePlayerControls = !Q_stricmp( "offline", szNetwork );
@@ -244,30 +239,12 @@ void GameSettings::Activate()
 	{
 		button->SetVisible( showSinglePlayerControls );
 		SetControlVisible( "IconForwardArrow", showSinglePlayerControls );
-
-		if ( IsX360() && button->IsVisible() )
-		{
-			button->NavigateTo();
-		}
-	}
-
-	button = dynamic_cast< BaseModHybridButton* > ( FindChildByName( "BtnJoinStart" ) );
-	if ( button )
-	{
-		if ( IsX360() && button->IsVisible() )
-		{
-			button->NavigateTo();
-		}
 	}
 
 	button = dynamic_cast< BaseModHybridButton* > ( FindChildByName( "BtnStartLobby" ) );
 	if ( button )
 	{
 		button->SetVisible( showGameAccess );
-		if ( IsX360() && button->IsVisible() )
-		{
-			button->NavigateTo();
-		}
 	}
 	*/
 
@@ -293,7 +270,7 @@ void GameSettings::Activate()
 
 	if ( m_drpServerType ) //&& m_drpServerType->IsVisible() )
 	{
-		char const *szDefaultServerToCreate = IsX360() ? "official" : "dedicated";
+		char const *szDefaultServerToCreate = "dedicated";
 		szDefaultServerToCreate = "listen"; // force listen servers by default since we don't have dedicated servers for now
 		char const *szServerType = m_pSettings->GetString( "options/server", szDefaultServerToCreate );
 		char chServerType[64];

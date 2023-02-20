@@ -250,10 +250,7 @@ void GenericConfirmation::LoadLayout()
 	// In the Xbox, OK/Cancel xbox buttons use the same font and are the same size, use the OK button
 	int buttonWide = 0;
 	int buttonTall = 0;
-	if ( IsX360() )
-	{
-		m_pLblOkButton->GetContentSize( buttonWide, buttonTall );
-	}
+	
 	// On the PC, the buttons will be the same size, use the OK button
 	vgui::Button *pOkButton = NULL;
 	vgui::Button *pCancelButton = NULL;
@@ -322,93 +319,10 @@ void GenericConfirmation::LoadLayout()
 
 	}
 
-	if ( IsX360() )
-	{
-		// the OK/Cancel button icons and text are for 360 only
-		// they just refer to the A/B buttons on controller
-		m_pLblCancelButton->SetVisible( m_data.bCancelButtonEnabled );
-		m_pLblCancelText->SetVisible( m_data.bCancelButtonEnabled );
-		m_pLblOkButton->SetVisible( m_data.bOkButtonEnabled );
-		m_pLblOkText->SetVisible( m_data.bOkButtonEnabled );
-	
-		if ( m_data.bCancelButtonEnabled || m_data.bOkButtonEnabled )
-		{
-			// The xbox has to assemble a graphic icon and text to the right of it.
-			// Calculate the positions for proper centering. The scripts can't do this.
-			// The buttons are the same size, but the text size varies, thus the calculations.
-			// Before I got to it, it was hardcoded, and it looked noob (crap) aligned in every case except for 1.
-			// The buttons are aligned to the left and right bottom edges
-			int buttonY = dialogHeight - borderGap - buttonTall;
-			int textY = buttonY + buttonTall/2;
-
-			// when only one button is enabled, center that button
-			vgui::Label *pLblButton = NULL;
-			vgui::Label *pLblText = NULL;
-			bool bSingleButton = false;
-			if (  m_data.bCancelButtonEnabled && !m_data.bOkButtonEnabled )
-			{
-				// cancel is centered
-				bSingleButton = true;
-				pLblButton = m_pLblCancelButton;
-				pLblText = m_pLblCancelText;
-			}
-			else if ( !m_data.bCancelButtonEnabled && m_data.bOkButtonEnabled )
-			{
-				// OK is centered
-				bSingleButton = true;
-				pLblButton = m_pLblOkButton;
-				pLblText = m_pLblOkText;
-			}
-			
-			if ( bSingleButton )
-			{
-				// center the button and its text
-				// only the cancel button should be visible, center CANCEL
-				int textWide, textTall;
-				pLblText->GetContentSize( textWide, textTall );
-				int totalWidth = 5*buttonWide/4 + textWide;
-				int buttonX = ( dialogWidth - totalWidth ) / 2;
-				pLblButton->SetPos( buttonX, buttonY );
-				pLblButton->SetSize( buttonWide, buttonTall );
-				int textX = buttonX + 5*buttonWide/4;
-				// back up half the text height
-				textY -= textTall/2;
-				pLblText->SetPos( textX, textY );
-			}
-			else
-			{
-				// Both buttons enabled
-				// Align the CANCEL button to the bottom left edge
-				int buttonX = buttonWide;
-				m_pLblCancelButton->SetPos( buttonX, buttonY );
-				m_pLblCancelButton->SetSize( buttonWide, buttonTall );
-
-				// advance past the button and a gap
-				int textX = buttonX + 5*buttonWide/4;
-				int textWide, textTall;
-				m_pLblCancelText->GetContentSize( textWide, textTall );
-				// back up half the text height
-				textY -= textTall/2;
-				m_pLblCancelText->SetPos( textX, textY );
-
-				// Align the OK text to the bottom right edge
-				m_pLblOkText->GetContentSize( textWide, textTall );
-				textX = dialogWidth - buttonWide - textWide;
-				// back up by the text width
-				m_pLblOkText->SetPos( textX, textY );
-				// back up by the button width and a gap
-				m_pLblOkButton->SetPos( textX - 5*buttonWide/4, buttonY );
-				m_pLblOkButton->SetSize( buttonWide, buttonTall );
-			}
-		}
-	}
-	else
-	{
-		m_pLblCancelButton->SetVisible( false );
-		m_pLblCancelText->SetVisible( false );
-		m_pLblOkButton->SetVisible( false );
-		m_pLblOkText->SetVisible( false );
-	}
+	m_pLblCancelButton->SetVisible( false );
+	m_pLblCancelText->SetVisible( false );
+	m_pLblOkButton->SetVisible( false );
+	m_pLblOkText->SetVisible( false );
 
 	if ( IsPC() )
 	{

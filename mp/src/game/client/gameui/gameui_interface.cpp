@@ -223,20 +223,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 void CGameUI::PostInit()
 {
-	if ( IsX360() )
-	{
-		enginesound->PrecacheSound( "UI/buttonrollover.wav", true, true );
-		enginesound->PrecacheSound( "UI/buttonclick.wav", true, true );
-		enginesound->PrecacheSound( "UI/buttonclickrelease.wav", true, true );
-		enginesound->PrecacheSound( "player/suit_denydevice.wav", true, true );
-
-		enginesound->PrecacheSound( "UI/menu_accept.wav", true, true );
-		enginesound->PrecacheSound( "UI/menu_focus.wav", true, true );
-		enginesound->PrecacheSound( "UI/menu_invalid.wav", true, true );
-		enginesound->PrecacheSound( "UI/menu_back.wav", true, true );
-		enginesound->PrecacheSound( "UI/menu_countdown.wav", true, true );
-	}
-
 #ifdef SWARM_DLL
 	// to know once client dlls have been loaded
 	BaseModUI::CUIGameData::Get()->OnGameUIPostInit();
@@ -288,9 +274,6 @@ void CGameUI::PlayGameStartupSound()
 	// L4D not using this path, L4D UI now handling with background menu movies
 	return;
 #endif
-
-	if ( IsX360() )
-		return;
 
 	if ( CommandLine()->FindParm( "-nostartupsound" ) )
 		return;
@@ -601,12 +584,6 @@ void CGameUI::OnGameUIHidden()
 //-----------------------------------------------------------------------------
 void CGameUI::RunFrame()
 {
-	if ( IsX360() && m_bOpenProgressOnStart )
-	{
-		StartProgressBar();
-		m_bOpenProgressOnStart = false;
-	}
-
 	int wide, tall;
 #if defined( TOOLFRAMEWORK_VGUI_REFACTOR )
 	// resize the background panel to the screen size
@@ -849,7 +826,7 @@ void CGameUI::StopProgressBar(bool bError, const char *failureReason, const char
 	if (!g_hLoadingDialog.Get())
 		return;
 
-	if ( !IsX360() && bError )
+	if ( bError )
 	{
 		// turn the dialog to error display mode
 		g_hLoadingDialog->DisplayGenericError(failureReason, extendedReason);
