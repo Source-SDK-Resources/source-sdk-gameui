@@ -42,7 +42,6 @@ protected:
 
 private:
 	static void AcceptCommentaryRulesCallback();
-	static void AcceptSplitscreenDisableCallback();
 	static void AcceptVersusSoftLockCallback();
 	static void AcceptQuitGameCallback();
 	void SetFooterState();

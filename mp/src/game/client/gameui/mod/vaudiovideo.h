@@ -47,7 +47,6 @@ private:
 	SliderControl* m_sldBrightness;
 	DropDownMenu* m_drpColorMode;
 	SliderControl* m_sldFilmGrain;
-	DropDownMenu* m_drpSplitScreenDirection;
 
 	SliderControl* m_sldGameVolume;
 	SliderControl* m_sldMusicVolume;

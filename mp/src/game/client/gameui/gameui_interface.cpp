@@ -477,8 +477,6 @@ void CGameUI::Shutdown()
 void CGameUI::ActivateGameUI()
 {
 	engine->ExecuteClientCmd("gameui_activate");
-	// Lock the UI to a particular player
-	SetGameUIActiveSplitScreenPlayerSlot( engine->GetActiveSplitScreenPlayerSlot() );
 }
 
 //-----------------------------------------------------------------------------
@@ -510,14 +508,7 @@ void CGameUI::AllowEngineHideGameUI()
 //-----------------------------------------------------------------------------
 void CGameUI::OnGameUIActivated()
 {
-	bool bWasActive = m_bActivatedUI;
 	m_bActivatedUI = true;
-
-	// Lock the UI to a particular player
-	if ( !bWasActive )
-	{
-		SetGameUIActiveSplitScreenPlayerSlot( engine->GetActiveSplitScreenPlayerSlot() );
-	}
 
 	// pause the server in case it is pausable
 	engine->ClientCmd_Unrestricted( "setpause nomsg" );
@@ -543,19 +534,12 @@ void CGameUI::OnGameUIActivated()
 //-----------------------------------------------------------------------------
 void CGameUI::OnGameUIHidden()
 {
-	bool bWasActive = m_bActivatedUI;
 	m_bActivatedUI = false;
 
 	// unpause the game when leaving the UI
 	engine->ClientCmd_Unrestricted( "unpause nomsg" );
 
 	GetUiBaseModPanelClass().OnGameUIHidden();
-
-	// Restore to default
-	if ( bWasActive )
-	{
-		SetGameUIActiveSplitScreenPlayerSlot( 0 );
-	}
 }
 
 //-----------------------------------------------------------------------------

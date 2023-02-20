@@ -225,9 +225,6 @@ void InGameChapterSelect::OnCommand(const char *command)
 
 		char const *szVoteCommand = "ChangeChapter";
 
-		int iUser = GetGameUIActiveSplitScreenPlayerSlot();
-		GAMEUI_ACTIVE_SPLITSCREEN_PLAYER_GUARD( iUser );
-
 		Panel *pDrpChapter = FindChildByName( "DrpChapter" );
 		if ( !pDrpChapter || !pDrpChapter->IsEnabled() )
 		{

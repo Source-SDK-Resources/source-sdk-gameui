@@ -99,7 +99,6 @@ private:
 	// List of all the keys that need to have their binding removed
 	CUtlVector<ButtonCode_t> m_KeysToUnbind;
 
-	int				m_nSplitScreenUser;
 };
 
 #endif // OPTIONS_SUB_KEYBOARD_H

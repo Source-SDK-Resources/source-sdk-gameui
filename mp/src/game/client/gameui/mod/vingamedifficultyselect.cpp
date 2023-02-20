@@ -100,8 +100,6 @@ void InGameDifficultySelect::OnCommand(const char *command)
 		if ( Q_stricmp( command, z_difficulty.GetString() ) != 0 )
 		{
 			// Selected a new difficulty
-			int iUser = GetGameUIActiveSplitScreenPlayerSlot();
-			GAMEUI_ACTIVE_SPLITSCREEN_PLAYER_GUARD( iUser );
 
 			static char voteDifficultyString[128];
 			Q_snprintf( voteDifficultyString, 128, "callvote ChangeDifficulty %s;", command );

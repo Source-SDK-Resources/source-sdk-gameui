@@ -288,13 +288,8 @@ void ControllerOptionsButtons::OnCommand(const char *command)
 				joy_cfg_preset.SetValue( i );
 			}
 
-			int iOldSlot = engine->GetActiveSplitScreenPlayerSlot();
-			engine->SetActiveSplitScreenPlayerSlot( m_iActiveUserSlot );
-
 			const char *pszCfg = pszButtonSettingConfigs[i];
 			engine->ExecuteClientCmd( VarArgs( "exec %s", pszCfg ) );
-
-			engine->SetActiveSplitScreenPlayerSlot( iOldSlot );
 
 //			RecalculateBindingLabels();
 			m_nRecalculateLabelsTicks = 1; // used to delay polling the values until we've flushed the command buffer 

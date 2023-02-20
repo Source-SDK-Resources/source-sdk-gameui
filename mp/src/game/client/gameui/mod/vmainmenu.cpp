@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -404,37 +404,6 @@ void MainMenu::OnCommand( const char *command )
 	else if ( !Q_stricmp( command, "QuitGame_NoConfirm" ) )
 	{
 		engine->ClientCmd( "quit" );
-	}
-	else if ( !Q_strcmp( command, "EnableSplitscreen" ) )
-	{
-		Msg( "Enabling splitscreen from main menu...\n" );
-
-		CBaseModPanel::GetSingleton().CloseAllWindows();
-		CAttractScreen::SetAttractMode( CAttractScreen::ATTRACT_GOSPLITSCREEN );
-		CBaseModPanel::GetSingleton().OpenWindow( WT_ATTRACTSCREEN, NULL, true );
-	}
-	else if ( !Q_strcmp( command, "DisableSplitscreen" ) )
-	{
-		GenericConfirmation* confirmation = 
-			static_cast< GenericConfirmation* >( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, this, false ) );
-
-		GenericConfirmation::Data_t data;
-
-		data.pWindowTitle = "#L4D360UI_MainMenu_SplitscreenDisableConf";
-		data.pMessageText = "#L4D360UI_MainMenu_SplitscreenDisableConfMsg";
-
-		data.bOkButtonEnabled = true;
-		data.pfnOkCallback = &AcceptSplitscreenDisableCallback;
-		data.bCancelButtonEnabled = true;
-
-		confirmation->SetUsageData(data);
-	}
-	else if ( !Q_strcmp( command, "DisableSplitscreen_NoConfirm" ) )
-	{
-		Msg( "Disabling splitscreen from main menu...\n" );
-
-		CAttractScreen::SetAttractMode( CAttractScreen::ATTRACT_GAMESTART  );
-		OnCommand( "ActivateAttractScreen" );
 	}
 	else if (!Q_strcmp(command, "ChangeGamers"))	// guest SIGN-IN command
 	{
@@ -968,14 +937,6 @@ void MainMenu::AcceptCommentaryRulesCallback()
 		g_pMatchFramework->CreateSession( pSettings );
 	}
 
-}
-
-void MainMenu::AcceptSplitscreenDisableCallback()
-{
-	if ( MainMenu *pMainMenu = static_cast< MainMenu* >( CBaseModPanel::GetSingleton().GetWindow( WT_MAINMENU ) ) )
-	{
-		pMainMenu->OnCommand( "DisableSplitscreen_NoConfirm" );
-	}
 }
 
 void MainMenu::AcceptQuitGameCallback()

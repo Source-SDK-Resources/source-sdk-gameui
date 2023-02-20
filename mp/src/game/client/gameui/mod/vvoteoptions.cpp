@@ -61,9 +61,6 @@ void VoteOptions::OnCommand(const char *command)
 	}
 	else if(!Q_strcmp(command, "RestartScenario"))
 	{
-		int iUser = GetGameUIActiveSplitScreenPlayerSlot();
-		GAMEUI_ACTIVE_SPLITSCREEN_PLAYER_GUARD( iUser );
-
 		engine->ClientCmd("gameui_hide");
 		engine->ClientCmd("callvote RestartGame;");
 		Close();

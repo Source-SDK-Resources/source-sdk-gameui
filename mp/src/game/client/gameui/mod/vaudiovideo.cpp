@@ -33,7 +33,6 @@ BaseClass(parent, panelName)
 	m_sldBrightness = NULL;
 	m_drpColorMode = NULL;
 	m_sldFilmGrain = NULL;
-	m_drpSplitScreenDirection = NULL;
 
 	m_sldGameVolume = NULL;
 	m_sldMusicVolume = NULL;
@@ -92,19 +91,6 @@ void AudioVideo::Activate()
 	if ( m_sldFilmGrain )
 	{
 		m_sldFilmGrain->Reset();
-	}
-
-	if ( m_drpSplitScreenDirection )
-	{
-		m_drpSplitScreenDirection->SetEnabled( false );
-		m_drpSplitScreenDirection->SetCurrentSelection( "#L4D360UI_SplitScreenDirection_Horizontal" );
-	
-
-		FlyoutMenu *pFlyout = m_drpSplitScreenDirection->GetCurrentFlyout();
-		if ( pFlyout )
-		{
-			pFlyout->SetListener( this );
-		}
 	}
 
 	if ( m_sldGameVolume )
@@ -237,12 +223,6 @@ void AudioVideo::OnThink()
 		needsActivate = true;
 	}
 
-	if ( !m_drpSplitScreenDirection)
-	{
-		m_drpSplitScreenDirection = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpSplitScreenDirection" ) );
-		needsActivate = true;
-	}
-
 	if ( !m_sldGameVolume )
 	{
 		m_sldGameVolume = dynamic_cast< SliderControl* >( FindChildByName( "SldGameVolume" ) );
@@ -368,33 +348,6 @@ void AudioVideo::OnCommand(const char *command)
 		ConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
 		mat_monitorgamma_tv_enabled.SetValue( 0 );
 		m_bDirtyVideoConfig = true;
-	}
-	else if ( !Q_stricmp( command, "#L4D360UI_SplitScreenDirection_Default" ) )
-	{
-		if ( m_drpSplitScreenDirection && m_drpSplitScreenDirection->IsEnabled() )
-		{
-			ConVarRef ss_splitmode( "ss_splitmode" );
-			ss_splitmode.SetValue( 0 );
-			m_bDirtyVideoConfig = true;
-		}
-	}
-	else if ( !Q_stricmp( command, "#L4D360UI_SplitScreenDirection_Horizontal" ) )
-	{
-		if ( m_drpSplitScreenDirection && m_drpSplitScreenDirection->IsEnabled() )
-		{
-			ConVarRef ss_splitmode( "ss_splitmode" );
-			ss_splitmode.SetValue( 1 );
-			m_bDirtyVideoConfig = true;
-		}
-	}
-	else if ( !Q_stricmp( command, "#L4D360UI_SplitScreenDirection_Vertical" ) )
-	{
-		if ( m_drpSplitScreenDirection && m_drpSplitScreenDirection->IsEnabled() )
-		{
-			ConVarRef ss_splitmode( "ss_splitmode" );
-			ss_splitmode.SetValue( 2 );
-			m_bDirtyVideoConfig = true;
-		}
 	}
 	else if ( Q_stricmp( "#L4D360UI_AudioOptions_CaptionOff", command ) == 0 )
 	{

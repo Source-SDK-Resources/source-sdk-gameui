@@ -99,12 +99,6 @@ void InGameMainMenu::OnCommand( const char *command )
 			command, iUserSlot, XBX_GetUserId( iUserSlot ) );
 	}
 
-	int iOldSlot = GetGameUIActiveSplitScreenPlayerSlot();
-
-	SetGameUIActiveSplitScreenPlayerSlot( iUserSlot );
-
-	GAMEUI_ACTIVE_SPLITSCREEN_PLAYER_GUARD( iUserSlot );
-
 	if ( !Q_strcmp( command, "ReturnToGame" ) )
 	{
 		engine->ClientCmd("gameui_hide");
@@ -236,22 +230,6 @@ void InGameMainMenu::OnCommand( const char *command )
 		m_ActiveControl->NavigateFrom( );
 		CBaseModPanel::GetSingleton().OpenWindow(WT_CLOUD, this, true );
 	}
-	else if ( !Q_strcmp( command, "EnableSplitscreen" ) || !Q_strcmp( command, "DisableSplitscreen" ) )
-	{
-		GenericConfirmation* confirmation = 
-			static_cast< GenericConfirmation* >( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, this, true ) );
-
-		GenericConfirmation::Data_t data;
-
-		data.pWindowTitle = "#L4D360UI_LeaveMultiplayerConf";
-		data.pMessageText = "#L4D360UI_MainMenu_SplitscreenChangeConfMsg";
-
-		data.bOkButtonEnabled = true;
-		data.pfnOkCallback = &LeaveGameOkCallback;
-		data.bCancelButtonEnabled = true;
-
-		confirmation->SetUsageData(data);
-	}
 	else if( !Q_strcmp( command, "ExitToMainMenu" ) )
 	{
 		GenericConfirmation* confirmation = 
@@ -325,8 +303,6 @@ void InGameMainMenu::OnCommand( const char *command )
 			}
 		}
 	}
-
-	SetGameUIActiveSplitScreenPlayerSlot( iOldSlot );
 }
 
 //=============================================================================
@@ -386,10 +362,6 @@ void InGameMainMenu::OnClose()
 
 void InGameMainMenu::OnThink()
 {
-	int iSlot = GetGameUIActiveSplitScreenPlayerSlot();
-
-	GAMEUI_ACTIVE_SPLITSCREEN_PLAYER_GUARD( iSlot );
-
 	IMatchSession *pIMatchSession = g_pMatchFramework->GetMatchSession();
 	KeyValues *pGameSettings = pIMatchSession ? pIMatchSession->GetSessionSettings() : NULL;
 	
@@ -407,32 +379,6 @@ void InGameMainMenu::OnThink()
 
 	SetControlEnabled( "BtnInviteFriends", bCanInvite );
 	SetControlEnabled( "BtnLeaderboard", CUIGameData::Get()->SignedInToLive() && !Q_stricmp( szGameMode, "survival" ) );
-
-	{
-		BaseModHybridButton *button = dynamic_cast< BaseModHybridButton* >( FindChildByName( "BtnOptions" ) );
-		if ( button )
-		{
-			BaseModUI::FlyoutMenu *flyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
-
-			if ( flyout )
-			{
-				bool bIsSplitscreen = false;
-
-				Button *pButton = flyout->FindChildButtonByCommand( "EnableSplitscreen" );
-				if ( pButton )
-				{
-					pButton->SetVisible( !bIsSplitscreen );
-
-				}
-
-				pButton = flyout->FindChildButtonByCommand( "DisableSplitscreen" );
-				if ( pButton )
-				{
-					pButton->SetVisible( bIsSplitscreen );
-				}
-			}
-		}
-	}
 
 	bool bCanGoIdle = !Q_stricmp( "campaign", szGameMode ) || !Q_stricmp( "single_mission", szGameMode );
 
@@ -522,12 +468,6 @@ void InGameMainMenu::PerformLayout( void )
 	/*	// this block used to restrict IDLE players from starting a vote
 	else
 	{
-		int iSlot = GetGameUIActiveSplitScreenPlayerSlot();
-
-		int iOldSplitSlot = engine->GetActiveSplitScreenPlayerSlot();
-
-		engine->SetActiveSplitScreenPlayerSlot( iSlot );
-
 		int iLocalPlayerTeam;
 		if ( GameClientExports()->GetPlayerTeamIdByUserId( -1, iLocalPlayerTeam ) )
 		{
@@ -538,7 +478,6 @@ void InGameMainMenu::PerformLayout( void )
 			}
 		}
 
-		engine->SetActiveSplitScreenPlayerSlot( iOldSplitSlot );
 	}*/
 
 	vgui::Button *pVoteButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnCallAVote" ) );

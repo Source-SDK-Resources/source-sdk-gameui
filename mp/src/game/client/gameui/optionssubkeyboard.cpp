@@ -49,22 +49,6 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : EditablePanel(pa
 
 	Q_memset( m_Bindings, 0, sizeof( m_Bindings ));
 
-	m_nSplitScreenUser = 0;
-
-	// For joystick buttons, controls which user are binding/unbinding
-	//HACK HACK:  Probably the entire gameui needs to have a splitscrene context for which player the settings apply to, but this is only
-	// on the PC...
-	static ConVarRef in_forceuser( "in_forceuser" );
-
-	if ( in_forceuser.IsValid() )
-	{
-		m_nSplitScreenUser = clamp( in_forceuser.GetInt(), 0, 1 );
-	}
-	else
-	{
-		m_nSplitScreenUser = MAX( 0, engine->GetActiveSplitScreenPlayerSlot() );
-	}
-
 	// create the key bindings list
 	CreateKeyBindingList();
 	// Store all current key bindings
@@ -446,11 +430,6 @@ void COptionsSubKeyboard::FillInCurrentBindings( void )
 	{
 		ButtonCode_t bc = ( ButtonCode_t )i;
 
-		bool bIsJoystickCode = IsJoystickCode( bc );
-		// Skip Joystick buttons for the "other" user
-		if ( bIsJoystickCode && GetJoystickForCode( bc ) != m_nSplitScreenUser )
-			continue;
-
 		// Look up binding
 		const char *binding = gameuifuncs->GetBindingForButtonCode( bc );
 		if ( !binding )
@@ -529,8 +508,7 @@ void COptionsSubKeyboard::BindKey( ButtonCode_t bc, const char *binding )
 	if ( !pszKeyName || !*pszKeyName )
 		return;
 
-	int nSlot = GetJoystickForCode( bc );
-	engine->ClientCmd_Unrestricted( UTIL_va( "cmd%d bind \"%s\" \"%s\"\n", nSlot + 1, pszKeyName, binding ) );
+	engine->ClientCmd_Unrestricted( UTIL_va( "bind \"%s\" \"%s\"\n", pszKeyName, binding ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -543,8 +521,7 @@ void COptionsSubKeyboard::UnbindKey( ButtonCode_t bc )
 	if ( !pszKeyName || !*pszKeyName )
 		return;
 
-	int nSlot = GetJoystickForCode( bc );
-	engine->ClientCmd_Unrestricted( UTIL_va( "cmd%d unbind \"%s\"\n", nSlot + 1, pszKeyName ) );
+	engine->ClientCmd_Unrestricted( UTIL_va( "unbind \"%s\"\n", pszKeyName ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -581,10 +558,6 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
 		if ( keyname && keyname[ 0 ] )
 		{
 			ButtonCode_t code = g_pInputSystem->StringToButtonCode( keyname );
-			if ( IsJoystickCode( code ) )
-			{
-				code = ButtonCodeToJoystickButtonCode( code, m_nSplitScreenUser );
-			}
 
 			// Tell the engine
 			BindKey( code, binding );
@@ -633,16 +606,8 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 		if ( cmd[ 0 ] == '\0' )
 			break;
 
-		if ( !Q_stricmp(cmd, "bind") ||
-		     !Q_stricmp(cmd, "cmd2 bind") )
+		if ( !Q_stricmp(cmd, "bind") )
 		{
-			// FIXME:  If we ever support > 2 player splitscreen this will need to be reworked.
-			int nJoyStick = 0;
-			if ( !stricmp(cmd, "cmd2 bind") )
-			{
-				nJoyStick = 1;
-			}
-
 			// Key name
 			char szKeyName[256];
 			data = UTIL_Parse( data, szKeyName, sizeof(szKeyName) );
@@ -653,10 +618,6 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 			data = UTIL_Parse( data, szBinding, sizeof(szBinding) );
 			if ( szKeyName[ 0 ] == '\0' )  
 				break; // Error
-
-			// Skip it if it's a bind for the other slit
-			if ( nJoyStick != m_nSplitScreenUser )
-				continue;
 
 			// Find item
 			KeyValues *item = GetItemForBinding( szBinding );
