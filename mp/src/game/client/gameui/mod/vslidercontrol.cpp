@@ -483,14 +483,11 @@ void SliderControl::OnFinishDragging( bool mousereleased, vgui::MouseCode code, 
 void SliderControl::OnCursorEntered()
 {
 	BaseClass::OnCursorEntered();
-	if ( IsPC() )
-	{
-		CBaseModPanel::GetSingleton().PlayUISound( UISOUND_FOCUS );
-		if( GetParent() )
-			GetParent()->NavigateToChild( this );
-		else
-			NavigateTo();
-	}
+	CBaseModPanel::GetSingleton().PlayUISound( UISOUND_FOCUS );
+	if( GetParent() )
+		GetParent()->NavigateToChild( this );
+	else
+		NavigateTo();
 }
 
 void SliderControl::OnCursorExited()

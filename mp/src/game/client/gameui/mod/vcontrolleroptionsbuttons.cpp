@@ -131,7 +131,7 @@ void ControllerOptionsButtons::UpdateFooter()
 	CBaseModFooterPanel *footer = BaseModUI::CBaseModPanel::GetSingleton().GetFooterPanel();
 	if ( footer )
 	{
-		footer->SetButtons( FB_ABUTTON, FF_AB_ONLY, IsPC() ? true : false );
+		footer->SetButtons( FB_ABUTTON, FF_AB_ONLY, true );
 		footer->SetButtonText( FB_ABUTTON, "#L4D360UI_Select" );
 	}	
 }

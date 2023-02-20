@@ -470,17 +470,8 @@ void CLoadingDialog::PerformLayout()
 		int wide,tall;
 		GetSize( wide, tall );
 
-		if ( IsPC() )
-		{
-			x = screenWide - ( wide + 10 );
-			y = screenTall - ( tall + 10 );
-		}
-		else
-		{
-			// Move farther in so we're title safe
-			x = screenWide - wide - (screenWide * 0.05);
-			y = screenTall - tall - (screenTall * 0.05);
-		}
+		x = screenWide - ( wide + 10 );
+		y = screenTall - ( tall + 10 );
 
 		x -= m_iAdditionalIndentX;
 		y -= m_iAdditionalIndentY;

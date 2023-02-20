@@ -455,7 +455,7 @@ void AudioVideo::UpdateFooter()
 	CBaseModFooterPanel *footer = BaseModUI::CBaseModPanel::GetSingleton().GetFooterPanel();
 	if ( footer )
 	{
-		footer->SetButtons( FB_ABUTTON | FB_BBUTTON, FF_AB_ONLY, IsPC() ? true : false );
+		footer->SetButtons( FB_ABUTTON | FB_BBUTTON, FF_AB_ONLY, true );
 		footer->SetButtonText( FB_ABUTTON, "#L4D360UI_Select" );
 		footer->SetButtonText( FB_BBUTTON, "#L4D360UI_Controller_Done" );
 	}

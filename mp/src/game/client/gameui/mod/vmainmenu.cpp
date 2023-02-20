@@ -385,31 +385,25 @@ void MainMenu::OnCommand( const char *command )
 	}
 	else if (!Q_strcmp(command, "QuitGame"))
 	{
-		if ( IsPC() )
-		{
-			GenericConfirmation* confirmation = 
-				static_cast< GenericConfirmation* >( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, this, false ) );
+		GenericConfirmation* confirmation = 
+			static_cast< GenericConfirmation* >( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, this, false ) );
 
-			GenericConfirmation::Data_t data;
+		GenericConfirmation::Data_t data;
 
-			data.pWindowTitle = "#L4D360UI_MainMenu_Quit_Confirm";
-			data.pMessageText = "#L4D360UI_MainMenu_Quit_ConfirmMsg";
+		data.pWindowTitle = "#L4D360UI_MainMenu_Quit_Confirm";
+		data.pMessageText = "#L4D360UI_MainMenu_Quit_ConfirmMsg";
 
-			data.bOkButtonEnabled = true;
-			data.pfnOkCallback = &AcceptQuitGameCallback;
-			data.bCancelButtonEnabled = true;
+		data.bOkButtonEnabled = true;
+		data.pfnOkCallback = &AcceptQuitGameCallback;
+		data.bCancelButtonEnabled = true;
 
-			confirmation->SetUsageData(data);
+		confirmation->SetUsageData(data);
 
-			NavigateFrom();
-		}
+		NavigateFrom();
 	}
 	else if ( !Q_stricmp( command, "QuitGame_NoConfirm" ) )
 	{
-		if ( IsPC() )
-		{
-			engine->ClientCmd( "quit" );
-		}
+		engine->ClientCmd( "quit" );
 	}
 	else if ( !Q_strcmp( command, "EnableSplitscreen" ) )
 	{
@@ -796,14 +790,11 @@ void MainMenu::OnThink()
 		}
 	}
 
-	if ( IsPC() )
+	FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
+	if ( pFlyout )
 	{
-		FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
-		if ( pFlyout )
-		{
-			const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-			pFlyout->SetControlEnabled( "BtnBrightness", !config.Windowed() );
-		}
+		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
+		pFlyout->SetControlEnabled( "BtnBrightness", !config.Windowed() );
 	}
 
 	BaseClass::OnThink();
@@ -812,7 +803,7 @@ void MainMenu::OnThink()
 //=============================================================================
 void MainMenu::OnOpen()
 {
-	if ( IsPC() && connect_lobby.GetString()[0] )
+	if ( connect_lobby.GetString()[0] )
 	{
 		// if we were launched with "+connect_lobby <lobbyid>" on the command line, join that lobby immediately
 		uint64 nLobbyID = _atoi64( connect_lobby.GetString() );
@@ -907,44 +898,37 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 	LoadControlSettings( pSettings );
 
 
-	if ( IsPC() )
+	FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
+	if ( pFlyout )
 	{
-		FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
-		if ( pFlyout )
+		bool bUsesCloud = false;
+
+		ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
+			SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
+
+		int32 availableBytes, totalBytes = 0;
+		if ( pRemoteStorage && pRemoteStorage->GetQuota( &totalBytes, &availableBytes ) )
 		{
-			bool bUsesCloud = false;
-
-			ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
-				SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
-
-			int32 availableBytes, totalBytes = 0;
-			if ( pRemoteStorage && pRemoteStorage->GetQuota( &totalBytes, &availableBytes ) )
+			if ( totalBytes > 0 )
 			{
-				if ( totalBytes > 0 )
-				{
-					bUsesCloud = true;
-				}
+				bUsesCloud = true;
 			}
-
-			pFlyout->SetControlEnabled( "BtnCloud", bUsesCloud );
 		}
+
+		pFlyout->SetControlEnabled( "BtnCloud", bUsesCloud );
 	}
 
 	SetFooterState();
 
-	if ( IsPC() )
+	vgui::Panel *firstPanel = FindChildByName( "BtnCoOp" );
+	if ( firstPanel )
 	{
-		vgui::Panel *firstPanel = FindChildByName( "BtnCoOp" );
-		if ( firstPanel )
+		if ( m_ActiveControl )
 		{
-			if ( m_ActiveControl )
-			{
-				m_ActiveControl->NavigateFrom( );
-			}
-			firstPanel->NavigateTo();
+			m_ActiveControl->NavigateFrom( );
 		}
+		firstPanel->NavigateTo();
 	}
-
 
 }
 
@@ -1013,7 +997,7 @@ void MainMenu::AcceptVersusSoftLockCallback()
 
 CON_COMMAND_F( openserverbrowser, "Opens server browser", 0 )
 {
-	bool isSteam = IsPC() && steamapicontext->SteamFriends() && steamapicontext->SteamUtils();
+	bool isSteam = steamapicontext->SteamFriends() && steamapicontext->SteamUtils();
 	if ( isSteam )
 	{
 		// show the server browser

@@ -202,14 +202,10 @@ void PasswordEntry::LoadLayout()
 	int buttonTall = 0;
 
 	// On the PC, the buttons will be the same size, use the OK button
-	vgui::Button *pOkButton = NULL;
-	vgui::Button *pCancelButton = NULL;
-	if ( IsPC() )
-	{
-		pOkButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnOk" ) );
-		pCancelButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnCancel" ) );
-		pOkButton->GetSize( buttonWide, buttonTall );
-	}
+	vgui::Button *pOkButton		= dynamic_cast< vgui::Button* >( FindChildByName( "BtnOk" ) );
+	vgui::Button *pCancelButton	= dynamic_cast< vgui::Button* >( FindChildByName( "BtnCancel" ) );
+	
+	pOkButton->GetSize( buttonWide, buttonTall );
 
 	// Account for input button
 	int inputTall = m_pInputField->GetTall();
@@ -257,47 +253,44 @@ void PasswordEntry::LoadLayout()
 	m_pLblOkButton->SetVisible( false );
 	m_pLblOkText->SetVisible( false );
 
-	if ( IsPC() )
+	if ( pOkButton )
 	{
-		if ( pOkButton )
+		pOkButton->SetVisible( m_data.bOkButtonEnabled );
+	}
+	if ( pCancelButton )
+	{
+		pCancelButton->SetVisible( m_data.bCancelButtonEnabled );
+	}
+
+	if ( m_data.bCancelButtonEnabled || m_data.bOkButtonEnabled )
+	{
+		// when only one button is enabled, center that button
+		vgui::Button *pButton = NULL;
+		bool bSingleButton = false;
+		if ( ( m_data.bCancelButtonEnabled && !m_data.bOkButtonEnabled ) )
 		{
-			pOkButton->SetVisible( m_data.bOkButtonEnabled );
+			// cancel is centered
+			bSingleButton = true;
+			pButton = pCancelButton;
 		}
-		if ( pCancelButton )
+		else if ( !m_data.bCancelButtonEnabled && m_data.bOkButtonEnabled )
 		{
-			pCancelButton->SetVisible( m_data.bCancelButtonEnabled );
+			// OK is centered
+			bSingleButton = true;
+			pButton = pOkButton;
 		}
 
-		if ( m_data.bCancelButtonEnabled || m_data.bOkButtonEnabled )
+		if ( bSingleButton )
 		{
-			// when only one button is enabled, center that button
-			vgui::Button *pButton = NULL;
-			bool bSingleButton = false;
-			if ( ( m_data.bCancelButtonEnabled && !m_data.bOkButtonEnabled ) )
-			{
-				// cancel is centered
-				bSingleButton = true;
-				pButton = pCancelButton;
-			}
-			else if ( !m_data.bCancelButtonEnabled && m_data.bOkButtonEnabled )
-			{
-				// OK is centered
-				bSingleButton = true;
-				pButton = pOkButton;
-			}
-
-			if ( bSingleButton )
-			{
-				// center the button
-				pButton->SetPos( ( dialogWidth - buttonWide )/2, nButtonY );
-			}
-			else
-			{
-				// left align the cancel
-				pCancelButton->SetPos( borderGap, nButtonY );
-				// right align the OK
-				pOkButton->SetPos( dialogWidth - borderGap - buttonWide, nButtonY );
-			}
+			// center the button
+			pButton->SetPos( ( dialogWidth - buttonWide )/2, nButtonY );
+		}
+		else
+		{
+			// left align the cancel
+			pCancelButton->SetPos( borderGap, nButtonY );
+			// right align the OK
+			pOkButton->SetPos( dialogWidth - borderGap - buttonWide, nButtonY );
 		}
 	}
 

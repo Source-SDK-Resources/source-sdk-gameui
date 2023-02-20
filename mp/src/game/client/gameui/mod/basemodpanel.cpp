@@ -162,7 +162,7 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 	SetScheme( m_UIScheme );
 
 	// Only one user on the PC, so set it now
-	SetLastActiveUserId( IsPC() ? 0 : -1 );
+	SetLastActiveUserId( 0 );
 
 	// Precache critical font characters for the 360, dampens severity of these runtime i/o hitches
 	IScheme *pScheme = vgui::scheme()->GetIScheme( m_UIScheme );
@@ -769,7 +769,7 @@ void CBaseModPanel::CloseAllWindows( int ePolicyFlags )
 bool CBaseModPanel::ActivateBackgroundEffects()
 {
 	// PC needs to keep start music, can't loop MP3's
-	if ( IsPC() && !IsBackgroundMusicPlaying() )
+	if ( !IsBackgroundMusicPlaying() )
 	{
 		StartBackgroundMusic( 1.0f );
 	}
@@ -819,7 +819,7 @@ void CBaseModPanel::OnGameUIActivated()
 			bForceReturnToFrontScreen = true; // this used to be some magic about mid-disconnecting-states on PC...
 			break;
 		}
-		if ( !IsPC() || bForceReturnToFrontScreen )
+		if ( bForceReturnToFrontScreen )
 		{
 			OpenFrontScreen();
 		}
@@ -1405,7 +1405,7 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 			pSettings->SetPtr( "options/asyncoperation", g_MatchSessionCreationAsyncOperation.Prepare() );
 
 			// For PC we don't want to cancel lobby creation
-			if ( IsPC() && !Q_stricmp( "creating", szProgress ) )
+			if ( !Q_stricmp( "creating", szProgress ) )
 				pSettings = NULL;
 
 			// Put up a wait screen
@@ -1563,31 +1563,25 @@ static void BaseUI_PositionDialog(vgui::PHandle dlg)
 //=============================================================================
 void CBaseModPanel::OpenOptionsDialog( Panel *parent )
 {
-	if ( IsPC() )
-	{			
-		if ( !m_hOptionsDialog.Get() )
-		{
-			m_hOptionsDialog = new COptionsDialog( parent );
-			BaseUI_PositionDialog( m_hOptionsDialog );
-		}
-
-		m_hOptionsDialog->Activate();
+	if ( !m_hOptionsDialog.Get() )
+	{
+		m_hOptionsDialog = new COptionsDialog( parent );
+		BaseUI_PositionDialog( m_hOptionsDialog );
 	}
+
+	m_hOptionsDialog->Activate();
 }
 
 //=============================================================================
 void CBaseModPanel::OpenKeyBindingsDialog( Panel *parent )
 {
-	if ( IsPC() )
-	{			
-		if ( !m_hOptionsDialog.Get() )
-		{
-			m_hOptionsDialog = new COptionsDialog( parent, OPTIONS_DIALOG_ONLY_BINDING_TABS );
-			BaseUI_PositionDialog( m_hOptionsDialog );
-		}
-
-		m_hOptionsDialog->Activate();
+	if ( !m_hOptionsDialog.Get() )
+	{
+		m_hOptionsDialog = new COptionsDialog( parent, OPTIONS_DIALOG_ONLY_BINDING_TABS );
+		BaseUI_PositionDialog( m_hOptionsDialog );
 	}
+
+	m_hOptionsDialog->Activate();
 }
 
 //=============================================================================
@@ -2025,18 +2019,12 @@ void CBaseModPanel::PlayUISound( UISound_t UISound )
 void CBaseModPanel::OnSetFocus()
 {
 	BaseClass::OnSetFocus();
-	if ( IsPC() )
-	{
-		GameConsole().Hide();
-	}
+	GameConsole().Hide();
 }
 
 void CBaseModPanel::OnMovedPopupToFront()
 {
-	if ( IsPC() )
-	{
-		GameConsole().Hide();
-	}
+	GameConsole().Hide();
 }
 
 bool CBaseModPanel::IsBackgroundMusicPlaying()

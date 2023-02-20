@@ -248,13 +248,10 @@ bool CBaseModFooterPanel::HasContent( void )
 	if ( bHasVisibleHelp )
 		return true;
 
-	if ( IsPC() )
+	vgui::Panel *pCloudLabel = FindChildByName( "UsesCloudLabel" );
+	if ( pCloudLabel && pCloudLabel->IsVisible() )
 	{
-		vgui::Panel *pCloudLabel = FindChildByName( "UsesCloudLabel" );
-		if ( pCloudLabel && pCloudLabel->IsVisible() )
-		{
-			return true;
-		}
+		return true;
 	}
 
 	return false;
@@ -279,20 +276,6 @@ void CBaseModFooterPanel::GetPosition( int &x, int &y )
 {
 	int wide, tall;
 	GetBounds( x, y, wide, tall );
-
-	if ( IsPC() )
-	{
-		return;
-	}
-
-	vgui::Label *pLblHelpText = dynamic_cast< vgui::Label* >( FindChildByName( "LblHelpText" ) );
-	bool bHasVisibleHelp = pLblHelpText && pLblHelpText->IsVisible();
-
-	if ( !bHasVisibleHelp )
-	{
-		// shrink and move the footer down
-		y += tall * ( 1.0f - MINIMAL_FOOTER_SCALE );
-	}
 }
 
 void CBaseModFooterPanel::SetButtons( CBaseModFooterPanel::FooterButtons_t flags, FooterFormat_t format, bool bEnableHelp )
@@ -309,11 +292,8 @@ void CBaseModFooterPanel::SetButtons( CBaseModFooterPanel::FooterButtons_t flags
 
 void CBaseModFooterPanel::SetShowCloud( bool bShow )
 {
-	if ( IsPC() )
-	{
-		SetControlVisible( "ImageCloud", bShow );
-		SetControlVisible( "UsesCloudLabel", bShow );
-	}
+	SetControlVisible( "ImageCloud", bShow );
+	SetControlVisible( "UsesCloudLabel", bShow );
 }
 
 CBaseModFooterPanel::FooterButtons_t CBaseModFooterPanel::GetButtons()

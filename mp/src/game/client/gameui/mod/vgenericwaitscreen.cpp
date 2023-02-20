@@ -280,26 +280,5 @@ void GenericWaitScreen::SetUpText()
 
 void GenericWaitScreen::UpdateFooter()
 {
-	if ( IsPC() )
-		// No footer voodoo for PC
-		return;
-
-	bool bCanCancel = ( m_pAsyncOperationAbortable &&
-		AOS_RUNNING == m_pAsyncOperationAbortable->GetState() );
-
-	CBaseModFooterPanel *pFooter = ( CBaseModFooterPanel * ) BaseModUI::CBaseModPanel::GetSingleton().GetFooterPanel();
-	if ( !pFooter )
-		return;
-	
-	if ( bCanCancel )
-	{
-		pFooter->SetVisible( true );
-		pFooter->SetButtons( FB_BBUTTON, FF_AB_ONLY, false );
-		pFooter->SetButtonText( FB_BBUTTON, "#L4D360UI_Cancel" );
-	}
-	else
-	{
-		pFooter->SetVisible( false );
-	}
 }
 

@@ -221,7 +221,7 @@ void CBaseModFrame::OnKeyCodePressed(KeyCode keycode)
 	}
 
 	// HACK: Allow F key bindings to operate even here
-	if ( IsPC() && keycode >= KEY_F1 && keycode <= KEY_F12 )
+	if ( keycode >= KEY_F1 && keycode <= KEY_F12 )
 	{
 		// See if there is a binding for the FKey
 		const char *binding = gameuifuncs->GetBindingForButtonCode( keycode );
@@ -687,29 +687,26 @@ void CBaseModFrame::ToggleTitleSafeBorder()
 // issue.  Maintains a stack of previous panels that had focus.
 void CBaseModFrame::PushModalInputFocus()
 {
-	if ( IsPC() )
+	if ( !m_bLayoutLoaded )
 	{
-		if ( !m_bLayoutLoaded )
-		{
-			// if we haven't been loaded yet, we've just been created and will load our layout shortly,
-			// delay this action until then
-			m_bDelayPushModalInputFocus = true;
-		}
-		else if ( !m_bIsFullScreen )
-		{
-			// only need to do this if NOT full screen -- if we are full screen then you can't click outside
-			// the topmost window.
+		// if we haven't been loaded yet, we've just been created and will load our layout shortly,
+		// delay this action until then
+		m_bDelayPushModalInputFocus = true;
+	}
+	else if ( !m_bIsFullScreen )
+	{
+		// only need to do this if NOT full screen -- if we are full screen then you can't click outside
+		// the topmost window.
 
-			// maintain a stack of who had modal input focus
-			HPanel handle = vgui::ivgui()->PanelToHandle( vgui::input()->GetAppModalSurface() );
-			if ( handle )
-			{
-				m_vecModalInputFocusStack.AddToHead( handle );
-			}
-
-			// set ourselves modal so you can't mouse click outside this panel to a child panel
-			vgui::input()->SetAppModalSurface( GetVPanel() );		
+		// maintain a stack of who had modal input focus
+		HPanel handle = vgui::ivgui()->PanelToHandle( vgui::input()->GetAppModalSurface() );
+		if ( handle )
+		{
+			m_vecModalInputFocusStack.AddToHead( handle );
 		}
+
+		// set ourselves modal so you can't mouse click outside this panel to a child panel
+		vgui::input()->SetAppModalSurface( GetVPanel() );		
 	}
 }
 
@@ -719,7 +716,7 @@ void CBaseModFrame::PopModalInputFocus()
 {
 	// only need to do this if NOT full screen -- if we are full screen then you can't click outside
 	// the topmost window.
-	if ( IsPC() && !m_bIsFullScreen )
+	if ( !m_bIsFullScreen )
 	{
 		// In general we should have modal input focus since we should only pop modal input focus
 		// if we are top most.  However, if all windows get closed at once we can get closed out of 
@@ -771,10 +768,6 @@ void CBaseModFrame::PopModalInputFocus()
 // Returns false if everything is OK.
 bool CBaseModFrame::CheckAndDisplayErrorIfNotLoggedIn()
 {
-	// only check if PC
-	if ( !IsPC() )
-		return false;
-
 #ifndef SWDS
 	// if we have Steam interfaces and user is logged on, everything is OK
 	if ( steamapicontext && steamapicontext->SteamUser() && steamapicontext->SteamMatchmaking() )

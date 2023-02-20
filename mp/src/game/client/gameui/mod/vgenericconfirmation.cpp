@@ -205,7 +205,7 @@ void GenericConfirmation::LoadLayout()
 	{
 		// account for size of the title and a gap
 		pLblTitle->GetContentSize( titleWide, titleTall );
-		int shim = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), IsPC() ? 90 : 15 );
+		int shim = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 90 );
 		if ( dialogWidth < titleWide + shim )
 		{
 			dialogWidth = titleWide + shim;
@@ -226,7 +226,7 @@ void GenericConfirmation::LoadLayout()
 			m_pLblMessage->GetContentSize( msgWide, msgTall );
 		}
 
-		int shimX = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), IsPC() ? 80 : 20 );
+		int shimX = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 80 );
 		int shimY = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 50 );
 		if ( dialogWidth < msgWide + shimX )
 		{
@@ -254,12 +254,9 @@ void GenericConfirmation::LoadLayout()
 	// On the PC, the buttons will be the same size, use the OK button
 	vgui::Button *pOkButton = NULL;
 	vgui::Button *pCancelButton = NULL;
-	if ( IsPC() )
-	{
-		pOkButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnOk" ) );
-		pCancelButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnCancel" ) );
-		pOkButton->GetSize( buttonWide, buttonTall );
-	}
+	pOkButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnOk" ) );
+	pCancelButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnCancel" ) );
+	pOkButton->GetSize( buttonWide, buttonTall );
 
 	if ( m_data.bOkButtonEnabled || m_data.bCancelButtonEnabled )
 	{
@@ -324,51 +321,49 @@ void GenericConfirmation::LoadLayout()
 	m_pLblOkButton->SetVisible( false );
 	m_pLblOkText->SetVisible( false );
 
-	if ( IsPC() )
+	if ( pOkButton )
 	{
-		if ( pOkButton )
+		pOkButton->SetVisible( m_data.bOkButtonEnabled );
+		ExpandButtonWidthIfNecessary( pOkButton );
+	}
+	if ( pCancelButton )
+	{
+		pCancelButton->SetVisible( m_data.bCancelButtonEnabled );
+		ExpandButtonWidthIfNecessary( pCancelButton );
+	}
+
+	if ( m_data.bCancelButtonEnabled || m_data.bOkButtonEnabled )
+	{
+		// when only one button is enabled, center that button
+		vgui::Button *pButton = NULL;
+		bool bSingleButton = false;
+		if ( ( m_data.bCancelButtonEnabled && !m_data.bOkButtonEnabled ) )
 		{
-			pOkButton->SetVisible( m_data.bOkButtonEnabled );
-			ExpandButtonWidthIfNecessary( pOkButton );
+			// cancel is centered
+			bSingleButton = true;
+			pButton = pCancelButton;
 		}
-		if ( pCancelButton )
+		else if ( !m_data.bCancelButtonEnabled && m_data.bOkButtonEnabled )
 		{
-			pCancelButton->SetVisible( m_data.bCancelButtonEnabled );
-			ExpandButtonWidthIfNecessary( pCancelButton );
+			// OK is centered
+			bSingleButton = true;
+			pButton = pOkButton;
 		}
 
-		if ( m_data.bCancelButtonEnabled || m_data.bOkButtonEnabled )
+		if ( bSingleButton )
 		{
-			// when only one button is enabled, center that button
-			vgui::Button *pButton = NULL;
-			bool bSingleButton = false;
-			if ( ( m_data.bCancelButtonEnabled && !m_data.bOkButtonEnabled ) )
+			// center the button
+			pButton->SetPos( ( dialogWidth - pButton->GetWide() )/2, dialogHeight - borderGap - buttonTall );
+		}
+		else
+		{
+			//if( dialogWidth <= minWidth )
 			{
-				// cancel is centered
-				bSingleButton = true;
-				pButton = pCancelButton;
+				// center left the OK
+				pOkButton->SetPos( dialogWidth/2 - buttonWide - borderGap/2, dialogHeight - borderGap - buttonTall );
+				// center right the CANCEL
+				pCancelButton->SetPos( dialogWidth/2 + borderGap/2, dialogHeight - borderGap - buttonTall );
 			}
-			else if ( !m_data.bCancelButtonEnabled && m_data.bOkButtonEnabled )
-			{
-				// OK is centered
-				bSingleButton = true;
-				pButton = pOkButton;
-			}
-
-			if ( bSingleButton )
-			{
-				// center the button
-				pButton->SetPos( ( dialogWidth - pButton->GetWide() )/2, dialogHeight - borderGap - buttonTall );
-			}
-			else
-			{
-				//if( dialogWidth <= minWidth )
-				{
-					// center left the OK
-					pOkButton->SetPos( dialogWidth/2 - buttonWide - borderGap/2, dialogHeight - borderGap - buttonTall );
-					// center right the CANCEL
-					pCancelButton->SetPos( dialogWidth/2 + borderGap/2, dialogHeight - borderGap - buttonTall );
-				}
 // 				else
 // 				{
 // 					// right align both the buttons
@@ -381,7 +376,6 @@ void GenericConfirmation::LoadLayout()
 // 					x -= pOkButton->GetWide();
 // 					pOkButton->SetPos(x, dialogHeight - borderGap - buttonTall );
 // 				}
-			}
 		}
 	}
 }

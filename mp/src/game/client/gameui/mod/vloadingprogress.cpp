@@ -36,7 +36,7 @@ LoadingProgress::LoadingProgress(Panel *parent, const char *panelName, LoadingWi
 {
 	memset( m_szGameMode, 0, sizeof( m_szGameMode ) );
 
-	if ( IsPC() && eLoadingType == LWT_LOADINGPLAQUE )
+	if ( eLoadingType == LWT_LOADINGPLAQUE )
 	{
 		MakePopup( false );
 	}

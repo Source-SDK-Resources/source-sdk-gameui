@@ -459,14 +459,11 @@ void InGameMainMenu::OnThink()
 
 	SetControlEnabled( "BtnGoIdle", bCanGoIdle );
 
-	if ( IsPC() )
+	FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
+	if ( pFlyout )
 	{
-		FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
-		if ( pFlyout )
-		{
-			const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-			pFlyout->SetControlEnabled( "BtnBrightness", !config.Windowed() );
-		}
+		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
+		pFlyout->SetControlEnabled( "BtnBrightness", !config.Windowed() );
 	}
 
 	BaseClass::OnThink();

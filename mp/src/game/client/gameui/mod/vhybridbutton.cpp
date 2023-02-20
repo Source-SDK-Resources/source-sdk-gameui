@@ -154,12 +154,9 @@ BaseModUI::BaseModHybridButton::~BaseModHybridButton()
 BaseModHybridButton::State BaseModHybridButton::GetCurrentState()
 {
 	State curState = Enabled;
-	if ( IsPC() )
+	if ( HasFocus() )
 	{
-		if ( HasFocus() )
-		{
-			curState = IsEnabled() ? Focus : FocusDisabled;
-		}
+		curState = IsEnabled() ? Focus : FocusDisabled;
 	}
 	if( m_isOpen )
 	{
@@ -194,10 +191,7 @@ void BaseModHybridButton::SetOpen()
 	if ( m_isOpen )
 		return;
 	m_isOpen = true;
-	if ( IsPC() )
-	{
-		PostMessageToAllSiblingsOfType< BaseModHybridButton >( new KeyValues( "OnSiblingHybridButtonOpened" ) );
-	}
+	PostMessageToAllSiblingsOfType< BaseModHybridButton >( new KeyValues( "OnSiblingHybridButtonOpened" ) );
 }
 
 void BaseModHybridButton::SetClosed()
@@ -210,9 +204,6 @@ void BaseModHybridButton::SetClosed()
 
 void BaseModHybridButton::OnSiblingHybridButtonOpened()
 {
-	if ( !IsPC() )
-		return;
-
 	bool bClosed = false;
 
 	FlyoutMenu *pActiveFlyout = FlyoutMenu::GetActiveMenu();
@@ -254,21 +245,18 @@ void BaseModHybridButton::UpdateFooterHelpText()
 void BaseModHybridButton::OnMousePressed( vgui::MouseCode code )
 {
 	BaseClass::OnMousePressed( code );
-	if ( IsPC() )
+	if( code == MOUSE_RIGHT )
 	{
-		if( code == MOUSE_RIGHT )
+		FlyoutMenu::CloseActiveMenu( this );
+	}
+	else
+	{
+		if( (code == MOUSE_LEFT) && (IsEnabled() == false) && (dynamic_cast<FlyoutMenu *>( GetParent() ) == NULL) )
 		{
+			//when trying to use an inactive item that isn't part of a flyout. Close any open flyouts.
 			FlyoutMenu::CloseActiveMenu( this );
 		}
-		else
-		{
-			if( (code == MOUSE_LEFT) && (IsEnabled() == false) && (dynamic_cast<FlyoutMenu *>( GetParent() ) == NULL) )
-			{
-				//when trying to use an inactive item that isn't part of a flyout. Close any open flyouts.
-				FlyoutMenu::CloseActiveMenu( this );
-			}
-			RequestFocus( 0 );			
-		}
+		RequestFocus( 0 );			
 	}
 }
 
@@ -293,17 +281,14 @@ void BaseModHybridButton::NavigateTo( )
 	}
 
 	m_isNavigateTo = true;
-	if ( IsPC() )
-	{
-		RequestFocus( 0 );
-	}
+	RequestFocus( 0 );
 }
 
 void BaseModHybridButton::NavigateFrom( )
 {
 	BaseClass::NavigateFrom( );
 
-	if ( IsPC() && CBaseModPanel::GetSingleton().GetFooterPanel() )
+	if ( CBaseModPanel::GetSingleton().GetFooterPanel() )
 	{
 		// Show no help text if they left the button
 		CBaseModPanel::GetSingleton().GetFooterPanel()->FadeHelpText();
@@ -833,7 +818,7 @@ void BaseModHybridButton::ApplySettings( KeyValues * inResourceData )
 	//0 = press and release
 	//1 = press
 	//2 = release
-	int activationType = inResourceData->GetInt( "ActivationType", IsPC() ? 1 : 2 );
+	int activationType = inResourceData->GetInt( "ActivationType", 1 );
 	clamp( activationType, 0, 2 );
 	SetButtonActivationType( static_cast< vgui::Button::ActivationType_t >( activationType ) );
 
@@ -1017,23 +1002,20 @@ void BaseModHybridButton::EnableDropdownSelection( bool bEnable )
 void BaseModHybridButton::OnCursorEntered()
 {
 	BaseClass::OnCursorEntered();
-	if ( IsPC() )
+	if ( !m_isOpen )
 	{
-		if ( !m_isOpen )
+		if ( IsEnabled() && !HasFocus() )
 		{
-			if ( IsEnabled() && !HasFocus() )
-			{
-				CBaseModPanel::GetSingleton().PlayUISound( UISOUND_FOCUS );
-			}
+			CBaseModPanel::GetSingleton().PlayUISound( UISOUND_FOCUS );
+		}
 
-			if( GetParent() )
-			{
-				GetParent()->NavigateToChild( this );
-			}
-			else
-			{
-				NavigateTo();
-			}
+		if( GetParent() )
+		{
+			GetParent()->NavigateToChild( this );
+		}
+		else
+		{
+			NavigateTo();
 		}
 	}
 }
@@ -1043,10 +1025,8 @@ void BaseModHybridButton::OnCursorExited()
 	// This is a hack for now, we shouldn't close if the cursor goes to the flyout of this item...
 	// Maybe have VFloutMenu check the m_navFrom and it's one of these, keep the SetClosedState...
 	BaseClass::OnCursorExited();
-	if ( IsPC() )
-	{
-//		SetClosed();
-	}
+
+//	SetClosed();
 }
 
 // Message targets that the button has been pressed
@@ -1054,17 +1034,14 @@ void BaseModHybridButton::FireActionSignal( void )
 {
 	BaseClass::FireActionSignal();
 
-	if ( IsPC() )
-	{
-		PostMessageToAllSiblingsOfType< BaseModHybridButton >( new KeyValues( "OnSiblingHybridButtonOpened" ) );
-	}
+	PostMessageToAllSiblingsOfType< BaseModHybridButton >( new KeyValues( "OnSiblingHybridButtonOpened" ) );
 }
 
 
 Panel* BaseModHybridButton::NavigateUp()
 {
 	Panel *target = BaseClass::NavigateUp();
-	if ( IsPC() && !target && 
+	if ( !target && 
 		(dynamic_cast< DropDownMenu * >( GetParent() ) || dynamic_cast< SliderControl * >( GetParent() )) )
 	{
 		target = GetParent()->NavigateUp();
@@ -1076,7 +1053,7 @@ Panel* BaseModHybridButton::NavigateUp()
 Panel* BaseModHybridButton::NavigateDown()
 {
 	Panel *target = BaseClass::NavigateDown();
-	if ( IsPC() && !target && 
+	if ( !target && 
 		(dynamic_cast< DropDownMenu * >( GetParent() ) || dynamic_cast< SliderControl * >( GetParent() )) )
 	{
 		target = GetParent()->NavigateDown();
@@ -1087,7 +1064,7 @@ Panel* BaseModHybridButton::NavigateDown()
 Panel* BaseModHybridButton::NavigateLeft()
 {
 	Panel *target = BaseClass::NavigateLeft();
-	if ( IsPC() && !target && 
+	if ( !target && 
 		dynamic_cast< DropDownMenu * >( GetParent() ) )
 	{
 		target = GetParent()->NavigateLeft();
@@ -1098,7 +1075,7 @@ Panel* BaseModHybridButton::NavigateLeft()
 Panel* BaseModHybridButton::NavigateRight()
 {
 	Panel *target = BaseClass::NavigateRight();
-	if ( IsPC() && !target && 
+	if ( !target && 
 		dynamic_cast< DropDownMenu * >( GetParent() ) )
 	{
 		target = GetParent()->NavigateRight();

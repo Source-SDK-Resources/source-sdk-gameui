@@ -387,10 +387,7 @@ void KeyboardMouse::OnCommand(const char *command)
 			// The joystick is being enabled, and this is a state change
 			// rather than a redundant execution of this code. Enable
 			// the gamepad controls by execing a config file.
-			if ( IsPC() )
-			{
-				engine->ClientCmd_Unrestricted( "exec 360controller_pc.cfg" );
-			}
+			engine->ClientCmd_Unrestricted( "exec 360controller_pc.cfg" );
 		}
 
 		joystick.SetValue( true );

@@ -1056,9 +1056,6 @@ ConversionErrorType COptionsSubMultiplayer::ConvertJPEGToTGA(const char *jpegpat
 // convert the bmp file given to a TGA file at the given destination path.
 ConversionErrorType COptionsSubMultiplayer::ConvertBMPToTGA(const char *bmpPath, const char *tgaPath)
 {
-	if ( !IsPC() )
-		return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-
 	HBITMAP hBitmap = (HBITMAP)LoadImage(NULL, bmpPath, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE | LR_DEFAULTSIZE);
 	BITMAP bitmap;
 

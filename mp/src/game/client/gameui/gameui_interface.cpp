@@ -213,8 +213,8 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	factoryBasePanel.SetPaintEnabled( true );
 	factoryBasePanel.SetVisible( true );
 
-	factoryBasePanel.SetMouseInputEnabled( IsPC() );
-	// factoryBasePanel.SetKeyBoardInputEnabled( IsPC() );
+	factoryBasePanel.SetMouseInputEnabled( true );
+	// factoryBasePanel.SetKeyBoardInputEnabled( true );
 	factoryBasePanel.SetKeyBoardInputEnabled( true );
 
 	vgui::VPANEL rootpanel = enginevguifuncs->GetPanel( PANEL_GAMEUIDLL );
@@ -343,23 +343,20 @@ void CGameUI::Start()
 	if ( !FindPlatformDirectory( m_szPlatformDir, sizeof( m_szPlatformDir ) ) )
 		return;
 
-	if ( IsPC() )
-	{
-		// setup config file directory
-		char szConfigDir[512];
-		Q_strncpy( szConfigDir, m_szPlatformDir, sizeof( szConfigDir ) );
-		Q_strncat( szConfigDir, "config", sizeof( szConfigDir ), COPY_ALL_CHARACTERS );
+	// setup config file directory
+	char szConfigDir[512];
+	Q_strncpy( szConfigDir, m_szPlatformDir, sizeof( szConfigDir ) );
+	Q_strncat( szConfigDir, "config", sizeof( szConfigDir ), COPY_ALL_CHARACTERS );
 
-		Msg( "Steam config directory: %s\n", szConfigDir );
+	Msg( "Steam config directory: %s\n", szConfigDir );
 
-		g_pFullFileSystem->AddSearchPath(szConfigDir, "CONFIG");
-		g_pFullFileSystem->CreateDirHierarchy("", "CONFIG");
+	g_pFullFileSystem->AddSearchPath(szConfigDir, "CONFIG");
+	g_pFullFileSystem->CreateDirHierarchy("", "CONFIG");
 
-		// user dialog configuration
-		vgui::system()->SetUserConfigFile("InGameDialogConfig.vdf", "CONFIG");
+	// user dialog configuration
+	vgui::system()->SetUserConfigFile("InGameDialogConfig.vdf", "CONFIG");
 
-		g_pFullFileSystem->AddSearchPath( "platform", "PLATFORM" );
-	}
+	g_pFullFileSystem->AddSearchPath( "platform", "PLATFORM" );
 
 	// localization
 	g_pVGuiLocalize->AddFile( "Resource/platform_%language%.txt");
@@ -367,46 +364,43 @@ void CGameUI::Start()
 
 	Sys_SetLastError( SYS_NO_ERROR );
 
-	if ( IsPC() )
+	g_hMutex = Sys_CreateMutex( "ValvePlatformUIMutex" );
+	g_hWaitMutex = Sys_CreateMutex( "ValvePlatformWaitMutex" );
+	if ( g_hMutex == NULL || g_hWaitMutex == NULL || Sys_GetLastError() == SYS_ERROR_INVALID_HANDLE )
 	{
-		g_hMutex = Sys_CreateMutex( "ValvePlatformUIMutex" );
-		g_hWaitMutex = Sys_CreateMutex( "ValvePlatformWaitMutex" );
-		if ( g_hMutex == NULL || g_hWaitMutex == NULL || Sys_GetLastError() == SYS_ERROR_INVALID_HANDLE )
+		// error, can't get handle to mutex
+		if (g_hMutex)
 		{
-			// error, can't get handle to mutex
-			if (g_hMutex)
-			{
-				Sys_ReleaseMutex(g_hMutex);
-			}
-			if (g_hWaitMutex)
-			{
-				Sys_ReleaseMutex(g_hWaitMutex);
-			}
-			g_hMutex = NULL;
-			g_hWaitMutex = NULL;
-			Error("Steam Error: Could not access Steam, bad mutex\n");
-			return;
+			Sys_ReleaseMutex(g_hMutex);
 		}
-		unsigned int waitResult = Sys_WaitForSingleObject(g_hMutex, 0);
-		if (!(waitResult == SYS_WAIT_OBJECT_0 || waitResult == SYS_WAIT_ABANDONED))
+		if (g_hWaitMutex)
 		{
-			// mutex locked, need to deactivate Steam (so we have the Friends/ServerBrowser data files)
-			// get the wait mutex, so that Steam.exe knows that we're trying to acquire ValveTrackerMutex
-			waitResult = Sys_WaitForSingleObject(g_hWaitMutex, 0);
-			if (waitResult == SYS_WAIT_OBJECT_0 || waitResult == SYS_WAIT_ABANDONED)
-			{
-				Sys_EnumWindows(SendShutdownMsgFunc, 1);
-			}
+			Sys_ReleaseMutex(g_hWaitMutex);
 		}
-
-		// Delay playing the startup music until two frames
-		// this allows cbuf commands that occur on the first frame that may start a map
-		m_iPlayGameStartupSound = 2;
-
-		// now we are set up to check every frame to see if we can friends/server browser
-		m_bTryingToLoadFriends = true;
-		m_iFriendsLoadPauseFrames = 1;
+		g_hMutex = NULL;
+		g_hWaitMutex = NULL;
+		Error("Steam Error: Could not access Steam, bad mutex\n");
+		return;
 	}
+	unsigned int waitResult = Sys_WaitForSingleObject(g_hMutex, 0);
+	if (!(waitResult == SYS_WAIT_OBJECT_0 || waitResult == SYS_WAIT_ABANDONED))
+	{
+		// mutex locked, need to deactivate Steam (so we have the Friends/ServerBrowser data files)
+		// get the wait mutex, so that Steam.exe knows that we're trying to acquire ValveTrackerMutex
+		waitResult = Sys_WaitForSingleObject(g_hWaitMutex, 0);
+		if (waitResult == SYS_WAIT_OBJECT_0 || waitResult == SYS_WAIT_ABANDONED)
+		{
+			Sys_EnumWindows(SendShutdownMsgFunc, 1);
+		}
+	}
+
+	// Delay playing the startup music until two frames
+	// this allows cbuf commands that occur on the first frame that may start a map
+	m_iPlayGameStartupSound = 2;
+
+	// now we are set up to check every frame to see if we can friends/server browser
+	m_bTryingToLoadFriends = true;
+	m_iFriendsLoadPauseFrames = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -427,28 +421,13 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 	if ( platformDir[0] == '\0' )
 	{
 		// we're not under steam, so setup using path relative to game
-		if ( IsPC() )
+		if ( ::GetModuleFileName( ( HINSTANCE )GetModuleHandle( NULL ), platformDir, bufferSize ) )
 		{
-			if ( ::GetModuleFileName( ( HINSTANCE )GetModuleHandle( NULL ), platformDir, bufferSize ) )
+			char *lastslash = strrchr(platformDir, '\\'); // this should be just before the filename
+			if ( lastslash )
 			{
-				char *lastslash = strrchr(platformDir, '\\'); // this should be just before the filename
-				if ( lastslash )
-				{
-					*lastslash = 0;
-					Q_strncat(platformDir, "\\platform\\", bufferSize, COPY_ALL_CHARACTERS );
-					return true;
-				}
-			}
-		}
-		else
-		{
-			// xbox fetches the platform path from exisiting platform search path
-			// path to executeable is not correct for xbox remote configuration
-			if ( g_pFullFileSystem->GetSearchPath( "PLATFORM", false, platformDir, bufferSize ) )
-			{
-				char *pSeperator = strchr( platformDir, ';' );
-				if ( pSeperator )
-					*pSeperator = '\0';
+				*lastslash = 0;
+				Q_strncat(platformDir, "\\platform\\", bufferSize, COPY_ALL_CHARACTERS );
 				return true;
 			}
 		}
@@ -605,7 +584,7 @@ void CGameUI::RunFrame()
 	GetUiBaseModPanelClass().RunFrame();
 
 	// Play the start-up music the first time we run frame
-	if ( IsPC() && m_iPlayGameStartupSound > 0 )
+	if ( m_iPlayGameStartupSound > 0 )
 	{
 		m_iPlayGameStartupSound--;
 		if ( !m_iPlayGameStartupSound )
@@ -614,7 +593,7 @@ void CGameUI::RunFrame()
 		}
 	}
 
-	if ( IsPC() && m_bTryingToLoadFriends && m_iFriendsLoadPauseFrames-- < 1 && g_hMutex && g_hWaitMutex )
+	if ( m_bTryingToLoadFriends && m_iFriendsLoadPauseFrames-- < 1 && g_hMutex && g_hWaitMutex )
 	{
 		// try and load Steam platform files
 		unsigned int waitResult = Sys_WaitForSingleObject(g_hMutex, 0);

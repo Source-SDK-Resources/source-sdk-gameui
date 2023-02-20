@@ -29,7 +29,7 @@ DECLARE_BUILD_FACTORY( FlyoutMenu );
 // Fix up spacing
 // Everything is tighter spacing on PC
 // Instead of changing all the resources we're going to make the conversion here
-//#define FLYOUTMENU_TALL_SCALE ( ( IsPC() ) ? ( 0.7f ) :( 1.0f ) )
+//#define FLYOUTMENU_TALL_SCALE 0.7f
 
 #define FLYOUTMENU_TALL_SCALE 1.0f
 

@@ -121,12 +121,9 @@ void CNB_Button::PaintBackground()
 
 void CNB_Button::OnCursorEntered()
 {
-	if ( IsPC() )
+	if ( IsEnabled() && !HasFocus() )
 	{
-		if ( IsEnabled() && !HasFocus() )
-		{
-			vgui::surface()->PlaySound( "UI/menu_focus.wav" );
-		}
+		vgui::surface()->PlaySound( "UI/menu_focus.wav" );
 	}
 	BaseClass::OnCursorEntered();
 }
