@@ -842,7 +842,7 @@ void Audio::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "Back", command ) == 0 )
 	{
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		OnKeyCodePressed( KEY_XBUTTON_B );
 	}
 	else if( Q_stricmp( "3rdPartyCredits", command ) == 0 )
 	{
@@ -1039,7 +1039,7 @@ void Audio::AcceptLanguageChangeCallback()
 	Audio *self = static_cast< Audio * >( CBaseModPanel::GetSingleton().GetWindow( WT_AUDIO ) );
 	if( self )
 	{
-		self->BaseClass::OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		self->BaseClass::OnKeyCodePressed( KEY_XBUTTON_B );
 	}
 }
 

@@ -460,7 +460,7 @@ void AudioVideo::AcceptLanguageChangeCallback()
 	AudioVideo *self = static_cast< AudioVideo * >( CBaseModPanel::GetSingleton().GetWindow( WT_AUDIOVIDEO ) );
 	if( self )
 	{
-		self->BaseClass::OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		self->BaseClass::OnKeyCodePressed( KEY_XBUTTON_B );
 	}
 }
 

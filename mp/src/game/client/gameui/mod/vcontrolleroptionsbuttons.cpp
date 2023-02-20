@@ -184,7 +184,7 @@ void ControllerOptionsButtons::OnKeyCodePressed(KeyCode code)
 	{
 	case KEY_XBUTTON_A:
 		// Nav back when the select one of the options
-		BaseClass::OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		BaseClass::OnKeyCodePressed( KEY_XBUTTON_B );
 		break;
 
 	default:
@@ -208,9 +208,6 @@ void ControllerOptionsButtons::RecalculateBindingLabels( void )
 	{
 		// what is it bound to?
 		vgui::KeyCode code = sControllerBindings[i].m_keyCode;
-
-		//int nJoystick = m_iActiveUserSlot;
-		code = ButtonCodeToJoystickButtonCode( code, m_iActiveUserSlot );
 
 		const char *pBinding = engine->Key_BindingForKey( code );
 		if ( !pBinding )

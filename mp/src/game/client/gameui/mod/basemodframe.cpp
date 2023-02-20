@@ -241,7 +241,7 @@ void CBaseModFrame::OnKeyCodeTyped( vgui::KeyCode code )
 	switch ( code )
 	{
 	case KEY_SPACE:
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_A, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		OnKeyCodePressed( KEY_XBUTTON_A );
 		break;
 
 	case KEY_ESCAPE:
@@ -252,7 +252,7 @@ void CBaseModFrame::OnKeyCodeTyped( vgui::KeyCode code )
 		}
 		else
 		{
-			OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+			OnKeyCodePressed( KEY_XBUTTON_B );
 		}
 		break;
 	}

@@ -474,7 +474,7 @@ void Multiplayer::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "Back", command ) == 0 )
 	{
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		OnKeyCodePressed( KEY_XBUTTON_B );
 	}
 	else if ( !Q_stricmp( command, "#L4D360UI_Gore_High" ) )
 	{

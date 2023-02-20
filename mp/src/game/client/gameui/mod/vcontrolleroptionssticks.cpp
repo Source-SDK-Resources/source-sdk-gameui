@@ -130,7 +130,7 @@ void ControllerOptionsSticks::OnKeyCodePressed(KeyCode code)
 	{
 	case KEY_XBUTTON_A:
 		// Nav back when the select one of the options
-		BaseClass::OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		BaseClass::OnKeyCodePressed( KEY_XBUTTON_B );
 		break;
 
 	case KEY_XBUTTON_Y:

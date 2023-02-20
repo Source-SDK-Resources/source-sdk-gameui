@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: 
 //
@@ -148,7 +148,7 @@ void COptionsSubKeyboard::OnCommand( const char *command )
 	}
 	else if ( !m_pKeyBindList->IsCapturing() && !stricmp( command, "ClearKey" ) )
 	{
-		// OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_DELETE, CL4DBasePanel::GetSingleton().GetLastActiveUserId() ) );
+		// OnKeyCodePressed( KEY_DELETE );
 		OnKeyCodePressed( KEY_DELETE ); // <<< PC only code, no need for joystick management
         m_pKeyBindList->RequestFocus();
 	}

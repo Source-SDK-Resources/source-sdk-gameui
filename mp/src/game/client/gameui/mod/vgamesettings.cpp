@@ -557,7 +557,7 @@ void GameSettings::OnCommand(const char *command)
 	else if( V_strcmp( command, "Back" ) == 0 )
 	{
 		// Act as though 360 back button was pressed
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		OnKeyCodePressed( KEY_XBUTTON_B );
 	}
 	else if ( const char *szDifficultyValue = StringAfterPrefix( command, "#L4D360UI_Difficulty_" ) )
 	{

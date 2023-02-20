@@ -65,11 +65,11 @@ void PasswordEntry::OnCommand(const char *command)
 {
 	if ( Q_stricmp( command, "OK" ) == 0 )
 	{
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_A, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		OnKeyCodePressed( KEY_XBUTTON_A );
 	}
 	else if ( Q_stricmp( command, "cancel" ) == 0 )
 	{
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		OnKeyCodePressed( KEY_XBUTTON_B );
 	}
 }
 
@@ -125,10 +125,10 @@ void PasswordEntry::OnKeyCodeTyped( vgui::KeyCode code )
 	switch ( code )
 	{
 	case KEY_SPACE:
-		return OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_A, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		return OnKeyCodePressed( KEY_XBUTTON_A );
 
 	case KEY_ESCAPE:
-		return OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		return OnKeyCodePressed( KEY_XBUTTON_B );
 	}
 
 	BaseClass::OnKeyTyped( code );

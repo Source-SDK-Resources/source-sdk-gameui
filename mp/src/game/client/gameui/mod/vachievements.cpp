@@ -594,7 +594,7 @@ void Achievements::OnCommand(const char *command)
 	if( V_strcmp( command, "Back" ) == 0 )
 	{
 		// Act as though 360 back button was pressed
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		OnKeyCodePressed( KEY_XBUTTON_B );
 		m_bShowingAssets = false;
 	}
 	else

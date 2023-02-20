@@ -1040,11 +1040,11 @@ void Video::OnCommand(const char *command)
 	else if( Q_stricmp( "Cancel", command ) == 0 )
 	{
 		m_bDirtyValues = false;
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		OnKeyCodePressed( KEY_XBUTTON_B );
 	}
 	else if( Q_stricmp( "Back", command ) == 0 )
 	{
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		OnKeyCodePressed( KEY_XBUTTON_B );
 	}
 	else if( Q_stricmp( "3rdPartyCredits", command ) == 0 )
 	{
