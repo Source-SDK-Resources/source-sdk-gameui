@@ -94,7 +94,6 @@ void CContentControlDialog::Activate()
 void CContentControlDialog::ResetPassword()
 {
 	// Set initial value
-#ifndef _XBOX
 	HKEY key;
 	if ( ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Valve\\Half-Life\\Settings", 0, KEY_READ, &key))
 	{
@@ -105,7 +104,6 @@ void CContentControlDialog::ResetPassword()
 		RegCloseKey( key );
 	}
     else
-#endif
     {
         m_szGorePW[ 0 ] = 0;
     }
@@ -203,7 +201,6 @@ void CContentControlDialog::OnClose()
 void CContentControlDialog::WriteToken( const char *str )
 {
 	// Set initial value
-#ifndef _XBOX
 	HKEY key;
 	if ( ERROR_SUCCESS == RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Valve\\Half-Life\\Settings", 0, KEY_WRITE, &key))
 	{
@@ -214,7 +211,6 @@ void CContentControlDialog::WriteToken( const char *str )
 
 		RegCloseKey( key );
 	}
-#endif
 	Q_strncpy( m_szGorePW, str, sizeof( m_szGorePW ) );
 
 	UpdateContentControlStatus();

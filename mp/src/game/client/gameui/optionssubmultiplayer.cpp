@@ -562,13 +562,11 @@ void COptionsSubMultiplayer::OnCommand( const char *command )
 {
 	if ( !stricmp( command, "Advanced" ) )
 	{
-#ifndef _XBOX
 		if (!m_hMultiplayerAdvancedDialog.Get())
 		{
 			m_hMultiplayerAdvancedDialog = new CMultiplayerAdvancedDialog( this );
 		}
 		m_hMultiplayerAdvancedDialog->Activate();
-#endif
 	}
 	else if (!stricmp( command, "ImportSprayImage" ) )
 	{
@@ -592,7 +590,6 @@ void COptionsSubMultiplayer::OnCommand( const char *command )
 // file selected.  This can only happen when someone selects an image to be imported as a spray logo.
 void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 {
-#ifndef _XBOX
 	if ((fullpath == NULL) || (fullpath[0] == 0))
 	{
 		return;
@@ -906,7 +903,6 @@ void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 
 	// change the cursor back to normal
 	surface()->SetCursor(dc_user);
-#endif
 }
 
 struct ValveJpegErrorHandler_t 
