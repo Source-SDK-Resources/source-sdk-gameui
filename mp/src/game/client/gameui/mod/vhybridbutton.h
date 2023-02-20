@@ -50,13 +50,6 @@ public:
 		BUTTON_ALIENSWARMDEFAULT,
 	};
 
-	enum EnableCondition
-	{
-		EC_ALWAYS,
-		EC_LIVE_REQUIRED,
-		EC_NOTFORDEMO,
-	};
-
 	BaseModHybridButton( Panel *parent, const char *panelName, const char *text, Panel *pActionSignalTarget = NULL, const char *pCmd = NULL );
 	BaseModHybridButton( Panel *parent, const char *panelName, const wchar_t *text, Panel *pActionSignalTarget = NULL, const char *pCmd = NULL );
 	virtual ~BaseModHybridButton();
@@ -94,7 +87,6 @@ protected:
 	virtual void OnKeyCodePressed( vgui::KeyCode code );
 	virtual void OnKeyCodeReleased( vgui::KeyCode keycode );
 	virtual void Paint();
-	virtual void OnThink();
 	virtual void OnCursorEntered();
 	virtual void OnCursorExited();
 	virtual void FireActionSignal( void );

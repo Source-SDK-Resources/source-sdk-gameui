@@ -35,7 +35,6 @@ using namespace BaseModUI;
 extern class IMatchSystem *matchsystem;
 extern IVEngineClient *engine;
 
-void Demo_DisableButton( Button *pButton );
 void OpenGammaDialog( VPANEL parent );
 
 //=============================================================================
@@ -104,11 +103,11 @@ void InGameMainMenu::OnCommand( const char *command )
 	{
 		CBaseModPanel::GetSingleton().OpenWindow(WT_INGAMEKICKPLAYERLIST, this, true );
 	}
-	else if ( !Q_strcmp(command, "ChangeScenario") && !demo_ui_enable.GetString()[0] )
+	else if ( !Q_strcmp(command, "ChangeScenario") )
 	{
 		CBaseModPanel::GetSingleton().OpenWindow(WT_INGAMECHAPTERSELECT, this, true );
 	}
-	else if ( !Q_strcmp( command, "ChangeChapter" ) && !demo_ui_enable.GetString()[0] )
+	else if ( !Q_strcmp( command, "ChangeChapter" ) )
 	{
 		CBaseModPanel::GetSingleton().OpenWindow( WT_INGAMECHAPTERSELECT, this, true );
 	}
@@ -313,15 +312,8 @@ void InGameMainMenu::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	if ( demo_ui_enable.GetString()[0] )
-	{
-		LoadControlSettings( CFmtStr( "Resource/UI/BaseModUI/InGameMainMenu_%s.res", demo_ui_enable.GetString() ) );
-	}
-	else
-	{
-		LoadControlSettings( "Resource/UI/BaseModUI/InGameMainMenu.res" );
-	}
-
+	LoadControlSettings( "Resource/UI/BaseModUI/InGameMainMenu.res" );
+	
 	SetPaintBackgroundEnabled( true );
 
 	SetFooterState();

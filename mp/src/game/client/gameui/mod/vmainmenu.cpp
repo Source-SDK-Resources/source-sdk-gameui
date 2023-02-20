@@ -53,7 +53,6 @@ static ConVar ui_play_online_browser( "ui_play_online_browser", "1", FCVAR_RELEA
 
 ConVar asw_show_all_singleplayer_maps( "asw_show_all_singleplayer_maps", "0", FCVAR_NONE, "If set, offline practice option on the main menu will show all maps." );
 
-void Demo_DisableButton( Button *pButton );
 void OpenGammaDialog( VPANEL parent );
 
 //=============================================================================
@@ -505,11 +504,6 @@ void MainMenu::OnCommand( const char *command )
 		// on PC, bring up the server browser and switch it to the LAN tab (tab #5)
 		engine->ClientCmd( "openserverbrowser" );
 	}
-	else if ( !Q_strcmp( command, "DemoConnect" ) )
-	{
-		g_pMatchFramework->GetMatchTitle()->PrepareClientForConnect( NULL );
-		engine->ClientCmd( CFmtStr( "connect %s", demo_connect_string.GetString() ) );
-	}
 	else if (command && command[0] == '#')
 	{
 		// Pass it straight to the engine as a command
@@ -869,21 +863,6 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 		firstPanel->NavigateTo();
 	}
 
-}
-
-const char *pDemoDisabledButtons[] = { "BtnVersus", "BtnSurvival", "BtnStatsAndAchievements", "BtnExtras" };
-
-void MainMenu::Demo_DisableButtons( void )
-{
-	for ( int i = 0; i < ARRAYSIZE( pDemoDisabledButtons ); i++ )
-	{
-		BaseModHybridButton *pButton = dynamic_cast< BaseModHybridButton* >( FindChildByName( pDemoDisabledButtons[i] ) );
-
-		if ( pButton )
-		{
-			Demo_DisableButton( pButton );
-		}
-	}
 }
 
 void MainMenu::AcceptCommentaryRulesCallback() 

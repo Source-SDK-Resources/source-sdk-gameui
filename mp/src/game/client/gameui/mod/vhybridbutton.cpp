@@ -28,56 +28,6 @@ using namespace vgui;
 
 DECLARE_BUILD_FACTORY_DEFAULT_TEXT( BaseModHybridButton, HybridButton );
 
-void Demo_DisableButton( Button *pButton )
-{
-	BaseModHybridButton *pHybridButton = dynamic_cast<BaseModHybridButton *>(pButton);
-
-	if (pHybridButton)
-	{
-		pHybridButton->SetEnabled( false );
-
-		char szTooltip[512];
-		wchar_t *wUnicode = g_pVGuiLocalize->Find( "#L4D360UI_MainMenu_DemoVersion" );
-		if ( !wUnicode )
-			wUnicode = L"";
-
-		g_pVGuiLocalize->ConvertUnicodeToANSI( wUnicode, szTooltip, sizeof( szTooltip ) );
-
-		pHybridButton->SetHelpText( szTooltip , false );
-	}
-}
-
-void Dlc1_DisableButton( Button *pButton )
-{
-	BaseModHybridButton *pHybridButton = dynamic_cast<BaseModHybridButton *>(pButton);
-
-	if(pHybridButton)
-	{
-		pHybridButton->SetEnabled( false );
-
-		char szTooltip[512];
-		wchar_t *wUnicode = g_pVGuiLocalize->Find( "#L4D360UI_DLC1_NotInstalled" );
-
-		if ( !wUnicode )
-			wUnicode = L"";
-
-		g_pVGuiLocalize->ConvertUnicodeToANSI( wUnicode, szTooltip, sizeof( szTooltip ) );
-
-		pHybridButton->SetHelpText( szTooltip , false );
-	}
-}
-
-struct HybridEnableStates
-{
-	BaseModUI::BaseModHybridButton::EnableCondition mCondition;
-	char mConditionName[64];
-};
-
-HybridEnableStates sHybridStates[] = 
-{
-	{ BaseModUI::BaseModHybridButton::EC_LIVE_REQUIRED,	"LiveRequired" },
-	{ BaseModUI::BaseModHybridButton::EC_NOTFORDEMO,		"Never" }
-};
 
 //=============================================================================
 // Constructor / Destructor
@@ -96,8 +46,6 @@ BaseModUI::BaseModHybridButton::BaseModHybridButton( Panel *parent, const char *
 	m_isNavigateTo = false;
 	m_bOnlyActiveUser = false;
 	m_bIgnoreButtonA = false;
-
-	mEnableCondition = EC_ALWAYS;
 
 	m_nStyle = BUTTON_SIMPLE;
 	m_hTextFont = 0;
@@ -127,8 +75,6 @@ BaseModUI::BaseModHybridButton::BaseModHybridButton( Panel *parent, const char *
 
 	m_isNavigateTo = false;
 	m_iUsablePlayerIndex = -1;
-
-	mEnableCondition = EC_ALWAYS;
 
 	m_nStyle = BUTTON_SIMPLE;
 	m_hTextFont = 0;
@@ -653,29 +599,6 @@ void BaseModHybridButton::Paint()
 	m_isNavigateTo = false;
 }
 
-void BaseModHybridButton::OnThink()
-{
-	switch( mEnableCondition )
-	{
-	case EC_LIVE_REQUIRED:
-		{
-			SetEnabled( true );
-		}	
-		break;
-	case EC_NOTFORDEMO:
-		{
-			if ( IsEnabled() )
-			{
-				Demo_DisableButton( this );
-			}
-		}
-		break;
-
-	}
-
-	BaseClass::OnThink();
-}
-
 void BaseModHybridButton::ApplySettings( KeyValues * inResourceData )
 {
 	BaseClass::ApplySettings( inResourceData );
@@ -848,25 +771,6 @@ void BaseModHybridButton::ApplySettings( KeyValues * inResourceData )
 		else if ( isdigit( pszValue[0] ) )
 		{
 			m_iUsablePlayerIndex = atoi( pszValue );
-		}
-	}
-
-	//handle different conditions to allow the control to be enabled and disabled automatically
-	const char * condition = inResourceData->GetString( "EnableCondition" );
-	for ( int index = 0; index < ( sizeof( sHybridStates ) / sizeof( HybridEnableStates ) ); ++index )
-	{
-		if ( Q_stricmp( condition, sHybridStates[ index ].mConditionName ) == 0 )
-		{
-			mEnableCondition = sHybridStates[ index ].mCondition;
-			break;
-		}
-	}
-
-	if ( mEnableCondition == EC_NOTFORDEMO )
-	{
-		if ( IsEnabled() )
-		{
-			Demo_DisableButton( this );
 		}
 	}
 

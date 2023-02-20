@@ -254,7 +254,6 @@ void GameModes::ApplySettings( KeyValues *pInResourceData )
 		pKV->SetString( "disabled_tooltiptext", m_GameModeInfos[iIndex].m_HintTextDisabled );
 		pKV->SetString( "style", "GameModeButton" );
 		pKV->SetInt( "ActivationType", 1 );
-		pKV->SetString( "EnableCondition", pModeKey->GetString( "EnableCondition", "" ) );
 		pKV->SetInt( "wideatopen", wideAtOpen );
 
 		m_GameModeInfos[iIndex].m_pHybridButton->ApplySettings( pKV );
