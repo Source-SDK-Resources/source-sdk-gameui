@@ -175,9 +175,6 @@ void CBaseModFrame::ReloadSettings()
 //=============================================================================
 void CBaseModFrame::OnKeyCodePressed(KeyCode keycode)
 {
-	int lastUser = GetJoystickForCode( keycode );
-	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( lastUser );
-
 	vgui::KeyCode code = GetBaseButtonCode( keycode );
 
 	switch(code)

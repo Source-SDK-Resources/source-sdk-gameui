@@ -79,7 +79,6 @@ protected:
 	char m_szInitialSelection[ MAX_PATH ];
 	int m_FromOriginalTall;
 
-	bool m_bOnlyActiveUser;
 	bool m_bExpandUp;
 	bool m_bUsingWideAtOpen;
 };

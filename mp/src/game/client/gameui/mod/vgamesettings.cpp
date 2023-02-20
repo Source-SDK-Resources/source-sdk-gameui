@@ -310,9 +310,6 @@ void GameSettings::OnThink()
 
 void GameSettings::OnKeyCodePressed(KeyCode code)
 {
-	int iUserSlot = GetJoystickForCode( code );
-	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( iUserSlot );
-	
 	switch( GetBaseButtonCode( code ) )
 	{
 	case KEY_XBUTTON_B:

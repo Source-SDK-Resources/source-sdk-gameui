@@ -57,14 +57,6 @@ Options::~Options()
 //=============================================================================
 void Options::OnCommand(const char *command)
 {
-	int iUserSlot = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-	int iController = XBX_GetUserId( iUserSlot );
-
-	if ( UI_IsDebug() )
-	{
-		Msg("[GAMEUI] Handling options menu command %s from user%d ctrlr%d\n", command, iUserSlot, iController );
-	}
-
 	if(!Q_strcmp(command, "Game"))
 	{
 		CBaseModPanel::GetSingleton().OpenWindow(WT_GAMEOPTIONS, this);
@@ -79,6 +71,6 @@ void Options::OnCommand(const char *command)
 	}
 	else if(!Q_strcmp(command, "Storage"))
 	{
-		CUIGameData::Get()->SelectStorageDevice( new CChangeStorageDevice( iController ) );
+		CUIGameData::Get()->SelectStorageDevice( new CChangeStorageDevice( 0 ) );
 	}
 }

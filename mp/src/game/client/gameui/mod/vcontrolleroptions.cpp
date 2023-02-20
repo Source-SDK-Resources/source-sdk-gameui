@@ -76,8 +76,6 @@ BaseClass(parent, panelName)
 	m_pEditButtons = NULL;
 	m_pEditSticks = NULL;
 
-	m_Title[0] = 0;
-
 	m_bDirty = false;
 	m_bNeedsActivate = false;
 
@@ -107,21 +105,6 @@ void ControllerOptions::UpdateFooter()
 void ControllerOptions::Activate()
 {
 	BaseClass::Activate();
-
-	m_iActiveUserSlot = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-
-	int iActiveController = XBX_GetUserId( m_iActiveUserSlot );
-
-	SetGameUIActiveSplitScreenPlayerSlot( m_iActiveUserSlot );
-
-	wchar_t *pwcTemplate = g_pVGuiLocalize->Find( "#L4D360UI_Controller_Title" );
-	if ( pwcTemplate )
-	{
-		wchar_t wGamerTag[32];
-		const char *pszPlayerName = BaseModUI::CUIGameData::Get()->GetLocalPlayerName( iActiveController );
-		g_pVGuiLocalize->ConvertANSIToUnicode( pszPlayerName, wGamerTag, sizeof( wGamerTag ) );
-		g_pVGuiLocalize->ConstructString( m_Title, sizeof( m_Title ), pwcTemplate, 1, wGamerTag );
-	}
 
 	ResetControlValues();
 
@@ -269,14 +252,9 @@ void ControllerOptionsResetDefaults_Confirm( void )
 //=============================================================================
 void ControllerOptions::ResetToDefaults( void )
 {
-	int iOldSlot = engine->GetActiveSplitScreenPlayerSlot();
-	engine->SetActiveSplitScreenPlayerSlot( m_iActiveUserSlot );
-
 	engine->ExecuteClientCmd( "exec config.360.cfg" );
 
 	engine->ExecuteClientCmd( "exec joy_preset_1.cfg" );
-
-	engine->SetActiveSplitScreenPlayerSlot( iOldSlot );
 
 //	ResetControlValues();
 	m_nResetControlValuesTicks = 1; // used to delay polling the values until we've flushed the command buffer 
@@ -287,9 +265,6 @@ void ControllerOptions::ResetToDefaults( void )
 //=============================================================================
 void ControllerOptions::OnKeyCodePressed(KeyCode code)
 {
-	if ( m_iActiveUserSlot != CBaseModPanel::GetSingleton().GetLastActiveUserId() )
-		return;
-
 	switch ( GetBaseButtonCode( code ) )
 	{
 	case KEY_XSTICK1_LEFT:
@@ -444,18 +419,16 @@ Panel* ControllerOptions::NavigateBack()
 		// We should never get to the nav back with dirty data and not ready, but this check will prevent any crasy edge cases
 		if ( CBaseModPanel::GetSingleton().IsReadyToWriteConfig() )
 		{
-			engine->ClientCmd_Unrestricted( VarArgs( "host_writeconfig_ss %d", XBX_GetUserId( m_iActiveUserSlot ) ) );
+			engine->ClientCmd_Unrestricted( VarArgs( "host_writeconfig_ss %d", XBX_GetUserId( 0 ) ) );
 		}
 	}
-
-	SetGameUIActiveSplitScreenPlayerSlot( 0 );
 
 	return BaseClass::NavigateBack();
 }
 
 void ControllerOptions::PaintBackground()
 {
-	BaseClass::DrawDialogBackground( NULL, m_Title, "#L4D360UI_Controller_Desc", NULL );
+	BaseClass::DrawDialogBackground( NULL, "controller_title", "#L4D360UI_Controller_Desc", NULL );
 }
 
 void ControllerOptions::ApplySchemeSettings( vgui::IScheme *pScheme )

@@ -168,8 +168,6 @@ void GenericWaitScreen::SetDataSettings( KeyValues *pSettings )
 
 void GenericWaitScreen::OnKeyCodePressed(vgui::KeyCode code)
 {
-	CBaseModPanel::GetSingleton().SetLastActiveUserId( GetJoystickForCode( code ) );
-
 	switch( GetBaseButtonCode( code ) )
 	{
 	case KEY_XBUTTON_B:

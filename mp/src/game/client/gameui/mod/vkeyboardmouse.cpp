@@ -314,13 +314,6 @@ void KeyboardMouse::OnThink()
 
 void KeyboardMouse::OnKeyCodePressed(KeyCode code)
 {
-	int joystick = GetJoystickForCode( code );
-	int userId = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-	if ( joystick != userId || joystick < 0 )
-	{	
-		return;
-	}
-
 	switch ( GetBaseButtonCode( code ) )
 	{
 	case KEY_XBUTTON_B:

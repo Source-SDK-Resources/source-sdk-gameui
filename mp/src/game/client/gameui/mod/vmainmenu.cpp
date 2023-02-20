@@ -84,14 +84,6 @@ MainMenu::~MainMenu()
 //=============================================================================
 void MainMenu::OnCommand( const char *command )
 {
-	int iUserSlot = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-
-	if ( UI_IsDebug() )
-	{
-		Msg("[GAMEUI] Handling main menu command %s from user%d ctrlr%d\n",
-			command, iUserSlot, XBX_GetUserId( iUserSlot ) );
-	}
-
 	bool bOpeningFlyout = false;
 
 	if ( char const *szQuickMatch = StringAfterPrefix( command, "QuickMatch_" ) )
@@ -695,9 +687,6 @@ void MainMenu::OnFlyoutMenuCancelled()
 //=============================================================================
 void MainMenu::OnKeyCodePressed( KeyCode code )
 {
-	int userId = GetJoystickForCode( code );
-	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( userId );
-
 	switch( GetBaseButtonCode( code ) )
 	{
 	case KEY_XBUTTON_B:

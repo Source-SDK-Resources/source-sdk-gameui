@@ -47,8 +47,6 @@ protected:
 private:
 	void UpdateFooter();
 
-	int m_iActiveUserSlot;
-
 	SliderControl		*m_pVerticalSensitivity;
 	SliderControl		*m_pHorizontalSensitivity;
 	DropDownMenu		*m_pLookType;

@@ -106,7 +106,6 @@ ConVar ui_lobby_noresults_create_msg_time( "ui_lobby_noresults_create_msg_time",
 //=============================================================================
 CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 	m_bClosingAllWindows( false ),
-	m_lastActiveUserId( 0 )
 {
 #if !defined( NOSTEAM )
 	// Set Steam overlay position
@@ -160,9 +159,6 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 
 	m_UIScheme = vgui::scheme()->LoadSchemeFromFileEx( 0, "resource/SwarmSchemeNew.res", "SwarmScheme" );
 	SetScheme( m_UIScheme );
-
-	// Only one user on the PC, so set it now
-	SetLastActiveUserId( 0 );
 
 	// Precache critical font characters for the 360, dampens severity of these runtime i/o hitches
 	IScheme *pScheme = vgui::scheme()->GetIScheme( m_UIScheme );
@@ -1526,21 +1522,6 @@ BaseModUI::CBaseModFooterPanel* CBaseModPanel::GetFooterPanel()
 		return NULL;
 	}
 	return m_FooterPanel;
-}
-
-void CBaseModPanel::SetLastActiveUserId( int userId )
-{
-	if ( m_lastActiveUserId != userId )
-	{
-		DevWarning( "SetLastActiveUserId: %d -> %d\n", m_lastActiveUserId, userId );
-	}
-
-	m_lastActiveUserId = userId;
-}
-
-int CBaseModPanel::GetLastActiveUserId( )
-{
-	return m_lastActiveUserId;
 }
 
 //-----------------------------------------------------------------------------

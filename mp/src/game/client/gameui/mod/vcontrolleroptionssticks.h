@@ -40,7 +40,6 @@ public:
 	MESSAGE_FUNC_HANDLE( OnHybridButtonNavigatedTo, "OnHybridButtonNavigatedTo", button );
 
 private:
-	int m_iActiveUserSlot;
 	bool m_bActivateOnFirstThink;
 };
 

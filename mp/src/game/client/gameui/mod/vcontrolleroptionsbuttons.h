@@ -40,7 +40,6 @@ public:
 private:
 	void UpdateFooter();
 
-	int m_iActiveUserSlot;
 	bool m_bActivateOnFirstThink;
 	EditablePanel *m_pLabelContainer;
 	int m_nRecalculateLabelsTicks; // used to delay polling the values until we've flushed the command buffer 

@@ -430,21 +430,11 @@ class BaseModUI::AchievementGenericPanelList : public GenericPanelList
 	DECLARE_CLASS_SIMPLE( AchievementGenericPanelList, GenericPanelList );
 
 public:
-	AchievementGenericPanelList::AchievementGenericPanelList( vgui::Panel *parent, const char *panelName, ITEM_SELECTION_MODE selectionMode, int iControllingSlot ) :
+	AchievementGenericPanelList::AchievementGenericPanelList( vgui::Panel *parent, const char *panelName, ITEM_SELECTION_MODE selectionMode ) :
 	    BaseClass( parent, panelName, selectionMode ),
-		m_iControllingUserSlot( iControllingSlot )
 	{
 	}
 
-protected:
-	void OnKeyCodePressed(KeyCode code)
-	{
-		if ( m_iControllingUserSlot != GetJoystickForCode( code ) )
-			return;
-
-		BaseClass::OnKeyCodePressed(code);
-	}
-	int m_iControllingUserSlot;
 };
 
 //=============================================================================
@@ -455,16 +445,13 @@ BaseClass(parent, panelName, false, true)
 {
 	GameUI().PreventEngineHideGameUI();
 
-	// Determine the slot and controller of the player who opened the dialog
-	m_iStartingUserSlot = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-
 	memset( m_wAchievementsTitle, 0, sizeof( m_wAchievementsTitle ) );
 
 	SetDeleteSelfOnClose(true);
 	SetProportional( true );
 
 	m_LblComplete = new Label(this, "LblComplete", ""); 
-	m_GplAchievements = new AchievementGenericPanelList( this, "GplAchievements", GenericPanelList::ISM_ELEVATOR, m_iStartingUserSlot );
+	m_GplAchievements = new AchievementGenericPanelList( this, "GplAchievements", GenericPanelList::ISM_ELEVATOR );
 	m_GplAchievements->ShowScrollProgress( true );
 	m_GplAchievements->SetScrollBarVisible( true );
 	m_GplAchievements->SetBgColor( Color( 0, 0, 0, 0 ) );
@@ -517,7 +504,7 @@ void Achievements::Activate()
 	//
 	for(int i = 0; i < achievementmgr->GetAchievementCount(); i++)
 	{
-		IAchievement* achievement = achievementmgr->GetAchievementByDisplayOrder( i, m_iStartingUserSlot );
+		IAchievement* achievement = achievementmgr->GetAchievementByDisplayOrder( i );
 
 		if ( achievement && achievement->IsAchieved() )
 		{
@@ -537,7 +524,7 @@ void Achievements::Activate()
 	//
 	for(int i = 0; i < achievementmgr->GetAchievementCount(); i++)
 	{
-		IAchievement* achievement = achievementmgr->GetAchievementByDisplayOrder( i, m_iStartingUserSlot );
+		IAchievement* achievement = achievementmgr->GetAchievementByDisplayOrder( i );
 
 		if ( achievement && !achievement->IsAchieved() )
 		{
@@ -601,18 +588,6 @@ void Achievements::OnCommand(const char *command)
 	{
 		BaseClass::OnCommand( command );
 	}	
-}
-
-//=============================================================================
-void Achievements::OnKeyCodePressed(KeyCode code)
-{
-	if ( m_iStartingUserSlot != GetJoystickForCode( code ) )
-		return;
-
-//	int iUserSlot = GetJoystickForCode( code );
-//	CBaseModPanel::GetSingleton().SetLastActiveUserId( iUserSlot );
-
-	BaseClass::OnKeyCodePressed(code);
 }
 
 //=============================================================================

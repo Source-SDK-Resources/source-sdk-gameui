@@ -141,32 +141,7 @@ void ControllerOptionsButtons::Activate()
 {
 	BaseClass::Activate();
 
-	m_iActiveUserSlot = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-
-	int iActiveController = XBX_GetUserId( m_iActiveUserSlot );
-
-	SetGameUIActiveSplitScreenPlayerSlot( m_iActiveUserSlot );
-
 	// Figure out which button should be default
-
-	vgui::Label *pLabel = dynamic_cast< vgui::Label * >( FindChildByName( "LblGameTitle" ) );
-	if ( pLabel )
-	{
-		wchar_t *pwcTemplate = g_pVGuiLocalize->Find("#L4D360UI_Controller_Buttons_Title");
-
-		if ( pwcTemplate )
-		{		
-			const char *pszPlayerName = BaseModUI::CUIGameData::Get()->GetLocalPlayerName( iActiveController );
-
-			wchar_t wWelcomeMsg[128];
-			wchar_t wGamerTag[32];
-			g_pVGuiLocalize->ConvertANSIToUnicode( pszPlayerName, wGamerTag, sizeof( wGamerTag ) );
-			g_pVGuiLocalize->ConstructString( wWelcomeMsg, sizeof( wWelcomeMsg ), pwcTemplate, 1, wGamerTag );
-
-			pLabel->MakeReadyForUse();
-			pLabel->SetText( wWelcomeMsg );
-		}
-	}
 
 	RecalculateBindingLabels();
 	UpdateFooter();
@@ -175,9 +150,6 @@ void ControllerOptionsButtons::Activate()
 //=============================================================================
 void ControllerOptionsButtons::OnKeyCodePressed(KeyCode code)
 {
-	if ( m_iActiveUserSlot != CBaseModPanel::GetSingleton().GetLastActiveUserId() )
-		return;
-
 	vgui::KeyCode basecode = GetBaseButtonCode( code );
 
 	switch( basecode )

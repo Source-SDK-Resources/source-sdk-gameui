@@ -146,7 +146,6 @@ public:
 	~Achievements();
 	void Activate();
 	void OnCommand(const char *command);
-	void OnKeyCodePressed(vgui::KeyCode code);
 
 	void PaintBackground( void );
 
@@ -157,7 +156,6 @@ protected:
 	enum ACHIEVEMENT_FILTER { AF_ALL, AF_COMPLETED, AF_INCOMPLETE, AF_SURVIVORS, AF_INFECTED };
 	enum ACHIEVEMENT_SORT { AS_COMPLETED, AS_INCOMPLETE, AS_GAMERSCORE };
 	void ApplySchemeSettings(vgui::IScheme *pScheme);
-	int m_iStartingUserSlot;
 
 private:
 	void UpdateFooter();

@@ -91,14 +91,6 @@ void ShowPlayerList();
 //=============================================================================
 void InGameMainMenu::OnCommand( const char *command )
 {
-	int iUserSlot = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-
-	if ( UI_IsDebug() )
-	{
-		Msg("[GAMEUI] Handling ingame menu command %s from user%d ctrlr%d\n",
-			command, iUserSlot, XBX_GetUserId( iUserSlot ) );
-	}
-
 	if ( !Q_strcmp( command, "ReturnToGame" ) )
 	{
 		engine->ClientCmd("gameui_hide");
@@ -188,7 +180,7 @@ void InGameMainMenu::OnCommand( const char *command )
 	else if (!Q_strcmp(command, "Storage"))
 	{
 		// Trigger storage device selector
-		CUIGameData::Get()->SelectStorageDevice( new CChangeStorageDevice( XBX_GetUserId( iUserSlot ) ) );
+		CUIGameData::Get()->SelectStorageDevice( new CChangeStorageDevice( 0 ) );
 	}
 	else if (!Q_strcmp(command, "Audio"))
 	{
@@ -308,9 +300,6 @@ void InGameMainMenu::OnCommand( const char *command )
 //=============================================================================
 void InGameMainMenu::OnKeyCodePressed( KeyCode code )
 {
-	int userId = GetJoystickForCode( code );
-	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( userId );
-
 	switch( GetBaseButtonCode( code ) )
 	{
 	case KEY_XBUTTON_START:

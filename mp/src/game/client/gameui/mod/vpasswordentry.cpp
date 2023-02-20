@@ -76,10 +76,8 @@ void PasswordEntry::OnCommand(const char *command)
 //=============================================================================
 void PasswordEntry::OnKeyCodePressed( KeyCode keycode )
 {
-	int userId = GetJoystickForCode( keycode );
 	vgui::KeyCode code = GetBaseButtonCode( keycode );
-	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( userId );
-
+	
 	switch ( code )
 	{
 	case KEY_XBUTTON_A:

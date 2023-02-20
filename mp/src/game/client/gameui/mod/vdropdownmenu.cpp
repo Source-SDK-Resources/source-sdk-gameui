@@ -293,14 +293,7 @@ void DropDownMenu::ApplySettings( KeyValues* inResourceData )
 
 void DropDownMenu::OnKeyCodePressed( vgui::KeyCode code )
 {
-	int userId = GetJoystickForCode( code );
 	vgui::KeyCode basecode = GetBaseButtonCode( code );
-
-	int active_userId = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-	if ( userId != active_userId || userId < 0 )
-	{	
-		return;
-	}
 
 	switch( basecode )
 	{

@@ -161,8 +161,6 @@ namespace BaseModUI
 		void PlayUISound( UISound_t uiSound );
 
 		CBaseModFooterPanel* GetFooterPanel();
-		void SetLastActiveUserId( int userId );
-		int GetLastActiveUserId();
 		void OpenOptionsDialog( Panel *parent );
 		void OpenKeyBindingsDialog( Panel *parent );
 
@@ -203,7 +201,6 @@ namespace BaseModUI
 		bool m_LevelLoading;
 		vgui::HScheme m_UIScheme;
 		vgui::DHANDLE<COptionsDialog> m_hOptionsDialog;	// standalone options dialog - PC only
-		int m_lastActiveUserId;
 
 		vgui::HFont m_hDefaultFont;
 

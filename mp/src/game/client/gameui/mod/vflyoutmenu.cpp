@@ -53,7 +53,6 @@ FlyoutMenu::FlyoutMenu( vgui::Panel *parent, const char* panelName )
 	m_szInitialSelection[0] = 0;
 	m_FromOriginalTall = 0;
 
-	m_bOnlyActiveUser = false;
 	m_bExpandUp = false;
 	m_bUsingWideAtOpen = false;
 }
@@ -298,7 +297,6 @@ void FlyoutMenu::ApplySettings( KeyValues* inResourceData )
 		m_defaultControl = dynamic_cast< vgui::Panel* >( FindChildByName( initFocus ) );
 	}
 
-	m_bOnlyActiveUser = ( inResourceData->GetInt( "OnlyActiveUser", 0 ) != 0 );
 
 	m_bExpandUp = ( inResourceData->GetInt( "ExpandUp", 0 ) != 0 );
 }
@@ -517,21 +515,6 @@ vgui::Button* FlyoutMenu::FindNextChildButtonByCommand( const char* command )
 
 void FlyoutMenu::OnKeyCodePressed( vgui::KeyCode code )
 {
-	int iJoystick = GetJoystickForCode( code );
-
-	if ( m_bOnlyActiveUser )
-	{
-		// Only allow input from the active userid
-		int userId = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-
-		if( iJoystick != userId || iJoystick < 0 )
-		{	
-			return;
-		}
-	}
-
-	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( iJoystick );
-
 	vgui::KeyCode basecode = GetBaseButtonCode( code );
 
 	switch( basecode )
