@@ -6,9 +6,7 @@
 #undef fopen
 
 #include <tier0/platform.h>
-#ifdef IS_WINDOWS_PC
 #include "windows.h"
-#endif
 
 #include "vjukebox.h"
 #include "VGenericPanelList.h"
