@@ -177,11 +177,6 @@ void InGameMainMenu::OnCommand( const char *command )
 	{
 		CBaseModPanel::GetSingleton().OpenWindow(WT_CONTROLLER, this, true );
 	}
-	else if (!Q_strcmp(command, "Storage"))
-	{
-		// Trigger storage device selector
-		CUIGameData::Get()->SelectStorageDevice( new CChangeStorageDevice( 0 ) );
-	}
 	else if (!Q_strcmp(command, "Audio"))
 	{
 		// audio options dialog, PC only

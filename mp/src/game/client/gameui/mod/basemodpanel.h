@@ -14,7 +14,6 @@
 #include "../OptionsDialog.h"
 #include "../OptionsSubKeyboard.h"
 #include "avi/ibik.h"
-#include "ixboxsystem.h"
 #include "matchmaking/imatchframework.h"
 
 class COptionsDialog;

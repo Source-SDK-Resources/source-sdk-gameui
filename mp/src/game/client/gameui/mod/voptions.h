@@ -27,7 +27,6 @@ private:
 	BaseModHybridButton* m_BtnGame;
 	BaseModHybridButton* m_BtnAudioVideo;
 	BaseModHybridButton* m_BtnController;
-	BaseModHybridButton* m_BtnStorage;
 	BaseModHybridButton* m_BtnCredits;
 };
 

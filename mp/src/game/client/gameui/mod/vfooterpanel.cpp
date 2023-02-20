@@ -16,9 +16,6 @@
 
 using namespace BaseModUI;
 
-// the xbox shrinks its footer when there is not help text
-#define MINIMAL_FOOTER_SCALE	0.75f
-
 struct buttonLayout_t
 {
 	bool	A_rAlight;

@@ -11,13 +11,11 @@
 #include "engine/ienginesound.h"
 #include "EngineInterface.h"
 #include "tier0/dbg.h"
-#include "ixboxsystem.h"
 #include "GameUI_Interface.h"
 #include "game/client/IGameClientExports.h"
 #include "gameui/igameconsole.h"
 #include "inputsystem/iinputsystem.h"
 #include "FileSystem.h"
-#include "filesystem/IXboxInstaller.h"
 #include "tier2/renderutils.h"
 
 

@@ -341,16 +341,6 @@ void MainMenu::OnCommand( const char *command )
 		}
 		CBaseModPanel::GetSingleton().OpenWindow(WT_CONTROLLER, this, true );
 	}
-	else if (!Q_strcmp(command, "Storage"))
-	{
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-
-		// Trigger storage device selector
-		CUIGameData::Get()->SelectStorageDevice( new CChangeStorageDevice( XBX_GetUserId( iUserSlot ) ) );
-	}
 	else if (!Q_strcmp(command, "Credits"))
 	{
 		KeyValues *pSettings = KeyValues::FromString(
@@ -396,15 +386,6 @@ void MainMenu::OnCommand( const char *command )
 	else if ( !Q_stricmp( command, "QuitGame_NoConfirm" ) )
 	{
 		engine->ClientCmd( "quit" );
-	}
-	else if (!Q_strcmp(command, "ChangeGamers"))	// guest SIGN-IN command
-	{
-		CAttractScreen::SetAttractMode( CAttractScreen::ATTRACT_GUESTSIGNIN, XBX_GetUserId( iUserSlot ) );
-		OnCommand( "ActivateAttractScreen" );
-	}
-	else if (!Q_strcmp(command, "ActivateAttractScreen"))
-	{
-		
 	}
 	else if (!Q_strcmp(command, "Audio"))
 	{

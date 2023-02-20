@@ -27,7 +27,6 @@ BaseClass( parent, panelName )
 	m_BtnGame = new BaseModHybridButton( this, "BtnGame", "#L4D360UI_Game", this, "Game" );
 	m_BtnAudioVideo = new BaseModHybridButton( this, "BtnAudioVideo", "#L4D360UI_AudioVideo", this, "AudioVideo" );
 	m_BtnController = new BaseModHybridButton( this, "BtnController", "#L4D360UI_Controller", this, "Controller" );
-	m_BtnStorage = new BaseModHybridButton( this, "BtnStorage", "#L4D360UI_Storage", this, "Storage" );
 	m_BtnCredits = new BaseModHybridButton( this, "BtnCredits", "#L4D360UI_Credits", this, "Credits" );
 
 	SetUpperGarnishEnabled( true );
@@ -50,7 +49,6 @@ Options::~Options()
 	delete m_BtnGame;
 	delete m_BtnAudioVideo;
 	delete m_BtnController;
-	delete m_BtnStorage;
 	delete m_BtnCredits;
 }
 
@@ -68,9 +66,5 @@ void Options::OnCommand(const char *command)
 	else if(!Q_strcmp(command, "Controller"))
 	{
 		CBaseModPanel::GetSingleton().OpenWindow(WT_CONTROLLER, this);
-	}
-	else if(!Q_strcmp(command, "Storage"))
-	{
-		CUIGameData::Get()->SelectStorageDevice( new CChangeStorageDevice( 0 ) );
 	}
 }
