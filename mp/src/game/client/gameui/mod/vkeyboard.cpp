@@ -102,7 +102,6 @@ void VKeyboard::OnKeyCodePressed(KeyCode code)
 	}
 }
 
-#ifndef _X360
 void VKeyboard::OnKeyCodeTyped( vgui::KeyCode code )
 {
 	// For PC, this maps space bar to OK and esc to cancel
@@ -128,7 +127,6 @@ void VKeyboard::OnKeyCodeTyped( vgui::KeyCode code )
 
 	BaseClass::OnKeyTyped( code );
 }
-#endif
 
 //=============================================================================
 void VKeyboard::OnCommand(const char *command)

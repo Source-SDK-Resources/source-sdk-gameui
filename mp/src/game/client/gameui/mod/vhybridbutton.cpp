@@ -18,9 +18,7 @@
 #include "VSliderControl.h"
 #include "gamemodes.h"
 
-#ifndef _X360
 #include <ctype.h>
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -676,11 +674,7 @@ void BaseModHybridButton::OnThink()
 	{
 	case EC_LIVE_REQUIRED:
 		{
-#ifdef _X360 
-			SetEnabled( CUIGameData::Get()->SignedInToLive() );
-#else
 			SetEnabled( true );
-#endif
 		}	
 		break;
 	case EC_NOTFORDEMO:

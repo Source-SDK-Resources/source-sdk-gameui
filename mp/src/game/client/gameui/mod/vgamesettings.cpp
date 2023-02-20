@@ -188,14 +188,8 @@ void GameSettings::Activate()
 
 	//bool showSearchControls = IsCustomMatchSearchCriteria();
 
-#ifdef _X360
-	bool bPlayingSplitscreen = XBX_GetNumGameUsers() > 1;
-#else
-	bool bPlayingSplitscreen = false;
-#endif
-
-	bool showSinglePlayerControls = !Q_stricmp( "offline", szNetwork ) && !bPlayingSplitscreen;
-
+	bool showSinglePlayerControls = !Q_stricmp( "offline", szNetwork );
+	
 	m_bBackButtonMeansDone = false; //( !showSearchControls && !showSinglePlayerControls && !showGameAccess );
 	m_bCloseSessionOnClose = showSinglePlayerControls;
 
@@ -1021,10 +1015,7 @@ void GameSettings::UpdateFooter()
 	if ( footer )
 	{
 		bool bDoHints = false;
-#if defined( _X360 )
-		// only do hints in english, all other languages have lengthy hints, can't fix in time
-		bDoHints = ( XBX_IsLocalized() == false );
-#endif
+
 		footer->SetButtons( FB_ABUTTON | FB_BBUTTON, FF_AB_ONLY, bDoHints );
 		footer->SetButtonText( FB_ABUTTON, "#L4D360UI_Select" );
 

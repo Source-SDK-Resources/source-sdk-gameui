@@ -64,11 +64,6 @@ public:
 
 	virtual void OnKeyCodePressed(vgui::KeyCode code);
 
-#ifdef _X360
-	virtual void NavigateTo();
-	virtual void NavigateFrom();
-#endif // _X360
-
 	virtual void PaintBackground();
 
 	virtual void RunFrame();

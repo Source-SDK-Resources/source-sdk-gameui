@@ -139,7 +139,6 @@ void GenericConfirmation::OnKeyCodePressed( KeyCode keycode )
 	}
 }
 
-#ifndef _X360
 void GenericConfirmation::OnKeyCodeTyped( vgui::KeyCode code )
 {
 	// For PC, this maps space bar and enter to OK and esc to cancel
@@ -155,7 +154,6 @@ void GenericConfirmation::OnKeyCodeTyped( vgui::KeyCode code )
 
 	BaseClass::OnKeyTyped( code );
 }
-#endif
 
 void GenericConfirmation::OnOpen( )
 {

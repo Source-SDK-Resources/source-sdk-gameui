@@ -149,20 +149,6 @@ void ControllerOptionsButtons::Activate()
 
 	// Figure out which button should be default
 
-#if defined ( _X360 )
-	ConVarRef joy_cfg_preset("joy_cfg_preset");
-	if ( joy_cfg_preset.IsValid() )
-	{
-		int iPreset = clamp( joy_cfg_preset.GetInt(), 0, NUM_CONTROLLER_BUTTONS_SETTINGS-1 );
-
-		vgui::Panel * firstPanel = FindChildByName( pszButtonSettingsButtonName[iPreset] );
-		if ( firstPanel )
-		{
-			firstPanel->NavigateTo();
-		}
-	}		
-#endif
-
 	vgui::Label *pLabel = dynamic_cast< vgui::Label * >( FindChildByName( "LblGameTitle" ) );
 	if ( pLabel )
 	{

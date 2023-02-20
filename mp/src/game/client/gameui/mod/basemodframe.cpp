@@ -74,9 +74,6 @@ CBaseModFrame::CBaseModFrame( vgui::Panel *parent, const char *panelName, bool o
 
 	Q_snprintf(m_ResourceName, sizeof( m_ResourceName ), "Resource/UI/BaseModUI/%s.res", panelName);
 
-#ifdef _X360
-	m_PassUnhandledInput = false;
-#endif
 	m_NavBack = NULL;
 	m_bCanNavBack = false;
 
@@ -238,7 +235,6 @@ void CBaseModFrame::OnKeyCodePressed(KeyCode keycode)
 	}
 }
 
-#ifndef _X360
 void CBaseModFrame::OnKeyCodeTyped( vgui::KeyCode code )
 {
 	// For PC, this maps space bar to OK and esc to cancel
@@ -261,8 +257,9 @@ void CBaseModFrame::OnKeyCodeTyped( vgui::KeyCode code )
 		break;
 	}
 
-	BaseClass::OnKeyTyped( code );}
-#endif
+	BaseClass::OnKeyTyped( code );
+}
+
 
 
 void CBaseModFrame::OnMousePressed( vgui::MouseCode code )
@@ -293,13 +290,6 @@ void CBaseModFrame::OnOpen()
 	
 	SetAlpha(255);//make sure we show up.
 	Activate();
-
-#ifdef _X360
-	if(m_ActiveControl != 0)
-	{
-		m_ActiveControl->NavigateTo();
-	}
-#endif // _X360
 
 	// close active menu if there is one
 	FlyoutMenu::CloseActiveMenu();
@@ -789,7 +779,6 @@ bool CBaseModFrame::CheckAndDisplayErrorIfNotLoggedIn()
 	if ( !IsPC() )
 		return false;
 
-#ifndef _X360
 #ifndef SWDS
 	// if we have Steam interfaces and user is logged on, everything is OK
 	if ( steamapicontext && steamapicontext->SteamUser() && steamapicontext->SteamMatchmaking() )
@@ -805,7 +794,6 @@ bool CBaseModFrame::CheckAndDisplayErrorIfNotLoggedIn()
 		return false;
 	}
 	
-#endif
 #endif
 
 	// Steam is not running or user not logged on, display error

@@ -114,16 +114,6 @@ void ControllerOptions::Activate()
 
 	SetGameUIActiveSplitScreenPlayerSlot( m_iActiveUserSlot );
 
-#if defined ( _X360 )
-	vgui::Panel * firstPanel = FindChildByName( "BtnEditButtons" );
-	if ( firstPanel )
-	{
-		if ( m_ActiveControl )
-			m_ActiveControl->NavigateFrom( );
-		firstPanel->NavigateTo();
-	}
-#endif
-
 	wchar_t *pwcTemplate = g_pVGuiLocalize->Find( "#L4D360UI_Controller_Title" );
 	if ( pwcTemplate )
 	{
@@ -285,18 +275,6 @@ void ControllerOptions::ResetToDefaults( void )
 	engine->ExecuteClientCmd( "exec config.360.cfg" );
 
 	engine->ExecuteClientCmd( "exec joy_preset_1.cfg" );
-
-#ifdef _X360
-	int iCtrlr = XBX_GetUserId( m_iActiveUserSlot );
-	UserProfileData const &upd = g_pMatchFramework->GetMatchSystem()->GetPlayerManager()
-		->GetLocalPlayer( iCtrlr )->GetPlayerProfileData();
-
-	int nMovementControl = ( upd.action_movementcontrol == XPROFILE_ACTION_MOVEMENT_CONTROL_L_THUMBSTICK ) ? 0 : 1;
-	engine->ExecuteClientCmd( VarArgs( "joy_movement_stick %d", nMovementControl ) );
-
-	int nYinvert = upd.yaxis;
-	engine->ExecuteClientCmd( VarArgs( "joy_inverty %d", nYinvert ) );
-#endif
 
 	engine->SetActiveSplitScreenPlayerSlot( iOldSlot );
 

@@ -54,9 +54,8 @@ namespace BaseModUI {
 		void ReloadSettings();
 
 		virtual void OnKeyCodePressed(vgui::KeyCode code);
-#ifndef _X360
 		virtual void OnKeyCodeTyped( vgui::KeyCode code );
-#endif
+
 		virtual void OnMousePressed( vgui::MouseCode code );
 
 		virtual void OnOpen();

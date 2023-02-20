@@ -70,10 +70,6 @@ public:
 	virtual void ShowPasswordUI( char const *pchCurrentPW );
 
  	virtual void SetProgressOnStart();
- 
-#if defined( _X360 ) && defined( _DEMO )
-	virtual void OnDemoTimeout();
-#endif
 
  	// state
  	bool IsInLevel();

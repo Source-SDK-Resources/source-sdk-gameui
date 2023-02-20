@@ -94,25 +94,6 @@ void ControllerOptionsSticks::Activate()
 
 	SetGameUIActiveSplitScreenPlayerSlot( m_iActiveUserSlot );
 
-#if defined ( _X360 )
-	ConVarRef joy_movement_stick("joy_movement_stick");
-	if ( joy_movement_stick.IsValid() )
-	{
-		int iSetting = ( joy_movement_stick.GetInt() > 0 ) ? 1 : 0;
-
-		for ( int k = 0; k < NUM_CONTROLLER_STICKS_SETTINGS; ++ k )
-		{
-			if ( Panel *btn = FindChildByName( pszStickSettingsButtonName[k] ) )
-				btn->NavigateFrom();
-		}
-
-		if ( Panel *btnActive = FindChildByName( pszStickSettingsButtonName[iSetting] ) )
-		{
-			btnActive->NavigateTo();
-		}
-	}
-#endif
-
 	vgui::Label *pLabel = dynamic_cast< vgui::Label * >( FindChildByName( "LblGameTitle" ) );
 	if ( pLabel )
 	{

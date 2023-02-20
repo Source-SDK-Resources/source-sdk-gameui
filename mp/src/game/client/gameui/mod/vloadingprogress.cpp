@@ -562,15 +562,11 @@ void LoadingProgress::SetupPoster( void )
 	vgui::ImagePanel *pPoster = dynamic_cast< vgui::ImagePanel* >( FindChildByName( "Poster" ) );
 	if ( pPoster )
 	{ 
-#if !defined( _X360 )
 		int screenWide, screenTall;
 		surface()->GetScreenSize( screenWide, screenTall );
 		float aspectRatio = (float)screenWide/(float)screenTall;
 		bool bIsWidescreen = aspectRatio >= 1.5999f;
-#else
-		static ConVarRef mat_xbox_iswidescreen( "mat_xbox_iswidescreen" );
-		bool bIsWidescreen = mat_xbox_iswidescreen.GetBool();
-#endif
+
 		const char *pszPosterImage;
 		int nChosenLoadingImage = RandomInt( 1, 4 );
 		switch( nChosenLoadingImage )
@@ -589,18 +585,6 @@ void LoadingProgress::SetupPoster( void )
 			bNamesVisible = true;
 		}
 	}
-
-	bool bIsLocalized = false;
-#ifdef _X360
-	bIsLocalized = XBX_IsLocalized();
-#else
-	char uilanguage[ 64 ];
-	engine->GetUILanguage( uilanguage, sizeof( uilanguage ) );
-	if ( Q_stricmp( uilanguage, "english" ) )
-	{
-		bIsLocalized = true;
-	}
-#endif
 
 	SetControlVisible( "LocalizedCampaignName", false );
 	SetControlVisible( "LocalizedCampaignTagline", false );

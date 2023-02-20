@@ -184,7 +184,6 @@ void AchievementListItem::ApplySchemeSettings(IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
 
-#ifndef _X360
 	if ( !m_pAchievement )
 		return;
 
@@ -277,9 +276,6 @@ void AchievementListItem::ApplySchemeSettings(IScheme *pScheme)
 		}
 	}
 	*/
-#else	
-	SetBgColor(pScheme->GetColor( "Button.BgColor", Color( 32, 32, 32, 255 ) ) );
-#endif
 }
 
 //=============================================================================
@@ -294,7 +290,6 @@ void AchievementListItem::PerformLayout( void )
 {
 	BaseClass::PerformLayout();
 
-#ifndef _X360
 	// TODO:
 	/*
 	uint64 iComponentBits = m_pAchievement->GetComponentBits();
@@ -335,13 +330,11 @@ void AchievementListItem::PerformLayout( void )
 		}
 	}
 	*/
-#endif
 }
 
 //=============================================================================
 void AchievementListItem::OnCommand( const char *command )
 {
-#ifndef _X360
 	if ( !Q_strcmp( command, "toggle_details" ) )
 	{
 		m_bShowingDetails = !m_bShowingDetails;
@@ -396,7 +389,6 @@ void AchievementListItem::OnCommand( const char *command )
 
 		InvalidateLayout();
 	}
-#endif
 }
 
 //=============================================================================
@@ -771,26 +763,6 @@ void Achievements::ApplySchemeSettings(vgui::IScheme *pScheme)
 	}
 }
 
-#ifdef _X360
-void Achievements::NavigateTo()
-{
-	BaseClass::NavigateTo();
-	if ( m_bShowingAssets )
-	{
-		m_GplAwards->NavigateTo();
-	}
-	else
-	{
-		m_GplAchievements->NavigateTo();
-	}
-}
-
-void Achievements::NavigateFrom()
-{
-	BaseClass::NavigateFrom();
-
-}
-#endif // _X360
 
 //=============================================================================
 void Achievements::PaintBackground()

@@ -148,11 +148,6 @@ public:
 	void OnCommand(const char *command);
 	void OnKeyCodePressed(vgui::KeyCode code);
 
-#ifdef _X360
-	virtual void NavigateTo();
-	virtual void NavigateFrom();
-#endif
-
 	void PaintBackground( void );
 
 	void ToggleDisplayType( bool bDisplayType );

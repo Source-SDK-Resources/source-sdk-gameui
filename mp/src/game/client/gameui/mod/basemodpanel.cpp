@@ -20,9 +20,6 @@
 #include "filesystem/IXboxInstaller.h"
 #include "tier2/renderutils.h"
 
-#ifdef _X360
-	#include "xbox/xbox_launch.h"
-#endif
 
 // BaseModUI High-level windows
 #include "VTransitionScreen.h"
@@ -94,29 +91,12 @@ extern IGameConsole *IGameConsole();
 //=============================================================================
 CBaseModPanel* CBaseModPanel::m_CFactoryBasePanel = 0;
 
-#ifndef _CERT
-#ifdef _X360
-ConVar ui_gameui_debug( "ui_gameui_debug", "1" );
-#else
 ConVar ui_gameui_debug( "ui_gameui_debug", "0", FCVAR_RELEASE );
-#endif
 int UI_IsDebug()
 {
-	return (*(int *)(&ui_gameui_debug)) ? ui_gameui_debug.GetInt() : 0;
+	return ui_gameui_debug.GetInt();
 }
-#endif
 
-#if defined( _X360 )
-static void InstallStatusChanged( IConVar *pConVar, const char *pOldValue, float flOldValue )
-{
-	// spew out status
-	if ( ((ConVar *)pConVar)->GetBool() && g_pXboxInstaller )
-	{
-		g_pXboxInstaller->SpewStatus();
-	}
-}
-ConVar xbox_install_status( "xbox_install_status", "0", 0, "Show install status", InstallStatusChanged );
-#endif
 
 // Use for show demos to force the correct campaign poster
 ConVar demo_campaign_name( "demo_campaign_name", "L4D2C5", FCVAR_DEVELOPMENTONLY, "Short name of campaign (i.e. L4D2C5), used to show correct poster in demo mode." );
@@ -128,7 +108,7 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 	m_bClosingAllWindows( false ),
 	m_lastActiveUserId( 0 )
 {
-#if !defined( _X360 ) && !defined( NOSTEAM )
+#if !defined( NOSTEAM )
 	// Set Steam overlay position
 	if ( steamapicontext && steamapicontext->SteamUtils() )
 	{
@@ -191,10 +171,6 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 	vgui::surface()->PrecacheFontCharacters( pScheme->GetFont( "DefaultBold", true ), NULL );
 	vgui::surface()->PrecacheFontCharacters( pScheme->GetFont( "DefaultLarge", true ), NULL );
 	vgui::surface()->PrecacheFontCharacters( pScheme->GetFont( "FrameTitle", true ), NULL );
-
-#ifdef _X360
-	x360_audio_english.SetValue( XboxLaunch()->GetForceEnglish() );
-#endif
 
 	m_FooterPanel = new CBaseModFooterPanel( this, "FooterPanel" );
 	m_hOptionsDialog = NULL;
@@ -323,13 +299,7 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_CLOUD:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[wt] = new Cloud(this, "Cloud");
-#endif
 			break;
 
 		case WT_CONTROLLER:
@@ -345,13 +315,7 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_DOWNLOADS:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[wt] = new Downloads(this, "Downloads");
-#endif
 			break;
 
 		case WT_GAMELOBBY:
@@ -391,13 +355,7 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_KEYBOARDMOUSE:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[wt] = new VKeyboard(this, "VKeyboard");
-#endif
 			break;
 
 		case WT_LOADINGPROGRESSBKGND:
@@ -453,13 +411,7 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_STEAMCLOUDCONFIRM:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[wt] = new SteamCloudConfirmation(this, "SteamCloudConfirmation");
-#endif
 			break;
 
 		case WT_STEAMGROUPSERVERS:
@@ -467,23 +419,11 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_CUSTOMCAMPAIGNS:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[ wt ] = new CustomCampaigns( this, "CustomCampaigns" );
-#endif
 			break;
 
 		case WT_DOWNLOADCAMPAIGN:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[ wt ] = new DownloadCampaign( this, "DownloadCampaign" );
-#endif
 			break;
 
 		case WT_LEADERBOARD:
@@ -491,43 +431,19 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_ADDONS:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[wt] = new Addons( this, "Addons" );
-#endif
 			break;
 
 		case WT_JUKEBOX:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[wt] = new VJukebox( this, "Jukebox" );
-#endif
 			break;
 
 		case WT_ADDONASSOCIATION:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[wt] = new AddonAssociation( this, "AddonAssociation" );
-#endif
 			break;
 
 		case WT_GETLEGACYDATA:
-#if defined( _X360 )
-			// not for xbox
-			Assert( 0 );
-			break;
-#else
 			m_Frames[wt] = new GetLegacyData( this, "GetLegacyData" );
-#endif
 			break;
 
 		default:
@@ -850,21 +766,6 @@ void CBaseModPanel::CloseAllWindows( int ePolicyFlags )
 	m_ActiveWindow[ WPRI_NORMAL ] = WT_NONE;
 }
 
-#if defined( _X360 ) && defined( _DEMO )
-void CBaseModPanel::OnDemoTimeout()
-{
-	if ( !engine->IsInGame() && !engine->IsConnected() && !engine->IsDrawingLoadingImage() )
-	{
-		// exit is terminal and unstoppable
-		StartExitingProcess( false );
-	}
-	else
-	{
-		engine->ExecuteClientCmd( "disconnect" );
-	}
-}
-#endif
-
 bool CBaseModPanel::ActivateBackgroundEffects()
 {
 	// PC needs to keep start music, can't loop MP3's
@@ -890,38 +791,6 @@ void CBaseModPanel::OnGameUIActivated()
 	}
 
 	COM_TimestampedLog( "CBaseModPanel::OnGameUIActivated()" );
-
-#if defined( _X360 )
-	if ( !engine->IsInGame() && !engine->IsConnected() && !engine->IsDrawingLoadingImage() )
-	{
-#if defined( _DEMO )
-		if ( engine->IsDemoExiting() )
-		{
-			// just got activated, maybe from a disconnect
-			// exit is terminal and unstoppable
-			SetVisible( true );
-			StartExitingProcess( false );
-			return;
-		}
-#endif
-		if ( !GameUI().IsInLevel() && !GameUI().IsInBackgroundLevel() )
-		{
-			// not using a background map
-			// start the menu movie and music now, as the main menu is about to open
-			// these are very large i/o operations on the xbox
-			// they must occur before the installer takes over the DVD
-			// otherwise the transfer rate is so slow and we sync stall for 10-15 seconds
-			ActivateBackgroundEffects();
-		}
-		// the installer runs in the background during the main menu
-		g_pXboxInstaller->Start();
-
-#if defined( _DEMO )
-		// ui valid can now adhere to demo timeout rules
-		engine->EnableDemoTimeout( true );
-#endif
-	}
-#endif
 
 	SetVisible( true );
 
@@ -976,10 +845,6 @@ void CBaseModPanel::OnGameUIHidden()
 		Msg( "[GAMEUI] CBaseModPanel::OnGameUIHidden()\n" );
 	}
 
-#if defined( _X360 )
-	// signal the installer to stop
-	g_pXboxInstaller->Stop();
-#endif
 
 // 	// We want to check here if we have any pending message boxes and
 // 	// if so, then we cannot just simply destroy all the UI elements
@@ -1018,38 +883,7 @@ void CBaseModPanel::OnGameUIHidden()
 
 void CBaseModPanel::OpenFrontScreen()
 {
-	WINDOW_TYPE frontWindow = WT_NONE;
-#ifdef _X360
-	// make sure we are in the startup menu.
-	if ( !GameUI().IsInBackgroundLevel() )
-	{
-		engine->ClientCmd( "startupmenu" );
-	}
-
-	if ( g_pMatchFramework->GetMatchSession() )
-	{
-		Warning( "CBaseModPanel::OpenFrontScreen during active game ignored!\n" );
-		return;
-	}
-
-	if( XBX_GetNumGameUsers() > 0 )
-	{
-		if ( CBaseModFrame *pAttractScreen = GetWindow( WT_ATTRACTSCREEN ) )
-		{
-			frontWindow = WT_ATTRACTSCREEN;
-		}
-		else
-		{
-			frontWindow = WT_MAINMENU;
-		}
-	}
-	else
-	{
-		frontWindow = WT_ATTRACTSCREEN;
-	}
-#else
-	frontWindow = WT_MAINMENU;
-#endif // _X360
+	WINDOW_TYPE frontWindow = WT_MAINMENU;
 
 	if( frontWindow != WT_NONE )
 	{
@@ -1154,20 +988,6 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 {
 	Assert( !m_LevelLoading );
 
-#if defined( _X360 )
-	// stop the installer
-	g_pXboxInstaller->Stop();
-	g_pXboxInstaller->SpewStatus();
-
-	// If the installer has finished while we are in the menus, then this is the ONLY place we
-	// know that there is no open files and we can redirect the search paths
-	if ( g_pXboxInstaller->ForceCachePaths() )
-	{
-		// the search paths got changed
-		// notify other systems who may have hooked absolute paths
-		engine->SearchPathsChangedAfterInstall();
-	}
-#endif
 
 	CloseAllWindows();
 
@@ -1370,14 +1190,6 @@ void CBaseModPanel::OnLevelLoadingFinished( KeyValues *kvEvent )
 	{
 		Msg( "[GAMEUI] CBaseModPanel::OnLevelLoadingFinished( %s, %s )\n", bError ? "Had Error" : "No Error", failureReason );
 	}
-
-#if defined( _X360 )
-	if ( GameUI().IsInBackgroundLevel() )
-	{
-		// start the installer when running the background map has finished
-		g_pXboxInstaller->Start();
-	}
-#endif
 
 	LoadingProgress *pLoadingProgress = static_cast<LoadingProgress*>( GetWindow( WT_LOADINGPROGRESS ) );
 	if ( pLoadingProgress )
@@ -1839,14 +1651,9 @@ void CBaseModPanel::ApplySchemeSettings(IScheme *pScheme)
 	int logoW = 384;
 	int logoH = 192;
 
-	bool bIsWidescreen;
-#if !defined( _X360 )
 	float aspectRatio = (float)screenWide/(float)screenTall;
-	bIsWidescreen = aspectRatio >= 1.5999f;
-#else
-	static ConVarRef mat_xbox_iswidescreen( "mat_xbox_iswidescreen" );
-	bIsWidescreen = mat_xbox_iswidescreen.GetBool();
-#endif
+	bool bIsWidescreen = aspectRatio >= 1.5999f;
+
 	if ( !bIsWidescreen )
 	{
 		// smaller in standard res
@@ -1867,31 +1674,6 @@ void CBaseModPanel::ApplySchemeSettings(IScheme *pScheme)
 		Q_snprintf( m_szFadeFilename, sizeof( m_szFadeFilename ), "materials/console/%s_widescreen.vtf", "SwarmSelectionScreen" );
 	}
 
-	// TODO: GetBackgroundMusic
-#if 0
-
-	bool bUseMono = false;
-#if defined( _X360 )
-	// cannot use the very large stereo version during the install
-	 bUseMono = g_pXboxInstaller->IsInstallEnabled() && !g_pXboxInstaller->IsFullyInstalled();
-#if defined( _DEMO )
-	bUseMono = true;
-#endif
-#endif
-
-	char backgroundMusic[MAX_PATH];
-	engine->GetBackgroundMusic( backgroundMusic, sizeof( backgroundMusic ), bUseMono );
-
-	// the precache will be a memory or stream wave as needed 
-	// on 360 the sound system will detect the install state and force it to a memory wave to finalize the the i/o now
-	// it will be a stream resource if the installer is dormant
-	// On PC it will be a streaming MP3
-	if ( enginesound->PrecacheSound( backgroundMusic, true, false ) )
-	{
-		// successfully precached
-		m_backgroundMusic = backgroundMusic;
-	}
-#endif
 }
 
 void CBaseModPanel::DrawColoredText( vgui::HFont hFont, int x, int y, unsigned int color, const char *pAnsiText )
@@ -1916,70 +1698,7 @@ void CBaseModPanel::DrawColoredText( vgui::HFont hFont, int x, int y, unsigned i
 
 void CBaseModPanel::DrawCopyStats()
 {
-#if defined( _X360 )
-	int wide, tall;
-	GetSize( wide, tall );
 
-	int xPos = 0.1f * wide;
-	int yPos = 0.1f * tall;
-
-	// draw copy status
-	char textBuffer[256];
-	const CopyStats_t *pCopyStats = g_pXboxInstaller->GetCopyStats();	
-
-	V_snprintf( textBuffer, sizeof( textBuffer ), "Version: %d (%s)", g_pXboxInstaller->GetVersion(), XBX_GetLanguageString() );
-	DrawColoredText( m_hDefaultFont, xPos, yPos, 0xffff00ff, textBuffer );
-	yPos += 20;
-
-	V_snprintf( textBuffer, sizeof( textBuffer ), "DVD Hosted: %s", g_pFullFileSystem->IsDVDHosted() ? "Enabled" : "Disabled" );
-	DrawColoredText( m_hDefaultFont, xPos, yPos, 0xffff00ff, textBuffer );
-	yPos += 20;
-
-	bool bDrawProgress = true;
-	if ( g_pFullFileSystem->IsInstalledToXboxHDDCache() )
-	{
-		DrawColoredText( m_hDefaultFont, xPos, yPos, 0x00ff00ff, "Existing Image Found." );
-		yPos += 20;
-		bDrawProgress = false;
-	}
-	if ( !g_pXboxInstaller->IsInstallEnabled() )
-	{
-		DrawColoredText( m_hDefaultFont, xPos, yPos, 0xff0000ff, "Install Disabled." );
-		yPos += 20;
-		bDrawProgress = false;
-	}
-	if ( g_pXboxInstaller->IsFullyInstalled() )
-	{
-		DrawColoredText( m_hDefaultFont, xPos, yPos, 0x00ff00ff, "Install Completed." );
-		yPos += 20;
-	}
-
-	if ( bDrawProgress )
-	{
-		yPos += 20;
-		V_snprintf( textBuffer, sizeof( textBuffer ), "From: %s (%.2f MB)", pCopyStats->m_srcFilename, (float)pCopyStats->m_ReadSize/(1024.0f*1024.0f) );
-		DrawColoredText( m_hDefaultFont, xPos, yPos, 0xffff00ff, textBuffer );
-		V_snprintf( textBuffer, sizeof( textBuffer ), "To: %s (%.2f MB)", pCopyStats->m_dstFilename, (float)pCopyStats->m_WriteSize/(1024.0f*1024.0f)  );
-		DrawColoredText( m_hDefaultFont, xPos, yPos + 20, 0xffff00ff, textBuffer );
-
-		float elapsed = 0;
-		float rate = 0;
-		if ( pCopyStats->m_InstallStartTime )
-		{
-			elapsed = (float)(GetTickCount() - pCopyStats->m_InstallStartTime) * 0.001f;
-		}
-		if ( pCopyStats->m_InstallStopTime )
-		{
-			elapsed = (float)(pCopyStats->m_InstallStopTime - pCopyStats->m_InstallStartTime) * 0.001f;
-		}
-		if ( elapsed )
-		{
-			rate = pCopyStats->m_TotalWriteSize/elapsed;
-		}
-		V_snprintf( textBuffer, sizeof( textBuffer ), "Progress: %d/%d MB Elapsed: %d secs (%.2f MB/s)", pCopyStats->m_BytesCopied/(1024*1024), g_pXboxInstaller->GetTotalSize()/(1024*1024), (int)elapsed, rate/(1024.0f*1024.0f) );
-		DrawColoredText( m_hDefaultFont, xPos, yPos + 40, 0xffff00ff, textBuffer );
-	}
-#endif
 }
 
 //=============================================================================
@@ -2040,13 +1759,6 @@ void CBaseModPanel::PaintBackground()
 			}
 		}
 	}
-
-#if defined( _X360 )
-	if ( !m_LevelLoading && !GameUI().IsInLevel() && xbox_install_status.GetBool() )
-	{
-		DrawCopyStats();
-	}
-#endif
 }
 
 IVTFTexture *LoadVTF( CUtlBuffer &temp, const char *szFileName )
@@ -2308,11 +2020,6 @@ void CBaseModPanel::OnCommand(const char *command)
 
 bool CBaseModPanel::IsReadyToWriteConfig( void )
 {
-	// For cert we only want to write config files is it has been at least 3 seconds
-#ifdef _X360
-	static ConVarRef r_host_write_last_time( "host_write_last_time" );
-	return ( Plat_FloatTime() > r_host_write_last_time.GetFloat() + 3.05f );
-#endif
 	return false;
 }
 
@@ -2365,11 +2072,6 @@ void CBaseModPanel::StartExitingProcess( bool bWarmRestart )
 		// already fired
 		return;
 	}
-
-#if defined( _X360 )
-	// signal the installer to stop
-	g_pXboxInstaller->Stop();
-#endif
 
 	// cold restart or warm
 	m_bWarmRestartMode = bWarmRestart;
@@ -2462,9 +2164,6 @@ void CBaseModPanel::ReleaseBackgroundMusic()
 	// need to stop the sound now, do not queue the stop
 	// we must release the 2-5 MB held by this resource
 	enginesound->StopSoundByGuid( m_nBackgroundMusicGUID );
-#if defined( _X360 )
-	// TODO: enginesound->UnloadSound( m_backgroundMusic );
-#endif
 
 	m_nBackgroundMusicGUID = 0;
 }

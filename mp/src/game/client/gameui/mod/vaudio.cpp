@@ -19,10 +19,6 @@
 #include "nb_header_footer.h"
 #include "vgui_controls/ImagePanel.h"
 
-#ifdef _X360
-#include "xbox/xbox_launch.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

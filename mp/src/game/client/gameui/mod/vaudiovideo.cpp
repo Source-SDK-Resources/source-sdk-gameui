@@ -13,10 +13,6 @@
 #include "vgui/ISurface.h"
 #include "VGenericConfirmation.h"
 
-#ifdef _X360
-#include "xbox/xbox_launch.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -67,11 +63,6 @@ void AudioVideo::Activate()
 {
 	BaseClass::Activate();
 
-#ifdef _X360
-	ConVarRef mat_xbox_ishidef( "mat_xbox_ishidef" );
-	ConVarRef mat_xbox_iswidescreen( "mat_xbox_iswidescreen" );
-#endif
-
 	if ( m_sldBrightness )
 	{
 		m_sldBrightness->Reset();
@@ -101,44 +92,13 @@ void AudioVideo::Activate()
 	if ( m_sldFilmGrain )
 	{
 		m_sldFilmGrain->Reset();
-
-#ifdef _X360
-		if ( !mat_xbox_ishidef.GetBool() )
-		{
-			m_sldFilmGrain->SetEnabled( false );
-		}
-#endif
 	}
 
 	if ( m_drpSplitScreenDirection )
 	{
-		bool bWidescreen = false;
-#ifdef _X360
-		bWidescreen = mat_xbox_iswidescreen.GetBool();
-#endif
-
-		if ( !bWidescreen )
-		{
-			m_drpSplitScreenDirection->SetEnabled( false );
-			m_drpSplitScreenDirection->SetCurrentSelection( "#L4D360UI_SplitScreenDirection_Horizontal" );
-		}
-		else
-		{
-			ConVarRef ss_splitmode( "ss_splitmode" );
-			int iSplitMode = ss_splitmode.GetInt();
-
-			switch ( iSplitMode )
-			{
-			case 1:
-				m_drpSplitScreenDirection->SetCurrentSelection( "#L4D360UI_SplitScreenDirection_Horizontal" );
-				break;
-			case 2:
-				m_drpSplitScreenDirection->SetCurrentSelection( "#L4D360UI_SplitScreenDirection_Vertical" );
-				break;
-			default:
-				m_drpSplitScreenDirection->SetCurrentSelection( "#L4D360UI_SplitScreenDirection_Default" );
-			}
-		}
+		m_drpSplitScreenDirection->SetEnabled( false );
+		m_drpSplitScreenDirection->SetCurrentSelection( "#L4D360UI_SplitScreenDirection_Horizontal" );
+	
 
 		FlyoutMenu *pFlyout = m_drpSplitScreenDirection->GetCurrentFlyout();
 		if ( pFlyout )

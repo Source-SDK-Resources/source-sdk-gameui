@@ -116,12 +116,7 @@ void InGameMainMenu::OnCommand( const char *command )
 	}
 	else if (!Q_strcmp(command, "BootPlayer"))
 	{
-#if defined ( _X360 )
-		OnCommand( "ReturnToGame" );
-		engine->ClientCmd("togglescores");
-#else
 		CBaseModPanel::GetSingleton().OpenWindow(WT_INGAMEKICKPLAYERLIST, this, true );
-#endif
 	}
 	else if ( !Q_strcmp(command, "ChangeScenario") && !demo_ui_enable.GetString()[0] )
 	{
@@ -160,22 +155,6 @@ void InGameMainMenu::OnCommand( const char *command )
 	{
 		if ( CheckAndDisplayErrorIfNotLoggedIn() )
 			return;
-
-#ifdef _X360
-		// If 360 make sure that the user is not a guest
-		if ( XBX_GetUserIsGuest( CBaseModPanel::GetSingleton().GetLastActiveUserId() ) )
-		{
-			GenericConfirmation* confirmation = 
-				static_cast<GenericConfirmation*>( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, this, false ) );
-			GenericConfirmation::Data_t data;
-			data.pWindowTitle = "#L4D360UI_MsgBx_AchievementsDisabled";
-			data.pMessageText = "#L4D360UI_MsgBx_GuestsUnavailableToGuests";
-			data.bOkButtonEnabled = true;
-			confirmation->SetUsageData(data);
-
-			return;
-		}
-#endif //_X360
 
 		m_ActiveControl->NavigateFrom( );
 		CBaseModPanel::GetSingleton().OpenWindow( WT_ACHIEVEMENTS, this, true );
@@ -221,13 +200,6 @@ void InGameMainMenu::OnCommand( const char *command )
 	}
 	else if (!Q_strcmp(command, "Storage"))
 	{
-#ifdef _X360
-		if ( XBX_GetUserIsGuest( iUserSlot ) )
-		{
-			CBaseModPanel::GetSingleton().PlayUISound( UISOUND_INVALID );
-			return;
-		}
-#endif
 		// Trigger storage device selector
 		CUIGameData::Get()->SelectStorageDevice( new CChangeStorageDevice( XBX_GetUserId( iUserSlot ) ) );
 	}
@@ -309,17 +281,6 @@ void InGameMainMenu::OnCommand( const char *command )
 	else
 	{
 		const char *pchCommand = command;
-#ifdef _X360
-		{
-			if ( !Q_strcmp(command, "FlmOptionsFlyout") )
-			{
-				if ( XBX_GetPrimaryUserIsGuest() )
-				{
-					pchCommand = "FlmOptionsGuestFlyout";
-				}
-			}
-		}
-#endif
 
 		if ( !Q_strcmp( command, "FlmVoteFlyout" ) )
 		{
@@ -364,9 +325,6 @@ void InGameMainMenu::OnCommand( const char *command )
 				BaseModHybridButton *hybrid = dynamic_cast<BaseModHybridButton *>( GetChild( iChild ) );
 				if ( hybrid && hybrid->GetCommand() && !Q_strcmp( hybrid->GetCommand()->GetString( "command"), command ) )
 				{
-#ifdef _X360
-					hybrid->NavigateFrom( );
-#endif //_X360
 					// open the menu next to the button that got clicked
 					flyout->OpenMenu( hybrid );
 					break;
@@ -465,19 +423,13 @@ void InGameMainMenu::OnThink()
 
 			if ( flyout )
 			{
-#ifdef _X360
-				bool bIsSplitscreen = ( XBX_GetNumGameUsers() > 1 );
-#else
 				bool bIsSplitscreen = false;
-#endif
 
 				Button *pButton = flyout->FindChildButtonByCommand( "EnableSplitscreen" );
 				if ( pButton )
 				{
 					pButton->SetVisible( !bIsSplitscreen );
-#ifdef _X360
-					pButton->SetEnabled( !XBX_GetPrimaryUserIsGuest() && Q_strcmp( engine->GetLevelName(), "maps/credits.360.bsp" ) != 0 );
-#endif
+
 				}
 
 				pButton = flyout->FindChildButtonByCommand( "DisableSplitscreen" );
@@ -632,10 +584,6 @@ void InGameMainMenu::PerformLayout( void )
 		flyout->SetListener( this );
 		
 		bool bSinglePlayer = true;
-
-#ifdef _X360
-		bSinglePlayer = ( XBX_GetNumGameUsers() == 1 );
-#endif
 
 		Button *pButton = flyout->FindChildButtonByCommand( "ReturnToLobby" );
 		if ( pButton )

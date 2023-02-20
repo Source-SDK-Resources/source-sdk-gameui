@@ -20,10 +20,6 @@ public:
 	MainMenu(vgui::Panel *parent, const char *panelName);
 	~MainMenu();
 
-#ifdef _X360
-	void Activate();
-#endif //_X360
-
 	void UpdateVisibility();
 
 	MESSAGE_FUNC_CHARPTR( OpenMainMenuJoinFailed, "OpenMainMenuJoinFailed", msg );

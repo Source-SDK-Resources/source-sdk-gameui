@@ -7,9 +7,7 @@
 
 #undef fopen
 
-#if !defined( _X360 )
 #include <windows.h> // SRC only!!
-#endif
 
 #include "OptionsSubMultiplayer.h"
 #include "MultiplayerAdvancedDialog.h"
@@ -58,10 +56,6 @@
 #include "bitmap/tgawriter.h"
 #include "ivtex.h"
 #include <io.h>
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -944,7 +938,6 @@ static void ValveJpegErrorHandler( j_common_ptr cinfo )
 // convert the JPEG file given to a TGA file at the given output path.
 ConversionErrorType COptionsSubMultiplayer::ConvertJPEGToTGA(const char *jpegpath, const char *tgaPath)
 {
-#if !defined( _X360 )
 	struct jpeg_decompress_struct jpegInfo;
 	struct ValveJpegErrorHandler_t jerr;
 	JSAMPROW row_pointer[1];
@@ -1058,10 +1051,6 @@ ConversionErrorType COptionsSubMultiplayer::ConvertJPEGToTGA(const char *jpegpat
 
 	free(buf);
 	return bRetVal ? CE_SUCCESS : CE_ERROR_WRITING_OUTPUT_FILE;
-
-#else
-	return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-#endif
 }
 
 // convert the bmp file given to a TGA file at the given destination path.

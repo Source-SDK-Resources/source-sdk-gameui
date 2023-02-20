@@ -5,9 +5,8 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#if !defined( _X360 )
 #include <windows.h>
-#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -80,10 +79,6 @@ inline UI_BASEMOD_PANEL_CLASS & ConstructUiBaseModPanelClass() { return *BasePan
 
 #endif
 
-#ifdef _X360
-#include "xbox/xbox_win32stubs.h"
-#endif // _X360
-
 #include "tier0/dbg.h"
 #include "engine/IEngineSound.h"
 #include "gameui_util.h"
@@ -92,9 +87,6 @@ inline UI_BASEMOD_PANEL_CLASS & ConstructUiBaseModPanelClass() { return *BasePan
 #include "tier0/memdbgon.h"
 
 IEngineVGui *enginevguifuncs = NULL;
-#ifdef _X360
-IXOnline  *xonline = NULL;			// 360 only
-#endif
 vgui::ISurface *enginesurfacefuncs = NULL;
 IAchievementMgr *achievementmgr = NULL;
 
@@ -177,10 +169,8 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	engine = (IVEngineClient *)factory( VENGINE_CLIENT_INTERFACE_VERSION, NULL );
 	bik = (IBik*)factory( BIK_INTERFACE_VERSION, NULL );
 
-#ifndef _X360
 	SteamAPI_InitSafe();
 	steamapicontext->Init();
-#endif
 
 	ConVarRef var( "gameui_xbox" );
 	m_bIsConsoleUI = var.IsValid() && var.GetBool();
@@ -201,18 +191,10 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	enginevguifuncs = (IEngineVGui *)factory( VENGINE_VGUI_VERSION, NULL );
 	enginesurfacefuncs = (vgui::ISurface *)factory(VGUI_SURFACE_INTERFACE_VERSION, NULL);
 	gameuifuncs = (IGameUIFuncs *)factory( VENGINE_GAMEUIFUNCS_VERSION, NULL );
-	xboxsystem = (IXboxSystem *)factory( XBOXSYSTEM_INTERFACE_VERSION, NULL );
-#ifdef _X360
-	xonline = (IXOnline *)factory( XONLINE_INTERFACE_VERSION, NULL );
-#endif
 #ifdef SWARM_DLL
 	g_pMatchExtSwarm = ( IMatchExtSwarm * ) factory( IMATCHEXT_SWARM_INTERFACE, NULL );
 #endif
 	bFailed = !enginesurfacefuncs || !gameuifuncs || !enginevguifuncs ||
-		!xboxsystem ||
-#ifdef _X360
-		!xonline ||
-#endif
 #ifdef SWARM_DLL
 		!g_pMatchExtSwarm ||
 #endif
@@ -520,9 +502,6 @@ void CGameUI::Shutdown()
 	}
 
 	steamapicontext->Clear();
-#ifndef _X360
-	// SteamAPI_Shutdown(); << Steam shutdown is controlled by engine
-#endif
 	
 	ConVar_Unregister();
 	DisconnectTier3Libraries();
@@ -1057,11 +1036,3 @@ void CGameUI::SetProgressOnStart()
 {
 	m_bOpenProgressOnStart = true;
 }
-
-#if defined( _X360 ) && defined( _DEMO )
-void CGameUI::OnDemoTimeout()
-{
-	GetUiBaseModPanelClass().OnDemoTimeout();
-}
-#endif
-

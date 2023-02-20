@@ -330,23 +330,6 @@ void SpinnerControl::OnKeyCodePressed(KeyCode code)
 	}
 }
 
-#ifdef _X360
-//=============================================================================
-void SpinnerControl::NavigateTo()
-{
-	BaseClass::NavigateTo();
-
-	m_LblCurrentText->SetBgColor(m_ActiveColor);
-}
-
-//=============================================================================
-void SpinnerControl::NavigateFrom()
-{
-	BaseClass::NavigateFrom();
-
-	m_LblCurrentText->SetBgColor(m_InactiveColor);
-}
-#endif // _X360
 
 //=============================================================================
 void SpinnerControl::PaintBackground()

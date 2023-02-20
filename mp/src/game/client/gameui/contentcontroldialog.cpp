@@ -8,9 +8,9 @@
 
 #include <stdio.h>
 #include <memory.h>
-#if !defined( _X360 )
+
 #include <windows.h>
-#endif
+
 
 #include "ContentControlDialog.h"
 #include "checksum_md5.h"
@@ -27,10 +27,6 @@
 #include <vgui_controls/Label.h>
 #include <vgui_controls/RadioButton.h>
 #include <vgui_controls/TextEntry.h>
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

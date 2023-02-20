@@ -40,9 +40,7 @@ protected:
 	virtual void PaintBackground();
 	virtual void ApplySchemeSettings( vgui::IScheme* pScheme );
 	virtual void OnKeyCodePressed(vgui::KeyCode code);
-#ifndef _X360
 	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-#endif
 
 	virtual void OnCommand( const char *command );
 

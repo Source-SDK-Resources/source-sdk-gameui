@@ -119,7 +119,6 @@ void PasswordEntry::OnKeyCodePressed( KeyCode keycode )
 	}
 }
 
-#ifndef _X360
 void PasswordEntry::OnKeyCodeTyped( vgui::KeyCode code )
 {
 	// For PC, this maps space bar to OK and esc to cancel
@@ -134,7 +133,6 @@ void PasswordEntry::OnKeyCodeTyped( vgui::KeyCode code )
 
 	BaseClass::OnKeyTyped( code );
 }
-#endif
 
 void PasswordEntry::OnOpen( )
 {

@@ -20,10 +20,6 @@
 #include "materialsystem/materialsystem_config.h"
 #include "cdll_util.h"
 
-#ifdef _X360
-#include "xbox/xbox_launch.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -195,10 +191,6 @@ void Video::SetupActivateData( void )
 //=============================================================================
 bool Video::SetupRecommendedActivateData( void )
 {
-#ifdef _X360
-	AssertMsg( false, "VideoCFG is not supported on 360." );
-	return false;
-#else
 	KeyValues *pConfigKeys = new KeyValues( "VideoConfig" );
 	if ( !pConfigKeys )
 		return false;
@@ -230,7 +222,6 @@ bool Video::SetupRecommendedActivateData( void )
 	pConfigKeys->deleteThis();
 
 	return true;
-#endif
 }
 
 void Video::OpenThirdPartyVideoCreditsDialog()
@@ -1388,13 +1379,8 @@ void Video::ApplyChanges()
 	engine->ClientCmd_Unrestricted( VarArgs( "host_writeconfig_ss %d", XBX_GetPrimaryUserId() ) );
 	m_bDirtyValues = false;
 
-	// Update the current video config file.
-#ifdef _X360
-	AssertMsg( false, "VideoCFG is not supported on 360." );
-#else
 	int nAspectRatioMode = GetScreenAspectMode( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height );
 	UpdateCurrentVideoConfig( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height, nAspectRatioMode, !config.Windowed(), config.NoWindowBorder() );
-#endif
 }
 
 void Video::OnNotifyChildFocus( vgui::Panel* child )

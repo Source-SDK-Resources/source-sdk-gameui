@@ -39,9 +39,6 @@ extern class IEngineVGui *enginevguifuncs;
 extern class IGameUIFuncs *gameuifuncs;
 extern class IEngineSound *enginesound;
 extern class IXboxSystem  *xboxsystem;
-#ifdef _X360
-extern class IXOnline  *xonline;
-#endif
 extern class IAchievementMgr *achievementmgr; 
 extern class CSteamAPIContext *steamapicontext;
 

@@ -285,16 +285,6 @@ void SliderControl::ApplySettings( KeyValues* inResourceData )
 	m_prgValue = dynamic_cast< vgui::ProgressBar* >( FindChildByName( "PrgValue" ) );
 	m_defaultMark = dynamic_cast< vgui::Panel* >( FindChildByName( "PnlDefaultMark" ) );
 
-#ifdef _X360
-	if( m_button )
-	{
-		if( !HasFocus() && !m_button->HasFocus() )
-		{
-			m_button->NavigateFrom( );
-		}
-	}
-#endif //_X360
-
 	SetStepSize( inResourceData->GetFloat( "stepSize", 1.0f ) );
 	SetMin( inResourceData->GetFloat( "minValue", 0.0f ) );
 	SetMax( inResourceData->GetFloat( "maxValue", 100.0f ) );

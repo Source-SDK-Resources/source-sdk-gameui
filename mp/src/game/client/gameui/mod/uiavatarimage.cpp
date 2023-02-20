@@ -9,11 +9,7 @@
 #include "EngineInterface.h"
 #include "vgui/ISurface.h"
 
-#ifndef _X360
 #include "steam/steam_api.h"
-#endif
-
-#ifndef _X360
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -111,5 +107,3 @@ void CGameUiAvatarImage::Paint( void )
 		vgui::surface()->DrawTexturedRect( m_nX, m_nY, m_nX + m_nWide, m_nY + m_nTall );
 	}
 }
-
-#endif // !_X360

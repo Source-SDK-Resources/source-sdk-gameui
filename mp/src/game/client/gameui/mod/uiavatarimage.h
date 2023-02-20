@@ -9,11 +9,6 @@
 
 #include "vgui/IImage.h"
 
-#ifdef _X360
-
-typedef vgui::IImage CGameUiAvatarImage;
-
-#else
 
 #include "steam/steam_api.h"
 
@@ -92,9 +87,6 @@ private:
 	bool m_bValid;
 	float m_flFetchedTime;
 };
-
-#endif // !_X360
-
 
 
 #endif // __UIAVATARIMAGE_H__
