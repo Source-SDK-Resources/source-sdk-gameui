@@ -107,22 +107,7 @@ private:
 
 	bool		m_isOpen;
 	bool		m_isNavigateTo; //to help cure flashing
-	bool		m_bOnlyActiveUser;
 	bool		m_bIgnoreButtonA;
-
-	enum UseIndex_t
-	{
-		USE_NOBODY = -2,		// Nobody can use the button
-		USE_EVERYBODY = -1,		// Everybody can use the button
-		USE_SLOT0 = 0,			// Only Slot0 can use the button
-		USE_SLOT1,				// Only Slot1 can use the button
-		USE_SLOT2,				// Only Slot2 can use the button
-		USE_SLOT3,				// Only Slot3 can use the button
-		USE_PRIMARY = 0xFF,		// Only primary user can use the button
-	};
-
-	int m_iUsablePlayerIndex;
-	EnableCondition mEnableCondition;
 
 	CUtlString	m_enabledToolText;
 	CUtlString	m_disabledToolText;

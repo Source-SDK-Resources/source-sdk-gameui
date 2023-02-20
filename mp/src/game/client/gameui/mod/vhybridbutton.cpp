@@ -44,7 +44,6 @@ BaseModUI::BaseModHybridButton::BaseModHybridButton( Panel *parent, const char *
 	SetConsoleStylePanel( true );
 
 	m_isNavigateTo = false;
-	m_bOnlyActiveUser = false;
 	m_bIgnoreButtonA = false;
 
 	m_nStyle = BUTTON_SIMPLE;
@@ -74,8 +73,7 @@ BaseModUI::BaseModHybridButton::BaseModHybridButton( Panel *parent, const char *
 	SetButtonActivationType( ACTIVATE_ONRELEASED );
 
 	m_isNavigateTo = false;
-	m_iUsablePlayerIndex = -1;
-
+	
 	m_nStyle = BUTTON_SIMPLE;
 	m_hTextFont = 0;
 	m_hTextBlurFont = 0;
@@ -757,24 +755,6 @@ void BaseModHybridButton::ApplySettings( KeyValues * inResourceData )
 		m_originalTall = m_nTextFontHeight;
 	}
 
-	m_iUsablePlayerIndex = USE_EVERYBODY;
-	if ( const char *pszValue = inResourceData->GetString( "usablePlayerIndex", "" ) )
-	{
-		if ( !stricmp( "primary", pszValue ) )
-		{
-			m_iUsablePlayerIndex = USE_PRIMARY;
-		}
-		else if ( !stricmp( "nobody", pszValue ) )
-		{
-			m_iUsablePlayerIndex = USE_NOBODY;
-		}
-		else if ( isdigit( pszValue[0] ) )
-		{
-			m_iUsablePlayerIndex = atoi( pszValue );
-		}
-	}
-
-	m_bOnlyActiveUser = ( inResourceData->GetInt( "OnlyActiveUser", 0 ) != 0 );
 	m_bIgnoreButtonA = ( inResourceData->GetInt( "IgnoreButtonA", 0 ) != 0 );
 
 	m_bShowDropDownIndicator = ( inResourceData->GetInt( "ShowDropDownIndicator", 0 ) != 0 );
@@ -813,24 +793,6 @@ void BaseModHybridButton::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 void BaseModHybridButton::OnKeyCodePressed( vgui::KeyCode code )
 {
-	int iJoystick = GetJoystickForCode( code );
-
-	if ( m_bOnlyActiveUser )
-	{
-		// Only allow input from the active userid
-		int userId = CBaseModPanel::GetSingleton().GetLastActiveUserId();
-
-		if( iJoystick != userId || iJoystick < 0 )
-		{	
-			return;
-		}
-	}
-
-	BaseModUI::CBaseModPanel::GetSingleton().SetLastActiveUserId( iJoystick );
-
-	int iController = XBX_GetUserId( iJoystick );
-	bool bIsPrimaryUser = ( iController >= 0 && XBX_GetPrimaryUserId() == DWORD( iController ) );
-
 	KeyCode localCode = GetBaseButtonCode( code );
 
 	if ( ( localCode == KEY_XBUTTON_A ) )
@@ -842,36 +804,7 @@ void BaseModHybridButton::OnKeyCodePressed( vgui::KeyCode code )
 			return;
 		}
 
-		bool bEnabled = true;
 		if ( !IsEnabled() )
-		{
-			bEnabled = false;
-		}
-
-		switch( m_iUsablePlayerIndex )
-		{
-		case USE_EVERYBODY:
-			break;
-
-		case USE_PRIMARY:
-			if ( !bIsPrimaryUser )
-				bEnabled = false;
-			break;
-
-		case USE_SLOT0:
-		case USE_SLOT1:
-		case USE_SLOT2:
-		case USE_SLOT3:
-			if ( iJoystick != m_iUsablePlayerIndex )
-				bEnabled = false;
-			break;
-
-		default:
-			bEnabled = false;
-			break;
-		}
-
-		if ( !bEnabled )
 		{
 			CBaseModPanel::GetSingleton().PlayUISound( UISOUND_INVALID );
 			return;
