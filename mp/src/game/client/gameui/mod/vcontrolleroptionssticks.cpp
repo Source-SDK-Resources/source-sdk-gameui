@@ -95,7 +95,7 @@ void ControllerOptionsSticks::Activate()
 	SetGameUIActiveSplitScreenPlayerSlot( m_iActiveUserSlot );
 
 #if defined ( _X360 )
-	CGameUIConVarRef joy_movement_stick("joy_movement_stick");
+	ConVarRef joy_movement_stick("joy_movement_stick");
 	if ( joy_movement_stick.IsValid() )
 	{
 		int iSetting = ( joy_movement_stick.GetInt() > 0 ) ? 1 : 0;
@@ -157,7 +157,7 @@ void ControllerOptionsSticks::OnKeyCodePressed(KeyCode code)
 		{
 			CBaseModPanel::GetSingleton().PlayUISound( UISOUND_ACCEPT );
 
-			static CGameUIConVarRef s_joy_legacy( "joy_legacy" );
+			static ConVarRef s_joy_legacy( "joy_legacy" );
 			if ( s_joy_legacy.IsValid() )
 			{
 				s_joy_legacy.SetValue( !s_joy_legacy.GetBool() );
@@ -205,7 +205,7 @@ void ControllerOptionsSticks::OnCommand(const char *command)
 {
 	if( !Q_strcmp( command, pszStickSettingsButtonName[CONTROLLER_STICKS_NORMAL] ) )
 	{
-		CGameUIConVarRef joy_movement_stick("joy_movement_stick");
+		ConVarRef joy_movement_stick("joy_movement_stick");
 		if ( joy_movement_stick.IsValid() )
 		{
 			joy_movement_stick.SetValue( CONTROLLER_STICKS_NORMAL );
@@ -220,7 +220,7 @@ void ControllerOptionsSticks::OnCommand(const char *command)
 	}
 	else if( !Q_strcmp( command, pszStickSettingsButtonName[CONTROLLER_STICKS_SOUTHPAW] ) )
 	{
-		CGameUIConVarRef joy_movement_stick("joy_movement_stick");
+		ConVarRef joy_movement_stick("joy_movement_stick");
 		if ( joy_movement_stick.IsValid() )
 		{
 			joy_movement_stick.SetValue( CONTROLLER_STICKS_SOUTHPAW );
@@ -258,7 +258,7 @@ void ControllerOptionsSticks::UpdateFooter()
 	footer->SetButtonText( FB_ABUTTON, "#L4D360UI_Select" );
 
 	// Legacy Control support hack here 
-	static CGameUIConVarRef s_joy_legacy( "joy_legacy" );
+	static ConVarRef s_joy_legacy( "joy_legacy" );
 	if ( s_joy_legacy.IsValid() )
 	{
 		if( s_joy_legacy.GetBool() )
@@ -281,13 +281,13 @@ void ControllerOptionsSticks::UpdateHelpText()
 	bool bUsingSouthpaw = false;
 
 	// Legacy Control support hack here 
-	static CGameUIConVarRef s_joy_legacy( "joy_legacy" );
+	static ConVarRef s_joy_legacy( "joy_legacy" );
 	if ( s_joy_legacy.IsValid() && s_joy_legacy.GetBool() )
 	{
 		bUsingLegacy = true;
 	}
 
-	CGameUIConVarRef joy_movement_stick("joy_movement_stick");
+	ConVarRef joy_movement_stick("joy_movement_stick");
 	if ( joy_movement_stick.IsValid() )
 	{
 		bUsingSouthpaw = joy_movement_stick.GetInt() == CONTROLLER_STICKS_SOUTHPAW;
@@ -311,7 +311,7 @@ void ControllerOptionsSticks::UpdateHelpText()
 
 void ControllerOptionsSticks::UpdateButtonNames()
 {
-	CGameUIConVarRef joy_legacy("joy_legacy");
+	ConVarRef joy_legacy("joy_legacy");
 	if ( joy_legacy.IsValid() )
 	{
 		int iLegacy = ( joy_legacy.GetInt() > 0 ) ? 1 : 0;

@@ -1987,7 +1987,7 @@ void Leaderboard::AddLeaderboardEntry( XUSER_STATS_ROW *pRow )
 	data.m_iDisplayRank = data.m_iRank;
 	data.m_iTimeInHundredths = pRow->i64Rating;
 
-	static CGameUIConVarRef cl_names_debug( "cl_names_debug" );
+	static ConVarRef cl_names_debug( "cl_names_debug" );
 	if ( cl_names_debug.GetInt() )
 	{
 		Q_strcpy( data.m_szGamerTag, "WWWWWWWWWWWWWWW" );

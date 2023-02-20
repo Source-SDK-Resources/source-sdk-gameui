@@ -26,7 +26,7 @@ protected:
 	virtual void OnThink();
 
 private:
-	vgui::CvarToggleCheckButton<CGameUIConVarRef> *m_pSteamCloudCheckBox;
+	vgui::CvarToggleCheckButton<ConVarRef> *m_pSteamCloudCheckBox;
 };
 
 };

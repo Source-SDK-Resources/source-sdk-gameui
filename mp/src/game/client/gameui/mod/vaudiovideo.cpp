@@ -68,8 +68,8 @@ void AudioVideo::Activate()
 	BaseClass::Activate();
 
 #ifdef _X360
-	CGameUIConVarRef mat_xbox_ishidef( "mat_xbox_ishidef" );
-	CGameUIConVarRef mat_xbox_iswidescreen( "mat_xbox_iswidescreen" );
+	ConVarRef mat_xbox_ishidef( "mat_xbox_ishidef" );
+	ConVarRef mat_xbox_iswidescreen( "mat_xbox_iswidescreen" );
 #endif
 
 	if ( m_sldBrightness )
@@ -80,7 +80,7 @@ void AudioVideo::Activate()
 
 	if ( m_drpColorMode )
 	{
-		CGameUIConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
+		ConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
 
 		if ( mat_monitorgamma_tv_enabled.GetBool() )
 		{
@@ -124,7 +124,7 @@ void AudioVideo::Activate()
 		}
 		else
 		{
-			CGameUIConVarRef ss_splitmode( "ss_splitmode" );
+			ConVarRef ss_splitmode( "ss_splitmode" );
 			int iSplitMode = ss_splitmode.GetInt();
 
 			switch ( iSplitMode )
@@ -159,8 +159,8 @@ void AudioVideo::Activate()
 
 	if ( m_drpCaptioning )
 	{
-		CGameUIConVarRef closecaption("closecaption");
-		CGameUIConVarRef cc_subtitles("cc_subtitles");
+		ConVarRef closecaption("closecaption");
+		ConVarRef cc_subtitles("cc_subtitles");
 
 		if ( !closecaption.GetBool() )
 		{
@@ -230,7 +230,7 @@ void AudioVideo::Activate()
 	
 	if ( m_drpGore )
 	{
-		CGameUIConVarRef z_wound_client_disabled ( "z_wound_client_disabled" );
+		ConVarRef z_wound_client_disabled ( "z_wound_client_disabled" );
 
 		if ( z_wound_client_disabled.GetBool() )
 		{
@@ -399,13 +399,13 @@ void AudioVideo::OnCommand(const char *command)
 {
 	if ( !Q_stricmp( command, "#L4D360UI_ColorMode_Television" ) )
 	{
-		CGameUIConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
+		ConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
 		mat_monitorgamma_tv_enabled.SetValue( 1 );
 		m_bDirtyVideoConfig = true;
 	}
 	else if ( !Q_stricmp( command, "#L4D360UI_ColorMode_LCD" ) )
 	{
-		CGameUIConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
+		ConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
 		mat_monitorgamma_tv_enabled.SetValue( 0 );
 		m_bDirtyVideoConfig = true;
 	}
@@ -413,7 +413,7 @@ void AudioVideo::OnCommand(const char *command)
 	{
 		if ( m_drpSplitScreenDirection && m_drpSplitScreenDirection->IsEnabled() )
 		{
-			CGameUIConVarRef ss_splitmode( "ss_splitmode" );
+			ConVarRef ss_splitmode( "ss_splitmode" );
 			ss_splitmode.SetValue( 0 );
 			m_bDirtyVideoConfig = true;
 		}
@@ -422,7 +422,7 @@ void AudioVideo::OnCommand(const char *command)
 	{
 		if ( m_drpSplitScreenDirection && m_drpSplitScreenDirection->IsEnabled() )
 		{
-			CGameUIConVarRef ss_splitmode( "ss_splitmode" );
+			ConVarRef ss_splitmode( "ss_splitmode" );
 			ss_splitmode.SetValue( 1 );
 			m_bDirtyVideoConfig = true;
 		}
@@ -431,44 +431,44 @@ void AudioVideo::OnCommand(const char *command)
 	{
 		if ( m_drpSplitScreenDirection && m_drpSplitScreenDirection->IsEnabled() )
 		{
-			CGameUIConVarRef ss_splitmode( "ss_splitmode" );
+			ConVarRef ss_splitmode( "ss_splitmode" );
 			ss_splitmode.SetValue( 2 );
 			m_bDirtyVideoConfig = true;
 		}
 	}
 	else if ( Q_stricmp( "#L4D360UI_AudioOptions_CaptionOff", command ) == 0 )
 	{
-		CGameUIConVarRef closecaption("closecaption");
-		CGameUIConVarRef cc_subtitles("cc_subtitles");
+		ConVarRef closecaption("closecaption");
+		ConVarRef cc_subtitles("cc_subtitles");
 		closecaption.SetValue( 0 );
 		cc_subtitles.SetValue( 0 );
 		m_bDirtyVideoConfig = true;
 	}
 	else if ( Q_stricmp( "#L4D360UI_AudioOptions_CaptionSubtitles", command ) == 0 )
 	{
-		CGameUIConVarRef closecaption("closecaption");
-		CGameUIConVarRef cc_subtitles("cc_subtitles");
+		ConVarRef closecaption("closecaption");
+		ConVarRef cc_subtitles("cc_subtitles");
 		closecaption.SetValue( 1 );
 		cc_subtitles.SetValue( 1 );
 		m_bDirtyVideoConfig = true;
 	}
 	else if ( Q_stricmp( "#L4D360UI_AudioOptions_CaptionOn", command ) == 0 )
 	{
-		CGameUIConVarRef closecaption("closecaption");
-		CGameUIConVarRef cc_subtitles("cc_subtitles");
+		ConVarRef closecaption("closecaption");
+		ConVarRef cc_subtitles("cc_subtitles");
 		closecaption.SetValue( 1 );
 		cc_subtitles.SetValue( 0 );
 		m_bDirtyVideoConfig = true;
 	}
 	else if ( !Q_stricmp( command, "#L4D360UI_Gore_High" ) )
 	{
-		CGameUIConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
+		ConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
 		z_wound_client_disabled.SetValue( 0 );
 		m_bDirtyVideoConfig = true;
 	}
 	else if ( !Q_stricmp( command, "#L4D360UI_Gore_Low" ) )
 	{
-		CGameUIConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
+		ConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
 		z_wound_client_disabled.SetValue( 1 );
 		m_bDirtyVideoConfig = true;
 	}

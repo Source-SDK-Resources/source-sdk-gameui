@@ -148,18 +148,18 @@ void ControllerOptions::Activate()
 void ControllerOptions::ResetControlValues( void )
 {
 	// labels for button config and stick config
-	CGameUIConVarRef joy_cfg_preset( "joy_cfg_preset" );
+	ConVarRef joy_cfg_preset( "joy_cfg_preset" );
 	int iButtonSetting = clamp( joy_cfg_preset.GetInt(), 0, 3 );
 	if ( m_pEditButtons )
 	{
 		m_pEditButtons->SetDropdownSelection( pszButtonSettingsDisplayName[iButtonSetting] );
 	}
 
-	CGameUIConVarRef joy_movement_stick("joy_movement_stick");
+	ConVarRef joy_movement_stick("joy_movement_stick");
 	int iStickSetting = ( joy_movement_stick.GetInt() > 0 ) ? 1 : 0;
 	if ( m_pEditSticks )
 	{
-		static CGameUIConVarRef s_joy_legacy( "joy_legacy" );
+		static ConVarRef s_joy_legacy( "joy_legacy" );
 		if ( s_joy_legacy.IsValid() && s_joy_legacy.GetBool() )
 		{
 			iStickSetting += 2; // Go to the legacy version of the default/southpaw string.
@@ -182,7 +182,7 @@ void ControllerOptions::ResetControlValues( void )
 	{
 		m_pLookType->SetFlyout( "FlmLookType" );
 
-		CGameUIConVarRef joy_inverty("joy_inverty");
+		ConVarRef joy_inverty("joy_inverty");
 
 		int iInvert = ( joy_inverty.GetInt() > 0 ) ? CONTROLLER_LOOK_TYPE_INVERTED : CONTROLLER_LOOK_TYPE_NORMAL;
 		m_pLookType->SetCurrentSelection( pszLookTypes[iInvert] );
@@ -198,7 +198,7 @@ void ControllerOptions::ResetControlValues( void )
 	{
 		m_pDuckMode->SetFlyout( "FlmDuckMode" );
 
-		CGameUIConVarRef option_duck_method("option_duck_method");
+		ConVarRef option_duck_method("option_duck_method");
 
 		int iDuckMode = ( option_duck_method.GetInt() > 0 ) ? DUCK_MODE_TOGGLE : DUCK_MODE_HOLD;
 		m_pDuckMode->SetCurrentSelection( pszDuckModes[iDuckMode] );
@@ -379,7 +379,7 @@ void ControllerOptions::OnCommand(const char *command)
 	}
 	else if( !Q_strcmp( command, pszDuckModes[DUCK_MODE_HOLD] ) )
 	{
-		CGameUIConVarRef option_duck_method("option_duck_method");
+		ConVarRef option_duck_method("option_duck_method");
 		if ( option_duck_method.IsValid() )
 		{
 			option_duck_method.SetValue( DUCK_MODE_HOLD );
@@ -388,7 +388,7 @@ void ControllerOptions::OnCommand(const char *command)
 	}
 	else if( !Q_strcmp( command, pszDuckModes[DUCK_MODE_TOGGLE] ) )
 	{
-		CGameUIConVarRef option_duck_method("option_duck_method");
+		ConVarRef option_duck_method("option_duck_method");
 		if ( option_duck_method.IsValid() )
 		{
 			option_duck_method.SetValue( DUCK_MODE_TOGGLE );
@@ -397,7 +397,7 @@ void ControllerOptions::OnCommand(const char *command)
 	}	
 	else if( !Q_strcmp( command, pszLookTypes[CONTROLLER_LOOK_TYPE_NORMAL] ) )
 	{
-		CGameUIConVarRef joy_inverty("joy_inverty");
+		ConVarRef joy_inverty("joy_inverty");
 		if ( joy_inverty.IsValid() )
 		{
 			joy_inverty.SetValue( CONTROLLER_LOOK_TYPE_NORMAL );
@@ -406,7 +406,7 @@ void ControllerOptions::OnCommand(const char *command)
 	}
 	else if( !Q_strcmp( command, pszLookTypes[CONTROLLER_LOOK_TYPE_INVERTED] ) )
 	{
-		CGameUIConVarRef joy_inverty("joy_inverty");
+		ConVarRef joy_inverty("joy_inverty");
 		if ( joy_inverty.IsValid() )
 		{
 			joy_inverty.SetValue( CONTROLLER_LOOK_TYPE_INVERTED );

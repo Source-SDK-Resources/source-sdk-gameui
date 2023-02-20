@@ -182,7 +182,7 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	steamapicontext->Init();
 #endif
 
-	CGameUIConVarRef var( "gameui_xbox" );
+	ConVarRef var( "gameui_xbox" );
 	m_bIsConsoleUI = var.IsValid() && var.GetBool();
 
 	vgui::VGui_InitInterfacesList( "GameUI", &factory, 1 );

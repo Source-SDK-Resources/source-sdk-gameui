@@ -137,7 +137,7 @@ void Audio::Activate()
 
 	if ( m_drpSpeakerConfiguration )
 	{
-		CGameUIConVarRef snd_surround_speakers("Snd_Surround_Speakers");
+		ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
 
 		switch ( snd_surround_speakers.GetInt() )
 		{
@@ -165,8 +165,8 @@ void Audio::Activate()
 
 	if ( m_drpSoundQuality )
 	{
-		CGameUIConVarRef Snd_PitchQuality("Snd_PitchQuality");
-		CGameUIConVarRef dsp_slow_cpu("dsp_slow_cpu");
+		ConVarRef Snd_PitchQuality("Snd_PitchQuality");
+		ConVarRef dsp_slow_cpu("dsp_slow_cpu");
 
 		int quality = 0;
 		if ( dsp_slow_cpu.GetBool() == false )
@@ -201,8 +201,8 @@ void Audio::Activate()
 
 	if ( m_drpCaptioning )
 	{
-		CGameUIConVarRef closecaption("closecaption");
-		CGameUIConVarRef cc_subtitles("cc_subtitles");
+		ConVarRef closecaption("closecaption");
+		ConVarRef cc_subtitles("cc_subtitles");
 
 		if ( !closecaption.GetBool() )
 		{
@@ -317,8 +317,8 @@ void Audio::Activate()
 	}
 	else
 	{
-		CGameUIConVarRef voice_modenable("voice_modenable");
-		CGameUIConVarRef voice_enable("voice_enable");
+		ConVarRef voice_modenable("voice_modenable");
+		ConVarRef voice_enable("voice_enable");
 
 		bool bVoiceEnabled = voice_enable.GetBool() && voice_modenable.GetBool();
 
@@ -340,7 +340,7 @@ void Audio::Activate()
 			}
 		}
 
-		CGameUIConVarRef voice_vox("voice_vox");
+		ConVarRef voice_vox("voice_vox");
 
 		if ( m_drpVoiceCommunicationStyle )
 		{
@@ -651,42 +651,42 @@ void Audio::OnCommand(const char *command)
 {
 	if( Q_stricmp( "#GameUI_Headphones", command ) == 0 )
 	{
-		CGameUIConVarRef snd_surround_speakers("Snd_Surround_Speakers");
+		ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
 		snd_surround_speakers.SetValue( "0" );
 
 		UpdateEnhanceStereo();
 	}
 	else if( Q_stricmp( "#GameUI_2Speakers", command ) == 0 )
 	{
-		CGameUIConVarRef snd_surround_speakers("Snd_Surround_Speakers");
+		ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
 		snd_surround_speakers.SetValue( "2" );
 
 		// headphones at high quality get enhanced stereo turned on
-		CGameUIConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
+		ConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
 		dsp_enhance_stereo.SetValue( 0 );
 	}
 	else if( Q_stricmp( "#GameUI_4Speakers", command ) == 0 )
 	{
-		CGameUIConVarRef snd_surround_speakers("Snd_Surround_Speakers");
+		ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
 		snd_surround_speakers.SetValue( "4" );
 
 		// headphones at high quality get enhanced stereo turned on
-		CGameUIConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
+		ConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
 		dsp_enhance_stereo.SetValue( 0 );
 	}
 	else if( Q_stricmp( "#GameUI_5Speakers", command ) == 0 )
 	{
-		CGameUIConVarRef snd_surround_speakers("Snd_Surround_Speakers");
+		ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
 		snd_surround_speakers.SetValue( "5" );
 
 		// headphones at high quality get enhanced stereo turned on
-		CGameUIConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
+		ConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
 		dsp_enhance_stereo.SetValue( 0 );
 	}
 	else if( Q_stricmp( "#GameUI_High", command ) == 0 )
 	{
-		CGameUIConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
-		CGameUIConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
+		ConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
+		ConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
 		dsp_slow_cpu.SetValue(false);
 		Snd_PitchQuality.SetValue(true);
 
@@ -694,44 +694,44 @@ void Audio::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "#GameUI_Medium", command ) == 0 )
 	{
-		CGameUIConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
-		CGameUIConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
+		ConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
+		ConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
 		dsp_slow_cpu.SetValue(false);
 		Snd_PitchQuality.SetValue(false);
 
 		// headphones at high quality get enhanced stereo turned on
-		CGameUIConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
+		ConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
 		dsp_enhance_stereo.SetValue( 0 );
 	}
 	else if( Q_stricmp( "#GameUI_Low", command ) == 0 )
 	{
-		CGameUIConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
-		CGameUIConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
+		ConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
+		ConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
 		dsp_slow_cpu.SetValue(true);
 		Snd_PitchQuality.SetValue(false);
 
 		// headphones at high quality get enhanced stereo turned on
-		CGameUIConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
+		ConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
 		dsp_enhance_stereo.SetValue( 0 );
 	}
 	else if( Q_stricmp( "#L4D360UI_AudioOptions_CaptionOff", command ) == 0 )
 	{
-		CGameUIConVarRef closecaption("closecaption");
-		CGameUIConVarRef cc_subtitles("cc_subtitles");
+		ConVarRef closecaption("closecaption");
+		ConVarRef cc_subtitles("cc_subtitles");
 		closecaption.SetValue( 0 );
 		cc_subtitles.SetValue( 0 );
 	}
 	else if( Q_stricmp( "#L4D360UI_AudioOptions_CaptionSubtitles", command ) == 0 )
 	{
-		CGameUIConVarRef closecaption("closecaption");
-		CGameUIConVarRef cc_subtitles("cc_subtitles");
+		ConVarRef closecaption("closecaption");
+		ConVarRef cc_subtitles("cc_subtitles");
 		closecaption.SetValue( 1 );
 		cc_subtitles.SetValue( 1 );
 	}
 	else if( Q_stricmp( "#L4D360UI_AudioOptions_CaptionOn", command ) == 0 )
 	{
-		CGameUIConVarRef closecaption("closecaption");
-		CGameUIConVarRef cc_subtitles("cc_subtitles");
+		ConVarRef closecaption("closecaption");
+		ConVarRef cc_subtitles("cc_subtitles");
 		closecaption.SetValue( 1 );
 		cc_subtitles.SetValue( 0 );
 	}
@@ -744,9 +744,9 @@ void Audio::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "VoiceCommunicationEnabled", command ) == 0 )
 	{
-		CGameUIConVarRef voice_modenable("voice_modenable");
-		CGameUIConVarRef voice_vox("voice_vox");
-		CGameUIConVarRef voice_enable("voice_enable");
+		ConVarRef voice_modenable("voice_modenable");
+		ConVarRef voice_vox("voice_vox");
+		ConVarRef voice_enable("voice_enable");
 		voice_modenable.SetValue( 1 );
 		voice_enable.SetValue( 1 );
 
@@ -769,8 +769,8 @@ void Audio::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "VoiceCommunicationDisabled", command ) == 0 )
 	{
-		CGameUIConVarRef voice_modenable("voice_modenable");
-		CGameUIConVarRef voice_enable("voice_enable");
+		ConVarRef voice_modenable("voice_modenable");
+		ConVarRef voice_enable("voice_enable");
 		voice_modenable.SetValue( 0 );
 		voice_enable.SetValue( 0 );
 
@@ -791,14 +791,14 @@ void Audio::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "VoiceCommunicationPushToTalk", command ) == 0 )
 	{
-		CGameUIConVarRef voice_vox("voice_vox");
+		ConVarRef voice_vox("voice_vox");
 		voice_vox.SetValue( 0 );
 
 		SetControlEnabled( "SldVoiceVoxThreshold", false );
 	}
 	else if( Q_stricmp( "VoiceCommunicationOpenMic", command ) == 0 )
 	{
-		CGameUIConVarRef voice_vox("voice_vox");
+		ConVarRef voice_vox("voice_vox");
 		voice_vox.SetValue( 1 );
 
 		SetControlEnabled( "SldVoiceVoxThreshold", true );
@@ -871,10 +871,10 @@ void Audio::OnCommand(const char *command)
 void Audio::UpdateEnhanceStereo( void )
 {
 	// headphones at high quality get enhanced stereo turned on
-	CGameUIConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
-	CGameUIConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
-	CGameUIConVarRef snd_surround_speakers("Snd_Surround_Speakers");
-	CGameUIConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
+	ConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
+	ConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
+	ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
+	ConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
 
 	if ( !dsp_slow_cpu.GetBool() && Snd_PitchQuality.GetBool() && snd_surround_speakers.GetInt() == 0 )
 	{
@@ -995,7 +995,7 @@ void Audio::EndTestMicrophone()
 	{
 		m_pVoiceTweak->EndVoiceTweakMode();
 
-		CGameUIConVarRef voice_vox("voice_vox");
+		ConVarRef voice_vox("voice_vox");
 
 		if ( voice_vox.GetBool() )
 		{
@@ -1006,8 +1006,8 @@ void Audio::EndTestMicrophone()
 
 	if ( m_pMicMeter )
 	{
-		CGameUIConVarRef voice_modenable("voice_modenable");
-		CGameUIConVarRef voice_enable("voice_enable");
+		ConVarRef voice_modenable("voice_modenable");
+		ConVarRef voice_enable("voice_enable");
 		m_pMicMeter->SetVisible( voice_enable.GetBool() && voice_modenable.GetBool() );
 	}
 

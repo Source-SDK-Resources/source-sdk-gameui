@@ -62,7 +62,7 @@ void Cloud::Activate()
 
 	if ( m_drpCloud )
 	{
-		CGameUIConVarRef cl_cloud_settings( "cl_cloud_settings" );
+		ConVarRef cl_cloud_settings( "cl_cloud_settings" );
 
 		int iCloudSettings = cl_cloud_settings.GetInt();
 
@@ -192,7 +192,7 @@ void Cloud::OnFlyoutMenuCancelled()
 //=============================================================================
 Panel* Cloud::NavigateBack()
 {
-	CGameUIConVarRef cl_cloud_settings( "cl_cloud_settings" );
+	ConVarRef cl_cloud_settings( "cl_cloud_settings" );
 	cl_cloud_settings.SetValue( ( ( m_bCloudEnabled ) ? ( STEAMREMOTESTORAGE_CLOUD_CONFIG | STEAMREMOTESTORAGE_CLOUD_SPRAY ) : ( 0 ) ) );
 
 	return BaseClass::NavigateBack();

@@ -230,7 +230,7 @@ BaseClass( parent, panelName, false, true )
 	m_pSupportRequiredPanel = NULL;
 	m_pInstallingSupportPanel = NULL;
 
-	m_pDoNotAskForAssociation = new CvarToggleCheckButton<CGameUIConVarRef>( 
+	m_pDoNotAskForAssociation = new CvarToggleCheckButton<ConVarRef>( 
 		this, 
 		"CheckButtonAssociation", 
 		"",
@@ -408,7 +408,7 @@ void Addons::ApplySchemeSettings(vgui::IScheme *pScheme)
 	SetupAsDialogStyle();
 
 	// show the disable if on
-	CGameUIConVarRef cl_ignore_vpk_association( "cl_ignore_vpk_association" );
+	ConVarRef cl_ignore_vpk_association( "cl_ignore_vpk_association" );
 	if ( !cl_ignore_vpk_association.GetBool() )
 	{
 		m_pDoNotAskForAssociation->SetVisible( false );

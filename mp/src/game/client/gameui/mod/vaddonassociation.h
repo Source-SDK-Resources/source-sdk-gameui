@@ -36,7 +36,7 @@ protected:
 	virtual void OnThink();
 
 private:
-	vgui::CvarToggleCheckButton<CGameUIConVarRef> *m_pDoNotAskForAssociation;
+	vgui::CvarToggleCheckButton<ConVarRef> *m_pDoNotAskForAssociation;
 
 };
 

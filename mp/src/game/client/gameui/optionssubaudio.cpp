@@ -83,8 +83,8 @@ void COptionsSubAudio::OnResetData()
 	// reset the combo boxes
 
 	// close captions
-	CGameUIConVarRef closecaption("closecaption");
-	CGameUIConVarRef cc_subtitles("cc_subtitles");
+	ConVarRef closecaption("closecaption");
+	ConVarRef cc_subtitles("cc_subtitles");
 	if (closecaption.GetBool())
 	{
 		if (cc_subtitles.GetBool())
@@ -102,7 +102,7 @@ void COptionsSubAudio::OnResetData()
 	}
 
 	// speakers
-	CGameUIConVarRef snd_surround_speakers("Snd_Surround_Speakers");
+	ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
 	int speakers = snd_surround_speakers.GetInt();
 	{for (int itemID = 0; itemID < m_pSpeakerSetupCombo->GetItemCount(); itemID++)
 	{
@@ -114,8 +114,8 @@ void COptionsSubAudio::OnResetData()
 	}}
 	
 	// sound quality is made up from several cvars
-	CGameUIConVarRef Snd_PitchQuality("Snd_PitchQuality");
-	CGameUIConVarRef dsp_slow_cpu("dsp_slow_cpu");
+	ConVarRef Snd_PitchQuality("Snd_PitchQuality");
+	ConVarRef dsp_slow_cpu("dsp_slow_cpu");
 	int quality = SOUNDQUALITY_LOW;
 	if (dsp_slow_cpu.GetBool() == false)
 	{
@@ -203,7 +203,7 @@ void COptionsSubAudio::OnApplyChanges()
 	// ConVar *closecaption = (ConVar *)cvar->FindVar("closecaption");
 	int closecaption_value = 0;
 
-	CGameUIConVarRef cc_subtitles( "cc_subtitles" );
+	ConVarRef cc_subtitles( "cc_subtitles" );
 	switch (m_pCloseCaptionCombo->GetActiveItem())
 	{
 	default:
@@ -228,13 +228,13 @@ void COptionsSubAudio::OnApplyChanges()
 	Q_snprintf( cmd, sizeof( cmd ), "closecaption %i\n", closecaption_value );
 	engine->ClientCmd_Unrestricted( cmd );
 
-	CGameUIConVarRef snd_surround_speakers( "Snd_Surround_Speakers" );
+	ConVarRef snd_surround_speakers( "Snd_Surround_Speakers" );
 	int speakers = m_pSpeakerSetupCombo->GetActiveItemUserData()->GetInt( "speakers" );
 	snd_surround_speakers.SetValue( speakers );
 
 	// quality
-	CGameUIConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
-	CGameUIConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
+	ConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
+	ConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
 	int quality = m_pSoundQualityCombo->GetActiveItemUserData()->GetInt( "quality" );
 	switch ( quality )
 	{
@@ -255,7 +255,7 @@ void COptionsSubAudio::OnApplyChanges()
 	};
 
 	// headphones at high quality get enhanced stereo turned on
-	CGameUIConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
+	ConVarRef dsp_enhance_stereo( "dsp_enhance_stereo" );
 	if (speakers == 0 && quality == SOUNDQUALITY_HIGH)
 	{
 		dsp_enhance_stereo.SetValue( 1 );

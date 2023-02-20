@@ -640,7 +640,7 @@ void InGameMainMenu::PerformLayout( void )
 		Button *pButton = flyout->FindChildButtonByCommand( "ReturnToLobby" );
 		if ( pButton )
 		{
-			static CGameUIConVarRef r_sv_hosting_lobby( "sv_hosting_lobby", true );
+			static ConVarRef r_sv_hosting_lobby( "sv_hosting_lobby", true );
 			bool bEnabled = r_sv_hosting_lobby.IsValid() && r_sv_hosting_lobby.GetBool() &&
 				// Don't allow return to lobby if playing local singleplayer (it has no lobby)
 				!( bPlayOffline && bSinglePlayer );

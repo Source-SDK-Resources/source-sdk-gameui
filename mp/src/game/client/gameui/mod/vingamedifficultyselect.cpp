@@ -58,7 +58,7 @@ void InGameDifficultySelect::LoadLayout()
 {
 	BaseClass::LoadLayout();
 
-	CGameUIConVarRef z_difficulty("z_difficulty");
+	ConVarRef z_difficulty("z_difficulty");
 
 	if ( z_difficulty.IsValid() )
 	{
@@ -95,7 +95,7 @@ void InGameDifficultySelect::OnCommand(const char *command)
 		 !Q_strcmp( command, "Insane" ) ||
 		 !Q_strcmp( command, "Imba" ) )
 	{
-		CGameUIConVarRef z_difficulty("z_difficulty");
+		ConVarRef z_difficulty("z_difficulty");
 
 		if ( Q_stricmp( command, z_difficulty.GetString() ) != 0 )
 		{

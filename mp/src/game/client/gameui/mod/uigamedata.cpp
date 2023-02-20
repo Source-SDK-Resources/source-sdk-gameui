@@ -567,7 +567,7 @@ void CUIGameData::DisplayOkOnlyMsgBox( CBaseModFrame *pCallerFrame, const char *
 
 const char *CUIGameData::GetLocalPlayerName( int iController )
 {
-	static CGameUIConVarRef cl_names_debug( "cl_names_debug" );
+	static ConVarRef cl_names_debug( "cl_names_debug" );
 	if ( cl_names_debug.GetInt() )
 		return "WWWWWWWWWWWWWWW";
 
@@ -589,14 +589,14 @@ void CUIGameData::SetLookSensitivity(float sensitivity)
 {
 	m_LookSensitivity = sensitivity;
 
-	static CGameUIConVarRef joy_yawsensitivity("joy_yawsensitivity");
+	static ConVarRef joy_yawsensitivity("joy_yawsensitivity");
 	if(joy_yawsensitivity.IsValid())
 	{
 		float defaultValue = atof(joy_yawsensitivity.GetDefault());
 		joy_yawsensitivity.SetValue(defaultValue * sensitivity);
 	}
 
-	static CGameUIConVarRef joy_pitchsensitivity("joy_pitchsensitivity");
+	static ConVarRef joy_pitchsensitivity("joy_pitchsensitivity");
 	if(joy_pitchsensitivity.IsValid())
 	{
 		float defaultValue = atof(joy_pitchsensitivity.GetDefault());
@@ -778,7 +778,7 @@ IImage *CUIGameData::GetAvatarImage( XUID playerID )
 
 char const * CUIGameData::GetPlayerName( XUID playerID, char const *szPlayerNameSpeculative )
 {
-	static CGameUIConVarRef cl_names_debug( "cl_names_debug" );
+	static ConVarRef cl_names_debug( "cl_names_debug" );
 	if ( cl_names_debug.GetInt() )
 		return "WWWWWWWWWWWWWWW";
 

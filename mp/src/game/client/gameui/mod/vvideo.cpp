@@ -121,7 +121,7 @@ BaseClass(parent, panelName)
 	m_pHeaderFooter->SetGradientBarEnabled( true );
 	m_pHeaderFooter->SetGradientBarPos( 100, 310 );
 
-	CGameUIConVarRef mat_grain_scale_override( "mat_grain_scale_override" );
+	ConVarRef mat_grain_scale_override( "mat_grain_scale_override" );
 	m_flFilmGrainInitialValue = mat_grain_scale_override.GetFloat();
 
 	m_bDirtyValues = false;
@@ -159,36 +159,36 @@ void Video::SetupActivateData( void )
 	m_bWindowed = config.Windowed();
 	m_bNoBorder = config.NoWindowBorder();
 
-	CGameUIConVarRef gpu_mem_level( "gpu_mem_level" );
+	ConVarRef gpu_mem_level( "gpu_mem_level" );
 	m_iModelTextureDetail = clamp( gpu_mem_level.GetInt(), 0, 2);
 
-	CGameUIConVarRef mem_level( "mem_level" );
+	ConVarRef mem_level( "mem_level" );
 	m_iPagedPoolMem = clamp( mem_level.GetInt(), 0, 2);
 
-	CGameUIConVarRef mat_antialias( "mat_antialias" );
-	CGameUIConVarRef mat_aaquality( "mat_aaquality" );
+	ConVarRef mat_antialias( "mat_antialias" );
+	ConVarRef mat_aaquality( "mat_aaquality" );
 	m_nAASamples = mat_antialias.GetInt();
 	m_nAAQuality = mat_aaquality.GetInt();
 
-	CGameUIConVarRef mat_forceaniso( "mat_forceaniso" );
+	ConVarRef mat_forceaniso( "mat_forceaniso" );
 	m_iFiltering = mat_forceaniso.GetInt();
 
-	CGameUIConVarRef mat_vsync( "mat_vsync" );
+	ConVarRef mat_vsync( "mat_vsync" );
 	m_bVSync = mat_vsync.GetBool();
 
-	CGameUIConVarRef mat_triplebuffered( "mat_triplebuffered" );
+	ConVarRef mat_triplebuffered( "mat_triplebuffered" );
 	m_bTripleBuffered = mat_triplebuffered.GetBool();
 
-	CGameUIConVarRef mat_queue_mode( "mat_queue_mode" );
+	ConVarRef mat_queue_mode( "mat_queue_mode" );
 	m_iQueuedMode = mat_queue_mode.GetInt();
 
-	CGameUIConVarRef gpu_level( "gpu_level" );
+	ConVarRef gpu_level( "gpu_level" );
 	m_iGPUDetail = clamp( gpu_level.GetInt(), 0, 3 );
 
-	CGameUIConVarRef cpu_level( "cpu_level" );
+	ConVarRef cpu_level( "cpu_level" );
 	m_iCPUDetail = clamp( cpu_level.GetInt(), 0, 2 );
 
-	CGameUIConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
+	ConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
 	m_bLockMouse = in_lock_mouse_to_window.GetBool();
 }
 
@@ -1330,43 +1330,43 @@ void Video::ApplyChanges()
 	if ( !m_bDirtyValues )
 	{
 		// Revert slider
-		CGameUIConVarRef mat_grain_scale_override( "mat_grain_scale_override" );
+		ConVarRef mat_grain_scale_override( "mat_grain_scale_override" );
 		mat_grain_scale_override.SetValue( m_flFilmGrainInitialValue );
 
 		// No need to apply settings
 		return;
 	}
 
-	CGameUIConVarRef gpu_mem_level( "gpu_mem_level" );
+	ConVarRef gpu_mem_level( "gpu_mem_level" );
 	gpu_mem_level.SetValue( m_iModelTextureDetail );
 
-	CGameUIConVarRef mem_level( "mem_level" );
+	ConVarRef mem_level( "mem_level" );
 	mem_level.SetValue( m_iPagedPoolMem );
 
-	CGameUIConVarRef mat_antialias( "mat_antialias" );
-	CGameUIConVarRef mat_aaquality( "mat_aaquality" );
+	ConVarRef mat_antialias( "mat_antialias" );
+	ConVarRef mat_aaquality( "mat_aaquality" );
 	mat_antialias.SetValue( m_nAAModes[ m_iAntiAlias ].m_nNumSamples );
 	mat_aaquality.SetValue( m_nAAModes[ m_iAntiAlias ].m_nQualityLevel );
 
-	CGameUIConVarRef mat_forceaniso( "mat_forceaniso" );
+	ConVarRef mat_forceaniso( "mat_forceaniso" );
 	mat_forceaniso.SetValue( m_iFiltering );
 
-	CGameUIConVarRef mat_vsync( "mat_vsync" );
+	ConVarRef mat_vsync( "mat_vsync" );
 	mat_vsync.SetValue( m_bVSync );
 
-	CGameUIConVarRef mat_triplebuffered( "mat_triplebuffered" );
+	ConVarRef mat_triplebuffered( "mat_triplebuffered" );
 	mat_triplebuffered.SetValue( m_bTripleBuffered );
 
-	CGameUIConVarRef mat_queue_mode( "mat_queue_mode" );
+	ConVarRef mat_queue_mode( "mat_queue_mode" );
 	mat_queue_mode.SetValue( m_iQueuedMode );
 
-	CGameUIConVarRef cpu_level( "cpu_level" );
+	ConVarRef cpu_level( "cpu_level" );
 	cpu_level.SetValue( m_iCPUDetail );
 
-	CGameUIConVarRef gpu_level( "gpu_level" );
+	ConVarRef gpu_level( "gpu_level" );
 	gpu_level.SetValue( m_iGPUDetail );
 
-	CGameUIConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
+	ConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
 	in_lock_mouse_to_window.SetValue( m_bLockMouse );
 
 	// Make sure there is a resolution change

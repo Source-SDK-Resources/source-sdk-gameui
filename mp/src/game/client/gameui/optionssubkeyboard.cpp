@@ -56,7 +56,7 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : EditablePanel(pa
 	{
 		//HACK HACK:  Probably the entire gameui needs to have a splitscrene context for which player the settings apply to, but this is only
 		// on the PC...
-		static CGameUIConVarRef in_forceuser( "in_forceuser" );
+		static ConVarRef in_forceuser( "in_forceuser" );
 
 		if ( in_forceuser.IsValid() )
 		{
@@ -113,7 +113,7 @@ void COptionsSubKeyboard::OnApplyChanges()
 {
 	ApplyAllBindings();
 
-	CGameUIConVarRef con_enable( "con_enable" );
+	ConVarRef con_enable( "con_enable" );
 	con_enable.SetValue( GetControlInt( "ConsoleCheck", 0 ) );
 }
 
@@ -433,13 +433,13 @@ void COptionsSubKeyboard::FillInCurrentBindings( void )
 	ClearBindItems();
 
 	bool bJoystick = false;
-	CGameUIConVarRef var( "joystick" );
+	ConVarRef var( "joystick" );
 	if ( var.IsValid() )
 	{
 		bJoystick = var.GetBool();
 	}
 
-	CGameUIConVarRef con_enable( "con_enable" );
+	ConVarRef con_enable( "con_enable" );
 	if ( con_enable.IsValid() )
 	{
 		SetControlInt("ConsoleCheck", con_enable.GetInt() ? 1 : 0);
@@ -672,7 +672,7 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 		else
 		{
 			// L4D: Use Defaults also resets cvars listed in config_default.cfg
-			CGameUIConVarRef var( cmd );
+			ConVarRef var( cmd );
 			if ( var.IsValid() )
 			{
 				char szValue[256] = "";
@@ -854,13 +854,13 @@ public:
 		input()->SetAppModalSurface(GetVPanel());
 
 		// reset the data
-		CGameUIConVarRef con_enable( "con_enable" );
+		ConVarRef con_enable( "con_enable" );
 		if ( con_enable.IsValid() )
 		{
 			SetControlInt("ConsoleCheck", con_enable.GetInt() ? 1 : 0);
 		}
 
-		CGameUIConVarRef hud_fastswitch( "hud_fastswitch", true );
+		ConVarRef hud_fastswitch( "hud_fastswitch", true );
 		if ( hud_fastswitch.IsValid() )
 		{
 			SetControlInt("FastSwitchCheck", hud_fastswitch.GetInt() ? 1 : 0);
@@ -870,10 +870,10 @@ public:
 	virtual void OnApplyData()
 	{
 		// apply data
-		CGameUIConVarRef con_enable( "con_enable" );
+		ConVarRef con_enable( "con_enable" );
 		con_enable.SetValue( GetControlInt( "ConsoleCheck", 0 ) );
 
-		CGameUIConVarRef hud_fastswitch( "hud_fastswitch", true );
+		ConVarRef hud_fastswitch( "hud_fastswitch", true );
 		hud_fastswitch.SetValue( GetControlInt( "FastSwitchCheck", 0 ) );
 	}
 

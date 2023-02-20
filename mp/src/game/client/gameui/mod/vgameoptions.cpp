@@ -124,7 +124,7 @@ void GameOptions::Activate()
 
 	int i = 0;
 
-	CGameUIConVarRef joy_inverty("joy_inverty");
+	ConVarRef joy_inverty("joy_inverty");
 	if(joy_inverty.IsValid())
 	{
 		for(i = 0; i < sizeof(gInvertYAxisItems) / sizeof(GenericSpinnerItem); ++i)
@@ -137,7 +137,7 @@ void GameOptions::Activate()
 		}
 	}
 
-	CGameUIConVarRef cl_rumblescale("cl_rumblescale");
+	ConVarRef cl_rumblescale("cl_rumblescale");
 	if(cl_rumblescale.IsValid())
 	{
 		int convertedValue = static_cast<int>(cl_rumblescale.GetFloat() * 5.0f);
@@ -151,7 +151,7 @@ void GameOptions::Activate()
 		}
 	}
 
-	CGameUIConVarRef cl_autocrouch("cl_autocrouch");
+	ConVarRef cl_autocrouch("cl_autocrouch");
 	if(cl_autocrouch.IsValid())
 	{
 		for(i = 0; i < sizeof(gAutoCrouchItems) / sizeof(GenericSpinnerItem); ++i)
@@ -180,7 +180,7 @@ void GameOptions::OnSetCurrentItem(const char* panelName)
 {
 	if(!Q_strcmp(panelName, m_SpnInvertYAxis->GetName()))
 	{
-		CGameUIConVarRef joy_inverty("joy_inverty");
+		ConVarRef joy_inverty("joy_inverty");
 		if(joy_inverty.IsValid())
 		{
 			joy_inverty.SetValue(m_SpnInvertYAxis->GetActiveItemUserData());
@@ -188,7 +188,7 @@ void GameOptions::OnSetCurrentItem(const char* panelName)
 	}
 	else if(!Q_strcmp(panelName, m_SpnVibration->GetName()))
 	{
-		CGameUIConVarRef cl_rumblescale("cl_rumblescale");
+		ConVarRef cl_rumblescale("cl_rumblescale");
 		if(cl_rumblescale.IsValid())
 		{
 			cl_rumblescale.SetValue(static_cast<float>(m_SpnVibration->GetActiveItemUserData()) / 5.0f);
@@ -196,7 +196,7 @@ void GameOptions::OnSetCurrentItem(const char* panelName)
 	}
 	else if(!Q_strcmp(panelName, m_SpnAutoCrouch->GetName()))
 	{
-		CGameUIConVarRef cl_autocrouch("cl_autocrouch");
+		ConVarRef cl_autocrouch("cl_autocrouch");
 		if(cl_autocrouch.IsValid())
 		{
 			cl_autocrouch.SetValue(m_SpnAutoCrouch->GetActiveItemUserData());

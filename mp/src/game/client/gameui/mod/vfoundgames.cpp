@@ -1452,7 +1452,7 @@ bool FoundGames::AddGameFromDetails( const FoundGameListItem::Info &fi )
 	// Make a copy
 	FoundGameListItem::Info fiCopy = fi;
 
-	static CGameUIConVarRef cl_names_debug( "cl_names_debug" );
+	static ConVarRef cl_names_debug( "cl_names_debug" );
 	if ( cl_names_debug.GetInt() )
 		Q_strncpy( fiCopy.Name, "WWWWWWWWWWWWWWW", sizeof( fiCopy.Name ) );
 

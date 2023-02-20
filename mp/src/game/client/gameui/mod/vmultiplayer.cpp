@@ -119,7 +119,7 @@ void Multiplayer::Activate()
 
 	if ( m_drpAllowLanGames )
 	{
-		CGameUIConVarRef net_allow_multicast( "net_allow_multicast" );
+		ConVarRef net_allow_multicast( "net_allow_multicast" );
 
 		m_drpAllowLanGames->SetCurrentSelection( CFmtStr( "MpLanGames%sabled", net_allow_multicast.GetBool() ? "En" : "Dis" ) );
 
@@ -132,7 +132,7 @@ void Multiplayer::Activate()
 
 	if ( m_drpAllowCustomContent )
 	{
-		CGameUIConVarRef cl_downloadfilter( "cl_downloadfilter" );
+		ConVarRef cl_downloadfilter( "cl_downloadfilter" );
 		m_drpAllowCustomContent->SetCurrentSelection( CFmtStr( "#GameUI_DownloadFilter_%s", cl_downloadfilter.GetString() ) );
 
 		FlyoutMenu *pFlyout = m_drpAllowCustomContent->GetCurrentFlyout();
@@ -144,7 +144,7 @@ void Multiplayer::Activate()
 
 	if ( m_drpColorBlind )
 	{
-		CGameUIConVarRef cl_colorblind( "cl_colorblind" );
+		ConVarRef cl_colorblind( "cl_colorblind" );
 		m_drpColorBlind->SetCurrentSelection( CFmtStr( "ColorBlind%d", cl_colorblind.GetInt() ) );
 
 		FlyoutMenu *pFlyout = m_drpColorBlind->GetCurrentFlyout();
@@ -156,7 +156,7 @@ void Multiplayer::Activate()
 
 	if ( m_drpGameInstructor )
 	{
-		CGameUIConVarRef gameinstructor_enable( "gameinstructor_enable" );
+		ConVarRef gameinstructor_enable( "gameinstructor_enable" );
 
 		if ( gameinstructor_enable.GetBool() )
 		{
@@ -176,7 +176,7 @@ void Multiplayer::Activate()
 
 	if ( m_drpAllowFreeLook )
 	{
-		CGameUIConVarRef spec_allowroaming( "spec_allowroaming" );
+		ConVarRef spec_allowroaming( "spec_allowroaming" );
 
 		if ( spec_allowroaming.GetBool() )
 		{
@@ -215,7 +215,7 @@ void Multiplayer::Activate()
 
 	if ( m_drpGore )
 	{
-		CGameUIConVarRef z_wound_client_disabled ( "z_wound_client_disabled" );
+		ConVarRef z_wound_client_disabled ( "z_wound_client_disabled" );
 
 		if ( z_wound_client_disabled.GetBool() )
 		{
@@ -352,33 +352,33 @@ void Multiplayer::OnCommand(const char *command)
 {
 	if( Q_stricmp( "#GameUI_Headphones", command ) == 0 )
 	{
-		CGameUIConVarRef snd_surround_speakers("Snd_Surround_Speakers");
+		ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
 		snd_surround_speakers.SetValue( "0" );
 	}
 	
 	else if ( char const *sz = StringAfterPrefix( command, "#GameUI_DownloadFilter_" ) )
 	{
-		CGameUIConVarRef  cl_downloadfilter( "cl_downloadfilter" );
+		ConVarRef  cl_downloadfilter( "cl_downloadfilter" );
 		cl_downloadfilter.SetValue( sz );
 	}
 	else if ( char const *sz = StringAfterPrefix( command, "ColorBlind" ) )
 	{
-		CGameUIConVarRef cl_colorblind( "cl_colorblind" );
+		ConVarRef cl_colorblind( "cl_colorblind" );
 		cl_colorblind.SetValue( sz );
 	}
 	else if ( char const *sz = StringAfterPrefix( command, "GameInstructor" ) )
 	{
-		CGameUIConVarRef gameinstructor_enable( "gameinstructor_enable" );
+		ConVarRef gameinstructor_enable( "gameinstructor_enable" );
 		gameinstructor_enable.SetValue( !Q_stricmp( sz, "Enabled" ) );
 	}
 	else if ( char const *sz = StringAfterPrefix( command, "AllowFreeLook" ) )
 	{
-		CGameUIConVarRef spec_allowroaming( "spec_allowroaming" );
+		ConVarRef spec_allowroaming( "spec_allowroaming" );
 		spec_allowroaming.SetValue( !Q_stricmp( sz, "Enabled" ) );
 	}
 	else if ( char const *sz = StringAfterPrefix( command, "MpLanGames" ) )
 	{
-		CGameUIConVarRef net_allow_multicast( "net_allow_multicast" );
+		ConVarRef net_allow_multicast( "net_allow_multicast" );
 		net_allow_multicast.SetValue( !Q_stricmp( sz, "Enabled" ) );
 	}
 
@@ -436,7 +436,7 @@ void Multiplayer::OnCommand(const char *command)
 			char rootFilename[MAX_PATH];
 			Q_snprintf( rootFilename, sizeof(rootFilename), MULTIPLAYER_SPRAY_FOLDER "%s%s.vtf", pchCustomPath, m_nSpraypaint[ iLogo ].m_szFilename );
 
-			CGameUIConVarRef cl_logofile( "cl_logofile", true );
+			ConVarRef cl_logofile( "cl_logofile", true );
 			cl_logofile.SetValue( rootFilename );
 
 			RemapLogo( m_nSpraypaint[ iLogo ].m_szFilename, m_pSprayLogo, pchCustomPath );
@@ -481,12 +481,12 @@ void Multiplayer::OnCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "#L4D360UI_Gore_High" ) )
 	{
-		CGameUIConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
+		ConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
 		z_wound_client_disabled.SetValue( 0 );
 	}
 	else if ( !Q_stricmp( command, "#L4D360UI_Gore_Low" ) )
 	{
-		CGameUIConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
+		ConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
 		z_wound_client_disabled.SetValue( 1 );
 	}
 	else
@@ -513,7 +513,7 @@ void Multiplayer::InitLogoList()
 	// Find our logos
 	int initialItem = 0;
 
-	CGameUIConVarRef cl_logofile( "cl_logofile", true );
+	ConVarRef cl_logofile( "cl_logofile", true );
 	if ( !cl_logofile.IsValid() )
 		return;
 
@@ -639,7 +639,7 @@ void Multiplayer::OnFileSelected(const char *fullpath)
 
 	if ( bSuccess )
 	{
-		CGameUIConVarRef cl_logofile( "cl_logofile", true );
+		ConVarRef cl_logofile( "cl_logofile", true );
 		if ( cl_logofile.IsValid() )
 		{
 			// get the vtfFilename from the path.

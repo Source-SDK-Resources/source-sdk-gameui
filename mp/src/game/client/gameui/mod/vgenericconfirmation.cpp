@@ -511,7 +511,7 @@ int GenericConfirmation::SetUsageData( const Data_t & data )
 
 	if ( data.bCheckBoxEnabled && data.pCheckBoxCvarName )
 	{
-		m_pCheckBox = new CvarToggleCheckButton<CGameUIConVarRef>( 
+		m_pCheckBox = new CvarToggleCheckButton<ConVarRef>( 
 			this, 
 			"CheckButton", 
 			"",

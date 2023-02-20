@@ -961,7 +961,7 @@ void MainMenu::OnOpen()
 	bool bSteamCloudVisible = false;
 
 	{
-		static CGameUIConVarRef cl_cloud_settings( "cl_cloud_settings" );
+		static ConVarRef cl_cloud_settings( "cl_cloud_settings" );
 		if ( cl_cloud_settings.GetInt() == -1 )
 		{
 			CBaseModPanel::GetSingleton().OpenWindow( WT_STEAMCLOUDCONFIRM, this, false );

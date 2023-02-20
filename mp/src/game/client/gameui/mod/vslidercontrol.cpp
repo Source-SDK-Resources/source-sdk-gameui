@@ -165,7 +165,7 @@ void SliderControl::SetConCommand( const char* conCommand )
 			delete m_conVarRef;
 		}
 
-		m_conVarRef = new CGameUIConVarRef( conCommand );
+		m_conVarRef = new ConVarRef( conCommand );
 
 		Reset();
 	}
@@ -189,7 +189,7 @@ void SliderControl::SetConCommandDefault( const char* conCommand )
 			delete m_conVarDefaultRef;
 		}
 
-		m_conVarDefaultRef = new CGameUIConVarRef( conCommand );
+		m_conVarDefaultRef = new ConVarRef( conCommand );
 	}
 	else
 	{
@@ -231,7 +231,7 @@ bool SliderControl::GetInversed()
 
 void SliderControl::Reset()
 {
-	CGameUIConVarRef* conVar = GetConVarRef();
+	ConVarRef* conVar = GetConVarRef();
 	if( conVar && conVar->IsValid() )
 	{
 		SetCurrentValue( conVar->GetFloat(), true );
@@ -599,7 +599,7 @@ void SliderControl::NavigateFrom()
 	}
 }
 
-CGameUIConVarRef* SliderControl::GetConVarRef()
+ConVarRef* SliderControl::GetConVarRef()
 {
 	return m_conVarRef;
 }
@@ -623,7 +623,7 @@ float SliderControl::UpdateProgressBar()
 
 void SliderControl::UpdateConVar()
 {
-	CGameUIConVarRef* conVar = GetConVarRef();
+	ConVarRef* conVar = GetConVarRef();
 	if( conVar && conVar->IsValid() )
 	{
 		conVar->SetValue( GetCurrentValue() );

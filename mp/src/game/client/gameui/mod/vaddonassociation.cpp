@@ -38,7 +38,7 @@ AddonAssociation::AddonAssociation( Panel *parent, const char *panelName )
 {
 	SetProportional( true );
 
-	m_pDoNotAskForAssociation = new CvarToggleCheckButton<CGameUIConVarRef>( 
+	m_pDoNotAskForAssociation = new CvarToggleCheckButton<ConVarRef>( 
 		this, 
 		"CheckButtonAddonAssociation", 
 		"#L4D360UI_Cloud_KeepInSync_Tip", 

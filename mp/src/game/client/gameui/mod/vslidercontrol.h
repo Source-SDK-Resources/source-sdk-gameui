@@ -4,7 +4,7 @@
 #include "basemodui.h"
 #include "vgui/mousecode.h"
 
-class CGameUIConVarRef;
+class ConVarRef;
 
 namespace BaseModUI
 {
@@ -63,7 +63,7 @@ namespace BaseModUI
 
 		void HandleMouseInput( bool bDrag );
 
-		CGameUIConVarRef* GetConVarRef();
+		ConVarRef* GetConVarRef();
 		float UpdateProgressBar();
 		void UpdateConVar();
 
@@ -86,8 +86,8 @@ namespace BaseModUI
 		float m_max;
 		float m_curValue;
 		float m_stepSize;
-		CGameUIConVarRef* m_conVarRef;
-		CGameUIConVarRef* m_conVarDefaultRef;
+		ConVarRef* m_conVarRef;
+		ConVarRef* m_conVarDefaultRef;
 
 		bool m_bDirty;
 	};

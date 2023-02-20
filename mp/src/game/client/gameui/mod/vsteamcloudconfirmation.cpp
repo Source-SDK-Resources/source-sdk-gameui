@@ -26,7 +26,7 @@ SteamCloudConfirmation::SteamCloudConfirmation( Panel *parent, const char *panel
 {
 	SetProportional( true );
 
-	m_pSteamCloudCheckBox = new CvarToggleCheckButton<CGameUIConVarRef>( 
+	m_pSteamCloudCheckBox = new CvarToggleCheckButton<ConVarRef>( 
 		this, 
 		"CheckButtonCloud", 
 		"#L4D360UI_Cloud_KeepInSync_Tip", 
@@ -59,7 +59,7 @@ void SteamCloudConfirmation::OnCommand(const char *command)
 {
 	if ( Q_stricmp( command, "OK" ) == 0 )
 	{
-		static CGameUIConVarRef cl_cloud_settings( "cl_cloud_settings" );
+		static ConVarRef cl_cloud_settings( "cl_cloud_settings" );
 
 		CBaseModPanel::GetSingleton().PlayUISound( UISOUND_ACCEPT );
 

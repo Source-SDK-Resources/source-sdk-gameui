@@ -71,7 +71,7 @@ protected:
 	vgui::Label *m_pLblCancelButton;
 	vgui::Label *m_pLblCancelText;
 	vgui::Panel *m_pPnlLowerGarnish;
-	vgui::CvarToggleCheckButton<CGameUIConVarRef> *m_pCheckBox;
+	vgui::CvarToggleCheckButton<ConVarRef> *m_pCheckBox;
 
 	CNB_Button* m_pBtnOK;
 	CNB_Button* m_pBtnCancel;

@@ -150,7 +150,7 @@ void ControllerOptionsButtons::Activate()
 	// Figure out which button should be default
 
 #if defined ( _X360 )
-	CGameUIConVarRef joy_cfg_preset("joy_cfg_preset");
+	ConVarRef joy_cfg_preset("joy_cfg_preset");
 	if ( joy_cfg_preset.IsValid() )
 	{
 		int iPreset = clamp( joy_cfg_preset.GetInt(), 0, NUM_CONTROLLER_BUTTONS_SETTINGS-1 );
@@ -296,7 +296,7 @@ void ControllerOptionsButtons::OnCommand(const char *command)
 	{
 		if( !Q_strcmp( command, pszButtonSettingsButtonName[i] ) )
 		{
-			CGameUIConVarRef joy_cfg_preset( "joy_cfg_preset" );
+			ConVarRef joy_cfg_preset( "joy_cfg_preset" );
 			if ( joy_cfg_preset.IsValid() )
 			{
 				joy_cfg_preset.SetValue( i );

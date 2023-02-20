@@ -70,7 +70,7 @@ void KeyboardMouse::Activate()
 
 	if ( m_drpMouseYInvert )
 	{
-		CGameUIConVarRef m_pitch("m_pitch");
+		ConVarRef m_pitch("m_pitch");
 
 		if ( m_pitch.GetFloat() > 0.0f )
 		{
@@ -90,7 +90,7 @@ void KeyboardMouse::Activate()
 
 	if ( m_drpMouseFilter )
 	{
-		CGameUIConVarRef m_filter("m_filter");
+		ConVarRef m_filter("m_filter");
 
 		if ( !m_filter.GetBool() )
 		{
@@ -115,7 +115,7 @@ void KeyboardMouse::Activate()
 
 	if ( m_drpDeveloperConsole )
 	{
-		CGameUIConVarRef con_enable("con_enable");
+		ConVarRef con_enable("con_enable");
 
 		if ( !con_enable.GetBool() )
 		{
@@ -133,7 +133,7 @@ void KeyboardMouse::Activate()
 		}
 	}
 
-	CGameUIConVarRef joystick("joystick");
+	ConVarRef joystick("joystick");
 
 	if ( m_drpGamepadEnable )
 	{
@@ -169,7 +169,7 @@ void KeyboardMouse::Activate()
 
 	if ( m_drpGamepadYInvert )
 	{
-		CGameUIConVarRef joy_inverty("joy_inverty");
+		ConVarRef joy_inverty("joy_inverty");
 
 		if ( !joy_inverty.GetBool() )
 		{
@@ -191,7 +191,7 @@ void KeyboardMouse::Activate()
 
 	if ( m_drpGamepadSwapSticks )
 	{
-		CGameUIConVarRef joy_movement_stick("joy_movement_stick");
+		ConVarRef joy_movement_stick("joy_movement_stick");
 
 		if ( !joy_movement_stick.GetBool() )
 		{
@@ -348,7 +348,7 @@ void KeyboardMouse::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "MouseYInvertEnabled", command ) == 0 )
 	{
-		CGameUIConVarRef m_pitch("m_pitch");
+		ConVarRef m_pitch("m_pitch");
 		if ( m_pitch.GetFloat() > 0.0f )
 		{
 			m_pitch.SetValue( -1.0f * m_pitch.GetFloat() );
@@ -356,7 +356,7 @@ void KeyboardMouse::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "MouseYInvertDisabled", command ) == 0 )
 	{
-		CGameUIConVarRef m_pitch("m_pitch");
+		ConVarRef m_pitch("m_pitch");
 		if ( m_pitch.GetFloat() < 0.0f )
 		{
 			m_pitch.SetValue( -1.0f * m_pitch.GetFloat() );
@@ -364,27 +364,27 @@ void KeyboardMouse::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "MouseFilterEnabled", command ) == 0 )
 	{
-		CGameUIConVarRef m_filter("m_filter");
+		ConVarRef m_filter("m_filter");
 		m_filter.SetValue( true );
 	}
 	else if( Q_stricmp( "MouseFilterDisabled", command ) == 0 )
 	{
-		CGameUIConVarRef m_filter("m_filter");
+		ConVarRef m_filter("m_filter");
 		m_filter.SetValue( false );
 	}
 	else if( Q_stricmp( "DeveloperConsoleEnabled", command ) == 0 )
 	{
-		CGameUIConVarRef con_enable("con_enable");
+		ConVarRef con_enable("con_enable");
 		con_enable.SetValue( true );
 	}
 	else if( Q_stricmp( "DeveloperConsoleDisabled", command ) == 0 )
 	{
-		CGameUIConVarRef con_enable("con_enable");
+		ConVarRef con_enable("con_enable");
 		con_enable.SetValue( false );
 	}
 	else if( Q_stricmp( "GamepadEnabled", command ) == 0 )
 	{
-		CGameUIConVarRef joystick("joystick");
+		ConVarRef joystick("joystick");
 
 		if( joystick.GetBool() == false )
 		{
@@ -410,7 +410,7 @@ void KeyboardMouse::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "GamepadDisabled", command ) == 0 )
 	{
-		CGameUIConVarRef joystick("joystick");
+		ConVarRef joystick("joystick");
 
 		if( joystick.GetBool() == true )
 		{
@@ -440,22 +440,22 @@ void KeyboardMouse::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "GamepadYInvertEnabled", command ) == 0 )
 	{
-		CGameUIConVarRef joy_inverty("joy_inverty");
+		ConVarRef joy_inverty("joy_inverty");
 		joy_inverty.SetValue( true );
 	}
 	else if( Q_stricmp( "GamepadYInvertDisabled", command ) == 0 )
 	{
-		CGameUIConVarRef joy_inverty("joy_inverty");
+		ConVarRef joy_inverty("joy_inverty");
 		joy_inverty.SetValue( false );
 	}
 	else if( Q_stricmp( "GamepadSwapSticksEnabled", command ) == 0 )
 	{
-		CGameUIConVarRef joy_movement_stick("joy_movement_stick");
+		ConVarRef joy_movement_stick("joy_movement_stick");
 		joy_movement_stick.SetValue( true );
 	}
 	else if( Q_stricmp( "GamepadSwapSticksDisabled", command ) == 0 )
 	{
-		CGameUIConVarRef joy_movement_stick("joy_movement_stick");
+		ConVarRef joy_movement_stick("joy_movement_stick");
 		joy_movement_stick.SetValue( false );
 	}
 	else if( Q_stricmp( "Back", command ) == 0 )

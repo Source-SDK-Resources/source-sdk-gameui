@@ -80,7 +80,7 @@ void QuickJoinPanelItem::SetInfo( QuickJoinPanel::QuickInfo const &qi )
 
 const wchar_t *QuickJoinPanelItem::GetName() const
 {
-	static CGameUIConVarRef cl_names_debug( "cl_names_debug" );
+	static ConVarRef cl_names_debug( "cl_names_debug" );
 	if ( cl_names_debug.GetInt() )
 		return PLAYER_DEBUG_NAME_UNICODE;
 

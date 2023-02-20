@@ -30,7 +30,7 @@ protected:
 	void UpdateText();
 
 private:
-//	vgui::CvarToggleCheckButton<CGameUIConVarRef> *m_pDoNotShowWarning;
+//	vgui::CvarToggleCheckButton<ConVarRef> *m_pDoNotShowWarning;
 
 	CUtlString m_campaignName;
 	CUtlString m_author;
