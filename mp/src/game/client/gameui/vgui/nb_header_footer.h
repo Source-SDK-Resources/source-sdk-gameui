@@ -7,13 +7,6 @@
 #include <vgui/VGUI.h>
 #include <vgui_controls/EditablePanel.h>
 
-#define ASW_BINK_MOVIES
-
-#ifdef ASW_BINK_MOVIES
-#include "avi/ibik.h"
-#else
-#include "avi/iavi.h"
-#endif
 
 // == MANAGED_CLASS_DECLARATIONS_START: Do not edit by hand ==
 class vgui::Label;
@@ -37,30 +30,32 @@ enum NB_Background_Style
 	NB_BACKGROUND_NONE,
 };
 
-class CASW_Background_Movie
+class IVideoMaterial;
+
+class CBackgroundMovie
 {
 public:
-	CASW_Background_Movie();
-	~CASW_Background_Movie();
+	CBackgroundMovie();
+	~CBackgroundMovie();
 
 	void Update();
 	void SetCurrentMovie( const char *szFilename );
 	int SetTextureMaterial();
 	void ClearCurrentMovie();
- 
+
+	float MaxU() { if (m_flMaxU == 0) return 1.0f; return m_flMaxU; }
+	float MaxV() { if (m_flMaxV == 0) return 1.0f; return m_flMaxV; }
+	float AspectRatio() { return m_flAspectRatio; }
 private:
-#ifdef ASW_BINK_MOVIES
-	BIKMaterial_t m_nBIKMaterial;
-#else
-	AVIMaterial_t m_nAVIMaterial;
-	float m_flStartTime;
-#endif
+	float m_flMaxU, m_flMaxV, m_flAspectRatio;
+	IVideoMaterial* m_pMaterial;
+
 	int m_nTextureID;
 	char m_szCurrentMovie[ MAX_PATH ];
 	int m_nLastGameState;
 };
 
-CASW_Background_Movie* ASWBackgroundMovie();
+CBackgroundMovie* BackgroundMovie();
 
 class CNB_Header_Footer : public vgui::EditablePanel
 {

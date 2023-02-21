@@ -1669,18 +1669,20 @@ void CBaseModPanel::PaintBackground()
 		{
 			ActivateBackgroundEffects();
 
-			if ( ASWBackgroundMovie() )
+			if ( BackgroundMovie() )
 			{
-				ASWBackgroundMovie()->Update();
-				if ( ASWBackgroundMovie()->SetTextureMaterial() != -1 )
+				BackgroundMovie()->Update();
+				if ( BackgroundMovie()->SetTextureMaterial() != -1 )
 				{
 					surface()->DrawSetColor( 255, 255, 255, 255 );
 					int x, y, w, h;
 					GetBounds( x, y, w, h );
 
-					// center, 16:9 aspect ratio
-					int width_at_ratio = h * (16.0f / 9.0f);
+					// center, aspect ratio
+					int width_at_ratio = h * BackgroundMovie()->AspectRatio();
 					x = ( w * 0.5f ) - ( width_at_ratio * 0.5f );
+					width_at_ratio /= BackgroundMovie()->MaxU();
+					h /= BackgroundMovie()->MaxV();
 
 					surface()->DrawTexturedRect( x, y, x + width_at_ratio, y + h );
 

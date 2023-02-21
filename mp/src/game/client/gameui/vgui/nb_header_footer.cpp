@@ -3,214 +3,123 @@
 #include "vgui_controls/Label.h"
 #include "vgui_controls/ImagePanel.h"
 #include <vgui/ISurface.h>
-#include "vgui_hudvideo.h"
-#include "asw_video.h"
 #include "VGUIMatSurface/IMatSystemSurface.h"
-#include "asw_gamerules.h"
+#include "video/ivideoservices.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 using namespace vgui;
 
-CASW_Background_Movie *g_pBackgroundMovie = NULL;
+CBackgroundMovie *g_pBackgroundMovie = NULL;
 
-CASW_Background_Movie* ASWBackgroundMovie()
+CBackgroundMovie* BackgroundMovie()
 {
 	if ( !g_pBackgroundMovie )
 	{
-		g_pBackgroundMovie = new CASW_Background_Movie();
+		g_pBackgroundMovie = new CBackgroundMovie();
 	}
 	return g_pBackgroundMovie;
 }
 
-CASW_Background_Movie::CASW_Background_Movie()
+CBackgroundMovie::CBackgroundMovie()
 {
-#ifdef ASW_BINK_MOVIES
-	m_nBIKMaterial = BIKMATERIAL_INVALID;
-#else
-	m_nAVIMaterial = AVIMATERIAL_INVALID;
-#endif
+	m_pMaterial = nullptr;
 	m_nTextureID = -1;
 	m_szCurrentMovie[0] = 0;
 	m_nLastGameState = -1;
+	m_flMaxU = m_flMaxV = 1.0f;
+	m_flAspectRatio = 16.0f / 9.0f;
 }
 
-CASW_Background_Movie::~CASW_Background_Movie()
+CBackgroundMovie::~CBackgroundMovie()
 {
-
+	ClearCurrentMovie();
 }
 
-void CASW_Background_Movie::SetCurrentMovie( const char *szFilename )
+void CBackgroundMovie::SetCurrentMovie( const char *szFilename )
 {
 	if ( Q_strcmp( m_szCurrentMovie, szFilename ) )
 	{
-#ifdef ASW_BINK_MOVIES
-		if ( m_nBIKMaterial != BIKMATERIAL_INVALID )
-		{
-			// FIXME: Make sure the m_pMaterial is actually destroyed at this point!
-			g_pBIK->DestroyMaterial( m_nBIKMaterial );
-			m_nBIKMaterial = BIKMATERIAL_INVALID;
-			m_nTextureID = -1;
-		}
+		ClearCurrentMovie();
 
-		char szMaterialName[ MAX_PATH ];
-		Q_snprintf( szMaterialName, sizeof( szMaterialName ), "BackgroundBIKMaterial%i", g_pBIK->GetGlobalMaterialAllocationNumber() );
-		m_nBIKMaterial = bik->CreateMaterial( szMaterialName, szFilename, "GAME", BIK_LOOP );
-#else
-		if ( m_nAVIMaterial != AVIMATERIAL_INVALID )
-		{
-			// FIXME: Make sure the m_pMaterial is actually destroyed at this point!
-			g_pAVI->DestroyAVIMaterial( m_nAVIMaterial );
-			m_nAVIMaterial = AVIMATERIAL_INVALID;
-			m_nTextureID = -1;
-		}
-
-		char szMaterialName[ MAX_PATH ];
+		char szMaterialName[MAX_PATH];
 		static int g_nGlobalAVIAllocationCount = 0;
-		Q_snprintf( szMaterialName, sizeof( szMaterialName ), "BackgroundAVIMaterial%i", g_nGlobalAVIAllocationCount++ );
-		m_nAVIMaterial = g_pAVI->CreateAVIMaterial( szMaterialName, szFilename, "GAME" );
-		m_flStartTime = gpGlobals->realtime;
+		Q_snprintf(szMaterialName, sizeof(szMaterialName), "BackgroundAVIMaterial%i", g_nGlobalAVIAllocationCount++);
 
-		IMaterial *pMaterial = avi->GetMaterial( m_nAVIMaterial );
-		pMaterial->IncrementReferenceCount();
-#endif
+		m_pMaterial = g_pVideo->CreateVideoMaterial(szMaterialName, szFilename, "GAME", VideoPlaybackFlags::LOOP_VIDEO);
 
-		Q_snprintf( m_szCurrentMovie, sizeof( m_szCurrentMovie ), "%s", szFilename );
+		if (m_pMaterial)
+		{
+			Q_snprintf(m_szCurrentMovie, sizeof(m_szCurrentMovie), "%s", szFilename);
+
+			m_pMaterial->GetVideoTexCoordRange(&m_flMaxU, &m_flMaxV);
+			int iVidW, iVidH;
+			m_pMaterial->GetVideoImageSize(&iVidW, &iVidH);
+			m_flAspectRatio = iVidW / (float)iVidH;
+		}
 	}
 }
 
-void CASW_Background_Movie::ClearCurrentMovie()
+void CBackgroundMovie::ClearCurrentMovie()
 {
-#ifdef ASW_BINK_MOVIES
-	if ( m_nBIKMaterial != BIKMATERIAL_INVALID )
+	if (m_pMaterial != nullptr)
 	{
-		// FIXME: Make sure the m_pMaterial is actually destroyed at this point!
-		g_pBIK->DestroyMaterial( m_nBIKMaterial );
-		m_nBIKMaterial = BIKMATERIAL_INVALID;
+		VideoResult_t result = g_pVideo->DestroyVideoMaterial(m_pMaterial);
+
+		m_pMaterial = nullptr;
 		m_nTextureID = -1;
+
+		m_flMaxU = m_flMaxV = 1.0f;
+		m_flAspectRatio = 16.0f / 9.0f;
+
+		if (result != VideoResult_t::SUCCESS)
+		{
+			Error("[Movie UI] Failed to destroy background movie!");
+		}
 	}
-#else
-	if ( m_nAVIMaterial != AVIMATERIAL_INVALID )
-	{
-		// FIXME: Make sure the m_pMaterial is actually destroyed at this point!
-		g_pAVI->DestroyAVIMaterial( m_nAVIMaterial );
-		m_nAVIMaterial = AVIMATERIAL_INVALID;
-		m_nTextureID = -1;
-	}
-#endif
 }
 
-int CASW_Background_Movie::SetTextureMaterial()
+int CBackgroundMovie::SetTextureMaterial()
 {
-#ifdef ASW_BINK_MOVIES
-	if ( m_nBIKMaterial == BIKMATERIAL_INVALID )
+	if ( m_pMaterial == nullptr )
 		return -1;
-#else
-	if ( m_nAVIMaterial == AVIMATERIAL_INVALID )
-		return -1;
-#endif
 
 	if ( m_nTextureID == -1 )
 	{
 		m_nTextureID = g_pMatSystemSurface->CreateNewTextureID( true );
 	}
-	
-#ifdef ASW_BINK_MOVIES
-	g_pMatSystemSurface->DrawSetTextureMaterial( m_nTextureID, g_pBIK->GetMaterial( m_nBIKMaterial ) );
-#else
-	g_pMatSystemSurface->DrawSetTextureMaterial( m_nTextureID, g_pAVI->GetMaterial( m_nAVIMaterial ) );
-#endif
+
+	g_pMatSystemSurface->DrawSetTextureMaterial( m_nTextureID, m_pMaterial->GetMaterial() );
+
 	return m_nTextureID;
 }
 
-void CASW_Background_Movie::Update()
+void CBackgroundMovie::Update()
 {
-	if ( engine->IsConnected() && ASWGameRules() )
+	if ( engine->IsConnected() && GameRules() )
 	{
-		int nGameState = ASWGameRules()->GetGameState();
-		if ( nGameState >= ASW_GS_DEBRIEF && ASWGameRules()->GetMissionSuccess() )
+		// Do something based on the gamerules...
+		int nGameState = 1;
+		if ( nGameState != m_nLastGameState )
 		{
-			nGameState += 10;
+			SetCurrentMovie( "media/BGFX_01.bik" );
+			m_nLastGameState = nGameState;
 		}
-		if ( nGameState != m_nLastGameState && !( nGameState == ASW_GS_LAUNCHING || nGameState == ASW_GS_INGAME ) )
-		{
-			const char *pFilename = NULL;
-#ifdef ASW_BINK_MOVIES
-			if ( ASWGameRules()->GetGameState() >= ASW_GS_DEBRIEF )
-			{
-				if ( ASWGameRules()->GetMissionSuccess() )
-				{
-					pFilename = "media/SpaceFX.bik";
-				}
-				else
-				{
-					pFilename = "media/BG_Fail.bik";
-				}
-			}
-			else
-			{
-				int nChosenMovie = RandomInt( 0, 3 );
-				switch( nChosenMovie )
-				{
-					case 0: pFilename = "media/BGFX_01.bik"; break;
-					case 1: pFilename = "media/BGFX_02.bik"; break;
-					default:
-					case 2: pFilename = "media/BGFX_03.bik"; break;
-					case 3: pFilename = "media/BG_04_FX.bik"; break;
-				}
-			}
-#else
-			pFilename = "media/test.avi";
-#endif
-			if ( pFilename )
-			{
-				SetCurrentMovie( pFilename );
-			}
-		}
-		m_nLastGameState = nGameState;
 	}
 	else
 	{
 		int nGameState = 0;
 		if ( nGameState != m_nLastGameState )
 		{
-#ifdef ASW_BINK_MOVIES
 			SetCurrentMovie( "media/BG_02.bik" );
-#else
-			SetCurrentMovie( "media/test.avi" );
-#endif
 			m_nLastGameState = nGameState;
 		}
 	}
 
-#ifdef ASW_BINK_MOVIES
-	if ( m_nBIKMaterial == BIKMATERIAL_INVALID )
-		return;
-
-	if ( g_pBIK->ReadyForSwap( m_nBIKMaterial ) )
-	{
-		if ( g_pBIK->Update( m_nBIKMaterial ) == false )
-		{
-			// FIXME: Make sure the m_pMaterial is actually destroyed at this point!
-			g_pBIK->DestroyMaterial( m_nBIKMaterial );
-			m_nBIKMaterial = BIKMATERIAL_INVALID;
-		}
-	}
-#else
-	if ( m_nAVIMaterial == AVIMATERIAL_INVALID )
-		return;
-
-	int nFrames = avi->GetFrameCount( m_nAVIMaterial );
-	float flTimePerFrame = 1.0f / avi->GetFrameRate( m_nAVIMaterial );
-	float flTimePassed = gpGlobals->realtime - m_flStartTime;
-	int nFramesPassed = flTimePassed / flTimePerFrame;
-	nFramesPassed = nFramesPassed % nFrames;
-	avi->SetFrame( m_nAVIMaterial, nFramesPassed );
-
-// 	float flMaxU, flMaxV;
-// 	g_pAVI->GetTexCoordRange( m_nAVIMaterial, &flMaxU, &flMaxV );
-#endif
+	if (m_pMaterial)
+		m_pMaterial->Update();
+	
 }
 
 // ======================================
@@ -244,7 +153,6 @@ CNB_Header_Footer::~CNB_Header_Footer()
 
 }
 
-extern ConVar asw_force_background_movie;
 ConVar asw_background_color( "asw_background_color", "16 32 46 128", FCVAR_NONE, "Color of background tinting in briefing screens" );
 
 void CNB_Header_Footer::ApplySchemeSettings( vgui::IScheme *pScheme )
@@ -276,7 +184,9 @@ void CNB_Header_Footer::ApplySchemeSettings( vgui::IScheme *pScheme )
 			{
 				m_pBackground->SetVisible( true );
 				m_pBackgroundImage->SetVisible( false );
-				m_pBackground->SetBgColor( asw_background_color.GetColor() );
+				color32 asw_color{0,0,0,0};
+				UTIL_StringToColor32(&asw_color, asw_background_color.GetString());
+				m_pBackground->SetBgColor( Color(asw_color.r, asw_color.g, asw_color.b, asw_color.a) );
 				break;
 			}
 		case NB_BACKGROUND_TRANSPARENT_RED:
@@ -383,25 +293,29 @@ void CNB_Header_Footer::SetMovieEnabled( bool bMovieEnabled )
 
 void CNB_Header_Footer::PaintBackground()
 {
+
 	BaseClass::PaintBackground();
 
-	if ( m_bMovieEnabled && ASWBackgroundMovie() )
+
+	if ( m_bMovieEnabled && BackgroundMovie() )
 	{
-		ASWBackgroundMovie()->Update();
-		if ( ASWBackgroundMovie()->SetTextureMaterial() != -1 )
+		BackgroundMovie()->Update();
+		if ( BackgroundMovie()->SetTextureMaterial() != -1 )
 		{
 			surface()->DrawSetColor( 255, 255, 255, 255 );
+			surface()->DrawSetColor(255, 255, 255, 255);
+			int x, y, w, h;
+			GetBounds(x, y, w, h);
 
-			int x, y, w, t;
-			GetBounds( x, y, w, t );
 
-			// center, 16:10 aspect ratio
-			int width_at_ratio = t * (16.0f / 9.0f);
-			x = ( w * 0.5f ) - ( width_at_ratio * 0.5f );
-			
-			surface()->DrawTexturedRect( x, y, x + width_at_ratio, y + t );
+			// center, aspect ratio
+			int width_at_ratio = h * BackgroundMovie()->AspectRatio();
+			x = (w * 0.5f) - (width_at_ratio * 0.5f);
+			width_at_ratio /= BackgroundMovie()->MaxU();
+			h /= BackgroundMovie()->MaxV();
 		}
 	}
+
 
 	// test of gradient header/footer
 	/*
