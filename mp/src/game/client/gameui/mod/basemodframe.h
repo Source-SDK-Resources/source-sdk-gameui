@@ -15,6 +15,8 @@
 
 namespace BaseModUI {
 
+	extern int s_NavLock;
+
 	struct DialogMetrics_t
 	{
 		int titleY;

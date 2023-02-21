@@ -37,6 +37,8 @@ extern class IMatchSystem *matchsystem;
 extern const char *COM_GetModDirectory( void );
 extern IGameUIFuncs *gameuifuncs;
 
+int BaseModUI::s_NavLock = 0;
+
 //=============================================================================
 //
 //=============================================================================
@@ -44,7 +46,7 @@ CUtlVector< IBaseModFrameListener * > CBaseModFrame::m_FrameListeners;
 
 bool CBaseModFrame::m_DrawTitleSafeBorder = false;
 
-ConVar ui_gameui_modal( "ui_gameui_modal", "1", FCVAR_RELEASE, "If set, the game UI pages will take modal input focus." );
+ConVar ui_gameui_modal( "ui_gameui_modal", "1", FCVAR_CLIENTDLL, "If set, the game UI pages will take modal input focus." );
 
 //=============================================================================
 CBaseModFrame::CBaseModFrame( vgui::Panel *parent, const char *panelName, bool okButtonEnabled, 

@@ -77,6 +77,7 @@ LoadingProgress::LoadingProgress(Panel *parent, const char *panelName, LoadingWi
 	m_bFullscreenPoster = true;
 
 	m_flLastEngineTime = 0;
+	m_nSpinnerFrame = 0;
 
 	// marked to indicate the controls exist
 	m_bValid = false;
@@ -198,7 +199,7 @@ void LoadingProgress::UpdateWorkingAnim()
 		if ( ( m_flLastEngineTime + 0.1f ) < time )
 		{
 			m_flLastEngineTime = time;
-			m_pWorkingAnim->SetFrame( m_pWorkingAnim->GetFrame() + 1 );
+			m_pWorkingAnim->SetFrame( ++m_nSpinnerFrame );
 		}
 	}
 }
@@ -292,8 +293,6 @@ void LoadingProgress::PaintBackground()
 		x = scheme()->GetProportionalScaledValue( 45 ) - wide/2;
 		y = screenTall - scheme()->GetProportionalScaledValue( 32 ) - tall/2;
 
-		m_pWorkingAnim->GetImage()->SetFrame( m_pWorkingAnim->GetFrame() );
-
 		surface()->DrawSetColor( Color( 255, 255, 255, 255 ) );
 		surface()->DrawSetTexture( m_pWorkingAnim->GetImage()->GetID() );
 		surface()->DrawTexturedRect( x, y, x+wide, y+tall );
@@ -325,14 +324,8 @@ void LoadingProgress::PaintBackground()
 		int nIntegerWide = f * wide;		
 		float flUsedFrac = (float)nIntegerWide / (float)wide;
 		
-		DrawTexturedRectParms_t params;
-		params.x0 = x;
-		params.y0 = y;
-		params.x1 = x + nIntegerWide;
-		params.y1 = y + tall;
-		params.s0 = 0;
-		params.s1 = flUsedFrac;
-		surface()->DrawTexturedRectEx( &params );		
+
+		surface()->DrawTexturedSubRect( x, y, x + nIntegerWide, y + tall, 0, 0, flUsedFrac, 1 );
 	}
 
 	// Need to call this periodically to collect sign in and sign out notifications,

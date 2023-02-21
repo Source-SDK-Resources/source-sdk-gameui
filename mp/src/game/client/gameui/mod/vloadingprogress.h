@@ -94,6 +94,7 @@ private:
 	float				m_flPeakProgress;
 
 	float				m_flLastEngineTime;
+	int					m_nSpinnerFrame;
 
 	char				m_szGameMode[MAX_PATH];
 

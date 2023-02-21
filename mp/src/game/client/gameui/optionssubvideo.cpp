@@ -373,7 +373,7 @@ public:
 		m_pShadowDetail = new ComboBox( this, "ShadowDetail", 6, false );
 		m_pShadowDetail->AddItem("#gameui_low", NULL);
 		m_pShadowDetail->AddItem("#gameui_medium", NULL);
-		if ( g_pMaterialSystemHardwareConfig->SupportsShadowDepthTextures() )
+		if ( g_pMaterialSystem->SupportsShadowDepthTextures() )
 		{
 			m_pShadowDetail->AddItem("#gameui_high", NULL);
 		}

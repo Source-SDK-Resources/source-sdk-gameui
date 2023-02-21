@@ -65,7 +65,7 @@ extern IGameConsole *IGameConsole();
 //=============================================================================
 CBaseModPanel* CBaseModPanel::m_CFactoryBasePanel = 0;
 
-ConVar ui_gameui_debug( "ui_gameui_debug", "0", FCVAR_RELEASE );
+ConVar ui_gameui_debug( "ui_gameui_debug", "0" );
 int UI_IsDebug()
 {
 	return ui_gameui_debug.GetInt();
