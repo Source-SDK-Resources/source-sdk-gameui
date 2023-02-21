@@ -821,18 +821,6 @@ void Audio::OnCommand(const char *command)
 			}
 		}
 	}
-	else if( !Q_strcmp( command, "Jukebox" ) )
-	{
-		if ( m_pVoiceTweak && m_pMicMeter2 )
-		{
-			if ( m_pMicMeter2->IsVisible() )
-			{
-				EndTestMicrophone();
-			}
-		}
-
-		CBaseModPanel::GetSingleton().OpenWindow( WT_JUKEBOX, this, true );
-	}
 	else if( Q_stricmp( "Back", command ) == 0 )
 	{
 		OnKeyCodePressed( KEY_XBUTTON_B );

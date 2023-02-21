@@ -18,32 +18,14 @@
 #include "FileSystem.h"
 #include "tier2/renderutils.h"
 
-
 // BaseModUI High-level windows
 #include "VTransitionScreen.h"
-#include "VAchievements.h"
-#include "vaddonassociation.h"
-#include "VAddons.h"
-#include "VAttractScreen.h"
 #include "VAudio.h"
 #include "VAudioVideo.h"
-#include "VCloud.h"
-#include "VControllerOptions.h"
-#include "VControllerOptionsButtons.h"
-#include "VControllerOptionsSticks.h"
-#include "VDownloads.h"
-#include "VFoundGames.h"
-#include "VFoundGroupGames.h"
-#include "vfoundpublicgames.h"
-#include "VGameLobby.h"
-#include "VGameOptions.h"
-#include "VGameSettings.h"
+
 #include "VGenericConfirmation.h"
 #include "VGenericWaitScreen.h"
-#include "vgetlegacydata.h"
-#include "VInGameDifficultySelect.h"
 #include "VInGameMainMenu.h"
-#include "VInGameChapterSelect.h"
 #include "VInGameKickPlayerList.h"
 #include "VKeyboardMouse.h"
 #include "vkeyboard.h"
@@ -52,15 +34,9 @@
 #include "VMainMenu.h"
 #include "VMultiplayer.h"
 #include "VOptions.h"
-#include "VSignInDialog.h"
 #include "VFooterPanel.h"
 #include "VPasswordEntry.h"
 #include "VVideo.h"
-#include "VSteamCloudConfirmation.h"
-#include "vcustomcampaigns.h"
-#include "vdownloadcampaign.h"
-#include "vjukebox.h"
-#include "vleaderboard.h"
 #include "gameconsole.h"
 #include "vgui/ISystem.h"
 #include "vgui/ISurface.h"
@@ -277,48 +253,12 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 	{
 		switch ( wt )
 		{
-		case WT_ACHIEVEMENTS:
-			m_Frames[wt] = new Achievements(this, "Achievements");
-			break;
-
 		case WT_AUDIO:
 			m_Frames[wt] = new Audio(this, "Audio");
 			break;
 
 		case WT_AUDIOVIDEO:
 			m_Frames[wt] = new AudioVideo(this, "AudioVideo");
-			break;
-
-		case WT_CLOUD:
-			m_Frames[wt] = new Cloud(this, "Cloud");
-			break;
-
-		case WT_CONTROLLER:
-			m_Frames[wt] = new ControllerOptions(this, "ControllerOptions");
-			break;
-
-		case WT_CONTROLLER_STICKS:
-			m_Frames[wt] = new ControllerOptionsSticks(this, "ControllerOptionsSticks");
-			break;
-
-		case WT_CONTROLLER_BUTTONS:
-			m_Frames[wt] = new ControllerOptionsButtons(this, "ControllerOptionsButtons");
-			break;
-
-		case WT_DOWNLOADS:
-			m_Frames[wt] = new Downloads(this, "Downloads");
-			break;
-
-		case WT_GAMELOBBY:
-			m_Frames[wt] = new GameLobby(this, "GameLobby");
-			break;
-
-		case WT_GAMEOPTIONS:
-			m_Frames[wt] = new GameOptions(this, "GameOptions");
-			break;
-
-		case WT_GAMESETTINGS:
-			m_Frames[wt] = new GameSettings(this, "GameSettings");
 			break;
 
 		case WT_GENERICCONFIRMATION:
@@ -331,10 +271,6 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 
 		case WT_INGAMEMAINMENU:
 			m_Frames[wt] = new InGameMainMenu(this, "InGameMainMenu");
-			break;
-
-		case WT_INGAMECHAPTERSELECT:
-			m_Frames[wt] = new InGameChapterSelect(this, "InGameChapterSelect");
 			break;
 
 		case WT_INGAMEKICKPLAYERLIST:
@@ -369,28 +305,12 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			m_Frames[wt] = new Options(this, "Options");
 			break;
 
-		case WT_SIGNINDIALOG:
-			m_Frames[wt] = new SignInDialog(this, "SignInDialog");
-			break;
-
 		case WT_GENERICWAITSCREEN:
 			m_Frames[ wt ] = new GenericWaitScreen( this, "GenericWaitScreen" );
 			break;
 
 		case WT_PASSWORDENTRY:
 			m_Frames[ wt ] = new PasswordEntry( this, "PasswordEntry" );
-			break;
-
-		case WT_ATTRACTSCREEN:
-			m_Frames[ wt ] = new CAttractScreen( this, "AttractScreen" );
-			break;
-
-		case WT_ALLGAMESEARCHRESULTS:
-			m_Frames[ wt ] = new FoundGames( this, "FoundGames" );
-			break;
-
-		case WT_FOUNDPUBLICGAMES:
-			m_Frames[ wt ] = new FoundPublicGames( this, "FoundPublicGames" );
 			break;
 
 		case WT_TRANSITIONSCREEN:
@@ -401,41 +321,6 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			m_Frames[wt] = new Video(this, "Video");
 			break;
 
-		case WT_STEAMCLOUDCONFIRM:
-			m_Frames[wt] = new SteamCloudConfirmation(this, "SteamCloudConfirmation");
-			break;
-
-		case WT_STEAMGROUPSERVERS:
-			m_Frames[ wt ] = new FoundGroupGames( this, "FoundGames" );
-			break;
-
-		case WT_CUSTOMCAMPAIGNS:
-			m_Frames[ wt ] = new CustomCampaigns( this, "CustomCampaigns" );
-			break;
-
-		case WT_DOWNLOADCAMPAIGN:
-			m_Frames[ wt ] = new DownloadCampaign( this, "DownloadCampaign" );
-			break;
-
-		case WT_LEADERBOARD:
-			m_Frames[ wt ] = new Leaderboard( this );
-			break;
-
-		case WT_ADDONS:
-			m_Frames[wt] = new Addons( this, "Addons" );
-			break;
-
-		case WT_JUKEBOX:
-			m_Frames[wt] = new VJukebox( this, "Jukebox" );
-			break;
-
-		case WT_ADDONASSOCIATION:
-			m_Frames[wt] = new AddonAssociation( this, "AddonAssociation" );
-			break;
-
-		case WT_GETLEGACYDATA:
-			m_Frames[wt] = new GetLegacyData( this, "GetLegacyData" );
-			break;
 
 		default:
 			Assert( false );	// unknown window type
@@ -864,12 +749,6 @@ void CBaseModPanel::OnGameUIHidden()
 	{
 		PostMessage( pInGameMainMenu, new KeyValues( "GameUIHidden" ) );
 	}
-
-	// Close achievements
-	if ( CBaseModFrame *pFrame = GetWindow( WT_ACHIEVEMENTS ) )
-	{
-		pFrame->Close();
-	}
 }
 
 void CBaseModPanel::OpenFrontScreen()
@@ -925,7 +804,7 @@ void CBaseModPanel::RunFrame()
 		bDoBlur = false;
 		break;
 	}
-	if ( GetWindow( WT_ATTRACTSCREEN ) || ( enginevguifuncs && !enginevguifuncs->IsGameUIVisible() ) )
+	if ( enginevguifuncs && !enginevguifuncs->IsGameUIVisible())
 	{
 		// attract screen might be open, but not topmost due to notification dialogs
 		bDoBlur = false;

@@ -10,17 +10,8 @@
 #include "VHybridButton.h"
 #include "VFlyoutMenu.h"
 #include "vGenericConfirmation.h"
-#include "VQuickJoin.h"
 #include "basemodpanel.h"
-#include "UIGameData.h"
-#include "VGameSettings.h"
-#include "VSteamCloudConfirmation.h"
-#include "vaddonassociation.h"
-
-#include "VSignInDialog.h"
 #include "VGuiSystemModuleLoader.h"
-#include "VAttractScreen.h"
-#include "gamemodes.h"
 
 #include "vgui/ILocalize.h"
 #include "vgui_controls/Label.h"
@@ -294,35 +285,10 @@ void MainMenu::OnCommand( const char *command )
 		confirmation->SetUsageData(data);
 		NavigateFrom();
 	}
-	else if ( !Q_strcmp( command, "StatsAndAchievements" ) )
-	{
-		// If PC make sure that the Steam user is logged in
-		if ( CheckAndDisplayErrorIfNotLoggedIn() )
-			return;
-
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-
-		CBaseModPanel::GetSingleton().OpenWindow( WT_ACHIEVEMENTS, this, true );
-	}
 	else if ( !Q_strcmp( command, "FlmExtrasFlyoutCheck" ) )
 	{
 		OnCommand( "FlmExtrasFlyout_Simple" );
 		return;
-	}
-	else if ( char const *szInviteType = StringAfterPrefix( command, "InviteUI_" ) )
-	{
-		CUIGameData::Get()->ExecuteOverlayCommand( "LobbyInvite" );
-	}
-	else if (!Q_strcmp(command, "Game"))
-	{
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-		CBaseModPanel::GetSingleton().OpenWindow(WT_GAMEOPTIONS, this, true );
 	}
 	else if (!Q_strcmp(command, "AudioVideo"))
 	{
@@ -331,38 +297,6 @@ void MainMenu::OnCommand( const char *command )
 			m_ActiveControl->NavigateFrom( );
 		}
 		CBaseModPanel::GetSingleton().OpenWindow(WT_AUDIOVIDEO, this, true );
-	}
-	else if (!Q_strcmp(command, "Controller"))
-	{
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-		CBaseModPanel::GetSingleton().OpenWindow(WT_CONTROLLER, this, true );
-	}
-	else if (!Q_strcmp(command, "Credits"))
-	{
-		KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" system { "
-				" network offline "
-			" } "
-			" game { "
-				" mode single_mission "
-			" } "
-			" options { "
-				" play credits "
-			" } "
-			);
-		KeyValues::AutoDelete autodelete( pSettings );
-
-		g_pMatchFramework->CreateSession( pSettings );
-
-		// Automatically start the credits session, no configuration required
-		if ( IMatchSession *pMatchSession = g_pMatchFramework->GetMatchSession() )
-		{
-			pMatchSession->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
-		}
 	}
 	else if (!Q_strcmp(command, "QuitGame"))
 	{
@@ -467,35 +401,6 @@ void MainMenu::OnCommand( const char *command )
 			CBaseModPanel::GetSingleton().OpenWindow(WT_MULTIPLAYER, this, true );
 		}
 	}
-	else if (!Q_strcmp(command, "CloudSettings"))
-	{
-		// standalone cloud settings dialog, PC only
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-		CBaseModPanel::GetSingleton().OpenWindow(WT_CLOUD, this, true );
-	}
-	else if (!Q_strcmp(command, "SeeAll"))
-	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() )
-			return;
-
-		KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" game { "
-			// passing empty game settings to indicate no preference
-			" } "
-			);
-		KeyValues::AutoDelete autodelete( pSettings );
-
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-		CBaseModPanel::GetSingleton().OpenWindow( WT_ALLGAMESEARCHRESULTS, this, true, pSettings );
-		CBaseModPanel::GetSingleton().PlayUISound( UISOUND_ACCEPT );
-	}
 	else if ( !Q_strcmp( command, "OpenServerBrowser" ) )
 	{
 		if ( CheckAndDisplayErrorIfNotLoggedIn() )
@@ -508,56 +413,6 @@ void MainMenu::OnCommand( const char *command )
 	{
 		// Pass it straight to the engine as a command
 		engine->ClientCmd( command+1 );
-	}
-	else if( !Q_strcmp( command, "Addons" ) )
-	{
-		CBaseModPanel::GetSingleton().OpenWindow( WT_ADDONS, this, true );
-	}
-	else if( !Q_strcmp( command, "CreateGame" ) )
-	{
-		KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" system { "
-			" network LIVE "
-			" access public "
-			" } "
-			" game { "
-			" mode = "
-			" campaign = "
-			" mission = "
-			" } "
-			" options { "
-			" action create "
-			" } "
-			);
-		KeyValues::AutoDelete autodelete( pSettings );
-
-		char const *szGameMode = "campaign";
-		pSettings->SetString( "game/mode", szGameMode );
-		pSettings->SetString( "game/campaign", "jacob" );
-		pSettings->SetString( "game/mission", "asi-jac1-landingbay_01" );
-
-		if ( !CUIGameData::Get()->SignedInToLive() )
-		{
-			pSettings->SetString( "system/network", "lan" );
-			pSettings->SetString( "system/access", "public" );
-		}
-
-		if ( StringHasPrefix( szGameMode, "team" ) )
-		{
-			pSettings->SetString( "system/netflag", "teamlobby" );
-		}
-// 		else if ( !Q_stricmp( "custommatch", m_pDataSettings->GetString( "options/action", "" ) ) )
-// 		{
-// 			pSettings->SetString( "system/access", "public" );
-// 		}
-
-		// TCR: We need to respect the default difficulty
-		pSettings->SetString( "game/difficulty", GameModeGetDefaultDifficulty( szGameMode ) );
-
-		CBaseModPanel::GetSingleton().PlayUISound( UISOUND_ACCEPT );
-		CBaseModPanel::GetSingleton().CloseAllWindows();
-		CBaseModPanel::GetSingleton().OpenWindow( WT_GAMESETTINGS, NULL, true, pSettings );
 	}
 	else
 	{
@@ -764,24 +619,6 @@ void MainMenu::OnOpen()
 
 	SetFooterState();
 
-	bool bSteamCloudVisible = false;
-
-	{
-		static ConVarRef cl_cloud_settings( "cl_cloud_settings" );
-		if ( cl_cloud_settings.GetInt() == -1 )
-		{
-			CBaseModPanel::GetSingleton().OpenWindow( WT_STEAMCLOUDCONFIRM, this, false );
-			bSteamCloudVisible = true;
-		}
-	}
-
-	if ( !bSteamCloudVisible )
-	{
-		if ( AddonAssociation::CheckAndSeeIfShouldShow() )
-		{
-			CBaseModPanel::GetSingleton().OpenWindow( WT_ADDONASSOCIATION, this, false );
-		}
-	}
 }
 
 //=============================================================================

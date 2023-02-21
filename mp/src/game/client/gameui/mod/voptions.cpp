@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -57,14 +57,10 @@ void Options::OnCommand(const char *command)
 {
 	if(!Q_strcmp(command, "Game"))
 	{
-		CBaseModPanel::GetSingleton().OpenWindow(WT_GAMEOPTIONS, this);
+	//	CBaseModPanel::GetSingleton().OpenWindow(WT_GAMEOPTIONS, this);
 	}
 	else if(!Q_strcmp(command, "AudioVideo"))
 	{
 		CBaseModPanel::GetSingleton().OpenWindow(WT_AUDIOVIDEO, this);
-	}
-	else if(!Q_strcmp(command, "Controller"))
-	{
-		CBaseModPanel::GetSingleton().OpenWindow(WT_CONTROLLER, this);
 	}
 }

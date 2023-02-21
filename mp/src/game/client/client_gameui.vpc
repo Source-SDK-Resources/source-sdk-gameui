@@ -128,20 +128,15 @@ $Project
 					$File    "gameui\mod\basemodframe.h"
 					$File    "gameui\mod\basemodpanel.h"
 					$File    "gameui\mod\basemodui.h"
-					$File    "gameui\mod\gamemodes.h"
-					$File    "gameui\mod\vachievements.h"
 					$File    "gameui\mod\vaudio.h"
 					$File    "gameui\mod\vaudiovideo.h"
 					$File    "gameui\mod\vdropdownmenu.h"
 					$File    "gameui\mod\vflyoutmenu.h"
 					$File    "gameui\mod\vfooterpanel.h"
-					$File    "gameui\mod\vgamesettings.h"
 					$File    "gameui\mod\vgenericconfirmation.h"
 					$File    "gameui\mod\vgenericpanellist.h"
 					$File    "gameui\mod\vgenericwaitscreen.h"
 					$File    "gameui\mod\vhybridbutton.h"
-					$File    "gameui\mod\vingamechapterselect.h"
-					$File    "gameui\mod\vingamedifficultyselect.h"
 					$File    "gameui\mod\vingamekickplayerlist.h"
 					$File    "gameui\mod\vingamemainmenu.h"
 					$File    "gameui\mod\vkeyboard.h"
@@ -159,19 +154,15 @@ $Project
 				}
 				$File    "gameui\mod\basemodframe.cpp" \
 						 "gameui\mod\basemodpanel.cpp" \
-						 "gameui\mod\gamemodes.cpp" \
 						 "gameui\mod\vaudio.cpp" \
 						 "gameui\mod\vaudiovideo.cpp" \
 						 "gameui\mod\vdropdownmenu.cpp" \
 						 "gameui\mod\vflyoutmenu.cpp" \
 						 "gameui\mod\vfooterpanel.cpp" \
-						 "gameui\mod\vgamesettings.cpp" \
 						 "gameui\mod\vgenericconfirmation.cpp" \
 						 "gameui\mod\vgenericpanellist.cpp" \
 						 "gameui\mod\vgenericwaitscreen.cpp" \
 						 "gameui\mod\vhybridbutton.cpp" \
-						 "gameui\mod\vingamechapterselect.cpp" \
-						 "gameui\mod\vingamedifficultyselect.cpp" \
 						 "gameui\mod\vingamekickplayerlist.cpp" \
 						 "gameui\mod\vingamemainmenu.cpp" \
 						 "gameui\mod\vkeyboard.cpp" \

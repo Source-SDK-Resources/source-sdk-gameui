@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -125,56 +125,9 @@ void InGameMainMenu::OnCommand( const char *command )
 		engine->ClientCmd("gameui_hide");
 		engine->ClientCmd("callvote ReturnToLobby;");
 	}
-	else if ( char const *szInviteType = StringAfterPrefix( command, "InviteUI_" ) )
-	{
-		CUIGameData::Get()->ExecuteOverlayCommand( "LobbyInvite" );
-	}
-	else if ( !Q_strcmp( command, "StatsAndAchievements" ) )
-	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() )
-			return;
-
-		m_ActiveControl->NavigateFrom( );
-		CBaseModPanel::GetSingleton().OpenWindow( WT_ACHIEVEMENTS, this, true );
-	}
-	else if ( char const *szLeaderboards = StringAfterPrefix( command, "Leaderboards_" ) )
-	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() ||
-			CUIGameData::Get()->CheckAndDisplayErrorIfOffline( this,
-			"#L4D360UI_MainMenu_SurvivalLeaderboards_Tip_Disabled" ) )
-			return;
-
-		KeyValues *pSettings = NULL;
-		if ( *szLeaderboards )
-		{
-			pSettings = KeyValues::FromString(
-				"settings",
-				" game { "
-					" mode = "
-				" } "
-				);
-			pSettings->SetString( "game/mode", szLeaderboards );
-		}
-		else
-		{
-			pSettings = g_pMatchFramework->GetMatchNetworkMsgController()->GetActiveServerGameDetails( NULL );
-		}
-		
-		if ( !pSettings )
-			return;
-		
-		KeyValues::AutoDelete autodelete( pSettings );
-		
-		m_ActiveControl->NavigateFrom( );
-		CBaseModPanel::GetSingleton().OpenWindow( WT_LEADERBOARD, this, true, pSettings );
-	}
 	else if (!Q_strcmp(command, "AudioVideo"))
 	{
 		CBaseModPanel::GetSingleton().OpenWindow(WT_AUDIOVIDEO, this, true );
-	}
-	else if (!Q_strcmp(command, "Controller"))
-	{
-		CBaseModPanel::GetSingleton().OpenWindow(WT_CONTROLLER, this, true );
 	}
 	else if (!Q_strcmp(command, "Audio"))
 	{
@@ -210,12 +163,6 @@ void InGameMainMenu::OnCommand( const char *command )
 		m_ActiveControl->NavigateFrom( );
 		CBaseModPanel::GetSingleton().OpenWindow(WT_MULTIPLAYER, this, true );
 	}
-	else if (!Q_strcmp(command, "CloudSettings"))
-	{
-		// standalone cloud settings dialog, PC only
-		m_ActiveControl->NavigateFrom( );
-		CBaseModPanel::GetSingleton().OpenWindow(WT_CLOUD, this, true );
-	}
 	else if( !Q_strcmp( command, "ExitToMainMenu" ) )
 	{
 		GenericConfirmation* confirmation = 
@@ -230,10 +177,6 @@ void InGameMainMenu::OnCommand( const char *command )
 		data.bCancelButtonEnabled = true;
 
 		confirmation->SetUsageData(data);
-	}
-	else if( !Q_strcmp( command, "Addons" ) )
-	{
-		CBaseModPanel::GetSingleton().OpenWindow( WT_ADDONS, this, true );
 	}
 	else
 	{
