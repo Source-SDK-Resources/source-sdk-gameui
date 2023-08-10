@@ -54,3 +54,17 @@ config.cfg
 # shader files
 *.tmp
 
+.vs
+*.vcproj*
+[Dd]ebug*/
+[Rr]elease*/
+*.vcxproj*
+*.sentinel
+[ms]p/game/**/bin
+*.lib
+*.pdb
+[ms]p/game/*/cfg/server_blacklist.txt
+[ms]p/game/*/sound/sound.cache
+[ms]p/game/*/modelsounds.cache
+[ms]p/game/*/stats.txt
+[ms]p/game/*/voice_ban.dt
