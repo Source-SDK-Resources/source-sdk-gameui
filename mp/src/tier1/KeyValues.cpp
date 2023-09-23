@@ -600,7 +600,7 @@ const char *KeyValues::ReadToken( CUtlBuffer &buf, bool &wasQuoted, bool &wasCon
 		}
 
 		// break on whitespace
-		if ( isspace(*c) )
+		if ( !bConditionalStart && isspace(*c) )
 			break;
 
 		if (nCount < (KEYVALUES_TOKEN_SIZE-1) )
@@ -2180,6 +2180,220 @@ void KeyValues::RecursiveMergeKeyValues( KeyValues *baseKV )
 // Returns whether a keyvalues conditional evaluates to true or false
 // Needs more flexibility with conditionals, checking convars would be nice.
 //-----------------------------------------------------------------------------
+
+#if 1
+
+// Ozxy:
+// I'm so sorry
+// Please let me know if this causes you any issues.
+
+struct ecValue_t
+{
+	const char* str;
+	bool value;
+};
+
+struct ecCondTok_t
+{
+	ecCondTok_t() { str = nullptr; len = 0; value = false; }
+	ecCondTok_t(const char* s, int l) { str = s; len = l; value = false; }
+	ecCondTok_t(bool b) { value = b; len = -1; str = 0; }
+	bool IsValue() { return len == -1; }
+
+	const char* str;
+	bool value;
+	int len;
+};
+
+static ecValue_t s_valueConditions[] = {
+	{ "X360",    IsX360()    },
+	{ "WIN32",   IsPC()      },
+	{ "WINDOWS", IsWindows() },
+	{ "OSX",	 IsOSX()     },
+	{ "LINUX",   IsLinux()   },
+	{ "POSIX",   IsPosix()   }
+};
+
+bool ECValueOf(const char* str, int len)
+{
+	for (int i = 0; i < sizeof(s_valueConditions) / sizeof(ecValue_t); i++)
+	{
+		int l = strlen(s_valueConditions[i].str);
+		if (l != len)
+			continue;
+		if (V_strnicmp(str, s_valueConditions[i].str, len) == 0)
+			return s_valueConditions[i].value;
+	}
+	return false;
+}
+
+void RecursiveEvalCond(CUtlVector<ecCondTok_t>& toks, int j)
+{
+	int end = toks.Count();
+	// Parenthesis pass
+	for (int i = j; i < toks.Count(); i++)
+	{
+		if (toks[i].IsValue())
+			continue;
+
+		if (*toks[i].str == '(')
+		{
+			toks.Remove(i);
+			RecursiveEvalCond(toks, i);
+			end = Min(toks.Count(), end);
+		}
+		else if (*toks[i].str == ')')
+		{
+			end = i;
+			toks.Remove(i);
+			end = Min(toks.Count(), end);
+			break;
+		}
+	}
+
+	// Not pass
+	for (int i = j; i < end; i++)
+	{
+		if (!toks[i].IsValue() && *toks[i].str == '!')
+		{
+			if (i + 1 >= toks.Count() || !toks[i+1].IsValue())
+			{
+				DevMsg("RecursiveEvalCond: Unexpected Not in condition!\n");
+				return;
+			}
+			toks[i] = { !toks[i + 1].value };
+			toks.Remove(i + 1);
+			end = Min(toks.Count(), end);
+		}
+	}
+
+	// And pass
+	for (int i = j; i < end; i++)
+	{
+		if (!toks[i].IsValue() && !V_strnicmp(toks[i].str, "&&", 2))
+		{
+			if (i + 1 >= toks.Count() || i - 1 < 0 || !toks[i - 1].IsValue() || !toks[i + 1].IsValue())
+			{
+				DevMsg("RecursiveEvalCond: Unexpected And in condition!\n");
+				return;
+			}
+
+			toks[i - 1] = { toks[i - 1].value && toks[i + 1].value };
+			toks.Remove(i);
+			toks.Remove(i);
+			end = Min(toks.Count(), end);
+			i--;
+		}
+	}
+
+	// Or pass
+	for (int i = j; i < end; i++)
+	{
+		if (!toks[i].IsValue() && !V_strnicmp(toks[i].str, "||", 2))
+		{
+			if (i + 1 >= toks.Count() || i - 1 < 0 || !toks[i - 1].IsValue() || !toks[i + 1].IsValue())
+			{
+				DevMsg("RecursiveEvalCond: Unexpected Or in condition!\n");
+				return;
+			}
+
+			toks[i - 1] = { toks[i - 1].value || toks[i + 1].value };
+			toks.Remove(i);
+			toks.Remove(i);
+			end = Min(toks.Count(), end);
+			i--;
+		}
+	}
+}
+
+bool EvaluateConditional(const char* str)
+{
+	if (!str)
+		return false;
+
+	if (*str == '[')
+		str++;
+
+	if (!*str)
+		return false;
+	
+	CUtlBuffer buf(str, KEYVALUES_TOKEN_SIZE, CUtlBuffer::BufferFlags_t::TEXT_BUFFER | CUtlBuffer::BufferFlags_t::READ_ONLY);
+
+	CUtlVector<ecCondTok_t> toks;
+
+	// Tokenize
+	for(;;)
+	{
+		// eating white spaces and remarks loop
+		while (true)
+		{
+			buf.EatWhiteSpace();
+			if (!buf.IsValid())
+				return NULL;	// file ends after reading whitespaces
+
+			// stop if it's not a comment; a new token starts here
+			if (!buf.EatCPPComment())
+				break;
+		}
+		const char* c = (const char*)buf.PeekGet(sizeof(char), 0);
+		if (!c || *c == ']')
+			break;
+
+
+		// Read the token
+		ecCondTok_t tok;
+
+		if (*c == '$')
+		{
+			tok = { c, 0 };
+			buf.SeekGet(CUtlBuffer::SEEK_CURRENT, 1);
+			c = (const char*)buf.PeekGet(sizeof(char), 0);
+
+			// Peek until control char
+			for (; c && *c; buf.SeekGet(CUtlBuffer::SEEK_CURRENT, 1), c = (const char*)buf.PeekGet(sizeof(char), 0))
+			{
+				if (isspace(*c) || (!isupper(*c) && !isdigit(*c)))
+					break;
+			}
+
+			tok.len = c - tok.str - 1;
+		}
+		else if ( !V_strnicmp(c, "||", 2) || !V_strnicmp(c, "&&", 2))
+		{
+			tok = { c, 2 };
+			// Skip 2
+			buf.SeekGet(CUtlBuffer::SEEK_CURRENT, 2);
+		}
+		else if (*c == '(' || *c == ')' || *c == '!')
+		{
+			tok = { c, 1 };
+			// Skip 1
+			buf.SeekGet(CUtlBuffer::SEEK_CURRENT, 1);
+		}
+		
+		toks.AddToTail(tok);
+	}
+
+	// Evaluate
+	
+	// Replace variables with values
+	for (int i = 0; i < toks.Count(); i++)
+	{
+		ecCondTok_t t = toks[i];
+		if (*t.str == '$')
+		{
+			bool val = ECValueOf(t.str + 1, t.len);
+			toks[i] = { val };
+		}
+	}
+	int i = 0;
+	RecursiveEvalCond(toks, i);
+
+	return toks.Count() == 1 && toks[0].IsValue() && toks[0].value;
+}
+
+#else
+
 bool EvaluateConditional( const char *str )
 {
 	if ( !str )
@@ -2212,7 +2426,7 @@ bool EvaluateConditional( const char *str )
 	
 	return false;
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
 // Read from a buffer...
