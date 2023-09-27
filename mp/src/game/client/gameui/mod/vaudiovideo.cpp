@@ -32,7 +32,6 @@ BaseClass(parent, panelName)
 
 	m_sldBrightness = NULL;
 	m_drpColorMode = NULL;
-	m_sldFilmGrain = NULL;
 
 	m_sldGameVolume = NULL;
 	m_sldMusicVolume = NULL;
@@ -86,11 +85,6 @@ void AudioVideo::Activate()
 		{
 			pFlyout->SetListener( this );
 		}
-	}
-
-	if ( m_sldFilmGrain )
-	{
-		m_sldFilmGrain->Reset();
 	}
 
 	if ( m_sldGameVolume )
@@ -211,12 +205,6 @@ void AudioVideo::OnThink()
 		needsActivate = true;
 	}
 
-	if ( !m_sldFilmGrain )
-	{
-		m_sldFilmGrain = dynamic_cast< SliderControl* >( FindChildByName( "SldFilmGrain" ) );
-		needsActivate = true;
-	}
-
 	if ( !m_sldGameVolume )
 	{
 		m_sldGameVolume = dynamic_cast< SliderControl* >( FindChildByName( "SldGameVolume" ) );
@@ -296,7 +284,6 @@ void AudioVideo::OnKeyCodePressed(KeyCode code)
 		{
 			if ( m_bDirtyVideoConfig || 
 				( m_sldBrightness && m_sldBrightness->IsDirty() ) ||
-				( m_sldFilmGrain && m_sldFilmGrain->IsDirty() ) || 
 				( m_sldGameVolume && m_sldGameVolume->IsDirty() ) || 
 				( m_sldMusicVolume && m_sldMusicVolume->IsDirty() ) )
 			{
@@ -416,7 +403,6 @@ Panel* AudioVideo::NavigateBack()
 	// For cert we can only write one config in this spot!! (and have to wait 3 seconds before writing another)
 	if ( m_bDirtyVideoConfig || 
 		 ( m_sldBrightness && m_sldBrightness->IsDirty() ) ||
-		 ( m_sldFilmGrain && m_sldFilmGrain->IsDirty() ) ||
 		 ( m_sldGameVolume && m_sldGameVolume->IsDirty() ) || 
 		 ( m_sldMusicVolume && m_sldMusicVolume->IsDirty() ) )
 	{

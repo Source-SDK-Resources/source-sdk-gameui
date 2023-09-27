@@ -91,7 +91,6 @@ BaseClass(parent, panelName)
 	m_drpResolution = NULL;
 	m_drpDisplayMode = NULL;
 	m_drpLockMouse = NULL;
-	m_sldFilmGrain = NULL;
 
 	m_btnAdvanced = NULL;
 
@@ -116,9 +115,6 @@ BaseClass(parent, panelName)
 	m_pHeaderFooter->SetFooterEnabled( true );
 	m_pHeaderFooter->SetGradientBarEnabled( true );
 	m_pHeaderFooter->SetGradientBarPos( 100, 310 );
-
-	ConVarRef mat_grain_scale_override( "mat_grain_scale_override" );
-	m_flFilmGrainInitialValue = mat_grain_scale_override.GetFloat();
 
 	m_bDirtyValues = false;
 }
@@ -215,7 +211,6 @@ bool Video::SetupRecommendedActivateData( void )
 	m_bTripleBuffered = pConfigKeys->GetBool( "setting.mat_triplebuffered", false );
 	m_iGPUDetail = pConfigKeys->GetInt( "setting.gpu_level", 0 );
 	m_iCPUDetail = pConfigKeys->GetInt( "setting.cpu_level", 0 );
-	m_flFilmGrain = pConfigKeys->GetFloat( "setting.mat_grain_scale_override", 1.0f );
 	m_iQueuedMode = pConfigKeys->GetInt( "setting.mat_queue_mode", -1 );
 	m_bLockMouse = pConfigKeys->GetBool( "setting.in_lock_mouse_to_window", true );
 
@@ -320,19 +315,6 @@ void Video::Activate( bool bRecommendedSettings )
 		if ( pFlyout )
 		{
 			pFlyout->SetListener( this );
-		}
-	}
-
-	if ( m_sldFilmGrain )
-	{
-		if ( !bRecommendedSettings )
-		{
-			m_sldFilmGrain->Reset();
-		}
-		else
-		{
-			m_sldFilmGrain->SetCurrentValue( m_flFilmGrain );
-			m_sldFilmGrain->ResetSliderPosAndDefaultMarkers();
 		}
 	}
 
@@ -688,13 +670,7 @@ void Video::OnThink()
 	{
 		m_drpLockMouse->SetVisible( m_bWindowed );
 	}
-
-	if( !m_sldFilmGrain )
-	{
-		m_sldFilmGrain = dynamic_cast< SliderControl* >( FindChildByName( "SldFilmGrain" ) );
-		needsActivate = true;
-	}
-
+	
 	if( !m_btnAdvanced )
 	{
 		m_btnAdvanced = dynamic_cast< BaseModHybridButton* >( FindChildByName( "BtnAdvanced" ) );
@@ -1313,10 +1289,6 @@ void Video::ApplyChanges()
 {
 	if ( !m_bDirtyValues )
 	{
-		// Revert slider
-		ConVarRef mat_grain_scale_override( "mat_grain_scale_override" );
-		mat_grain_scale_override.SetValue( m_flFilmGrainInitialValue );
-
 		// No need to apply settings
 		return;
 	}

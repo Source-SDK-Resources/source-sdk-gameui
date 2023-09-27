@@ -85,7 +85,6 @@ private:
 	DropDownMenu		*m_drpResolution;
 	DropDownMenu		*m_drpDisplayMode;
 	DropDownMenu		*m_drpLockMouse;
-	SliderControl		*m_sldFilmGrain;
 
 	BaseModHybridButton	*m_btnAdvanced;
 
@@ -127,10 +126,7 @@ private:
 	int		m_iQueuedMode;
 	int		m_iGPUDetail;
 	int		m_iCPUDetail;
-	int		m_flFilmGrain;
 	bool	m_bLockMouse;
-
-	float	m_flFilmGrainInitialValue;
 
 	vgui::DHANDLE<class COptionsSubVideoThirdPartyCreditsDlg> m_OptionsSubVideoThirdPartyCreditsDlg;
 };
