@@ -120,6 +120,7 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 
 	m_FooterPanel = new CBaseModFooterPanel( this, "FooterPanel" );
 	m_hOptionsDialog = NULL;
+	m_hCreateMultiplayerGameDialog = NULL;
 
 	m_bWarmRestartMode = false;
 	m_ExitingFrameCount = 0;
@@ -710,6 +711,10 @@ void CBaseModPanel::OnGameUIHidden()
 	{
 		PostMessage( m_hOptionsDialog.Get(), new KeyValues( "GameUIHidden" ) );
 	}
+	if ( m_hCreateMultiplayerGameDialog.Get() )
+	{
+		PostMessage( m_hCreateMultiplayerGameDialog.Get(), new KeyValues( "GameUIHidden" ) );
+	}
 
 	// Notify the in game menu that game UI is closing
 	CBaseModFrame *pInGameMainMenu = GetWindow( WT_INGAMEMAINMENU );
@@ -996,6 +1001,18 @@ void CBaseModPanel::OpenOptionsDialog( Panel *parent )
 	}
 
 	m_hOptionsDialog->Activate();
+}
+
+//=============================================================================
+void CBaseModPanel::OpenCreateMultiplayerGameDialog( Panel *parent )
+{
+	if ( !m_hCreateMultiplayerGameDialog.Get() )
+	{
+		m_hCreateMultiplayerGameDialog = new CCreateMultiplayerGameDialog( parent );
+		BaseUI_PositionDialog( m_hCreateMultiplayerGameDialog );
+	}
+
+	m_hCreateMultiplayerGameDialog->Activate();
 }
 
 //=============================================================================

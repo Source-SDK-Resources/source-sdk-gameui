@@ -12,6 +12,7 @@
 #include "vgui_controls/Button.h"
 #include "tier1/utllinkedlist.h"
 #include "../OptionsDialog.h"
+#include "../CreateMultiplayerGameDialog.h"
 #include "../OptionsSubKeyboard.h"
 
 
@@ -140,6 +141,7 @@ namespace BaseModUI
 		CBaseModFooterPanel* GetFooterPanel();
 		void OpenOptionsDialog( Panel *parent );
 		void OpenKeyBindingsDialog( Panel *parent );
+		void OpenCreateMultiplayerGameDialog( Panel* parent );
 
 		MESSAGE_FUNC_CHARPTR( OnNavigateTo, "OnNavigateTo", panelName );
 
@@ -177,6 +179,7 @@ namespace BaseModUI
 		bool m_LevelLoading;
 		vgui::HScheme m_UIScheme;
 		vgui::DHANDLE<COptionsDialog> m_hOptionsDialog;	// standalone options dialog - PC only
+		vgui::DHANDLE<CCreateMultiplayerGameDialog> m_hCreateMultiplayerGameDialog;
 
 		vgui::HFont m_hDefaultFont;
 
