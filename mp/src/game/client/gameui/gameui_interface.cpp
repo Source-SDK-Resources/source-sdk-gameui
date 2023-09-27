@@ -210,10 +210,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 void CGameUI::PostInit()
 {
-#ifdef SWARM_DLL
-	// to know once client dlls have been loaded
-	BaseModUI::CUIGameData::Get()->OnGameUIPostInit();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -257,11 +253,6 @@ int __stdcall SendShutdownMsgFunc(WHANDLE hwnd, int lparam)
 //-----------------------------------------------------------------------------
 void CGameUI::PlayGameStartupSound()
 {
-#if defined( LEFT4DEAD )
-	// L4D not using this path, L4D UI now handling with background menu movies
-	return;
-#endif
-
 	if ( CommandLine()->FindParm( "-nostartupsound" ) )
 		return;
 
@@ -934,21 +925,6 @@ bool CGameUI::HasLoadingBackgroundDialog()
 	return ( NULL != g_hLoadingBackgroundDialog );
 }
 
-//-----------------------------------------------------------------------------
-
-void CGameUI::NeedConnectionProblemWaitScreen()
-{
-#ifdef SWARM_DLL
-	BaseModUI::CUIGameData::Get()->NeedConnectionProblemWaitScreen();
-#endif
-}
-
-void CGameUI::ShowPasswordUI( char const *pchCurrentPW )
-{
-#ifdef SWARM_DLL
-	BaseModUI::CUIGameData::Get()->ShowPasswordUI( pchCurrentPW );
-#endif
-}
 
 //-----------------------------------------------------------------------------
 void CGameUI::SetProgressOnStart()
