@@ -61,7 +61,6 @@ void CLoadingTipPanel::ReloadScheme( void )
 //--------------------------------------------------------------------------------------------------------
 void CLoadingTipPanel::SetupTips( void )
 {
-#ifdef _DEMO
 	KeyValues *pKV = new KeyValues( "Tips" );
 	KeyValues::AutoDelete autodelete( pKV );
 	if ( !pKV->LoadFromFile( g_pFullFileSystem, "scripts/tips.txt", "GAME" ) )
@@ -78,17 +77,6 @@ void CLoadingTipPanel::SetupTips( void )
 		V_strncpy( info.szTipImage, "achievements/ACH_SURVIVE_BRIDGE", MAX_TIP_LENGTH );
 		m_Tips.AddToTail( info );
 	}
-#else
-	TitleAchievementsDescription_t const *desc = g_pMatchFramework->GetMatchTitle()->DescribeTitleAchievements();
-	for ( ; desc->m_szAchievementName; ++desc )
-	{
-		sTipInfo info;
-		V_snprintf( info.szTipTitle, MAX_TIP_LENGTH, "#%s_NAME", desc->m_szAchievementName );
-		V_snprintf( info.szTipString, MAX_TIP_LENGTH, "#%s_DESC", desc->m_szAchievementName );
-		V_snprintf( info.szTipImage, MAX_TIP_LENGTH, "achievements/%s", desc->m_szAchievementName );
-		m_Tips.AddToTail( info );
-	}
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------------

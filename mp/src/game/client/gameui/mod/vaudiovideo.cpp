@@ -133,13 +133,7 @@ void AudioVideo::Activate()
 
 	if ( m_drpLanguage )
 	{
-#if defined( _DEMO )
-		// not allowing this for the demo, can't reboot to force english
-		bool bIsLocalized = false;
-#else
-		bool bIsLocalized = XBX_IsAudioLocalized();
-#endif
-		if ( !bIsLocalized )
+		if ( !XBX_IsAudioLocalized() )
 		{
 			// hidden if we don't have an audio localization for our current non-english language
 			// the audio is in english, there is no other choice for their audio
