@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -84,18 +84,19 @@ private:
 	DropDownMenu		*m_drpAspectRatio;
 	DropDownMenu		*m_drpResolution;
 	DropDownMenu		*m_drpDisplayMode;
-	DropDownMenu		*m_drpLockMouse;
+	//DropDownMenu		*m_drpLockMouse;
 
 	BaseModHybridButton	*m_btnAdvanced;
 
+	DropDownMenu		*m_drpTextureDetail;
 	DropDownMenu		*m_drpModelDetail;
-	DropDownMenu		*m_drpPagedPoolMem;
+	//DropDownMenu		*m_drpPagedPoolMem;
 	DropDownMenu		*m_drpAntialias;
 	DropDownMenu		*m_drpFiltering;
 	DropDownMenu		*m_drpVSync;
 	DropDownMenu		*m_drpQueuedMode;
 	DropDownMenu		*m_drpShaderDetail;
-	DropDownMenu		*m_drpCPUDetail;
+	//DropDownMenu		*m_drpCPUDetail;
 
 	CNB_Header_Footer *m_pHeaderFooter;
 
@@ -114,19 +115,20 @@ private:
 	int		m_iResolutionWidth;
 	int		m_iResolutionHeight;
 	bool	m_bWindowed;
-	bool	m_bNoBorder;
-	int		m_iModelTextureDetail;
-	int		m_iPagedPoolMem;
+	//bool	m_bNoBorder;
+	int		m_iModelDetail;
+	int		m_iTextureDetail;
+	//int		m_iPagedPoolMem;
 	int		m_iAntiAlias;
 	int		m_iFiltering;
 	int		m_nAASamples;
 	int		m_nAAQuality;
 	bool	m_bVSync;
-	bool	m_bTripleBuffered;
+	//bool	m_bTripleBuffered;
 	int		m_iQueuedMode;
 	int		m_iGPUDetail;
-	int		m_iCPUDetail;
-	bool	m_bLockMouse;
+	//int		m_iCPUDetail;
+	//bool	m_bLockMouse;
 
 	vgui::DHANDLE<class COptionsSubVideoThirdPartyCreditsDlg> m_OptionsSubVideoThirdPartyCreditsDlg;
 };

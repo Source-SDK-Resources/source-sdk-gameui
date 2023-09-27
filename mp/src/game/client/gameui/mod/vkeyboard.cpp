@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -14,7 +14,6 @@
 #include "vgui/ISurface.h"
 #include "VGenericConfirmation.h"
 #include "materialsystem/materialsystem_config.h"
-#include "ConfigManager.h"
 #include "cdll_util.h"
 #include "nb_header_footer.h"
 #include "optionssubkeyboard.h"
@@ -100,9 +99,9 @@ void VKeyboard::OnKeyCodeTyped( vgui::KeyCode code )
 	// For PC, this maps space bar to OK and esc to cancel
 	switch ( code )
 	{
-	case KEY_SPACE:
-		OnKeyCodePressed( KEY_XBUTTON_A );
-		break;
+	//case KEY_SPACE:
+	//	OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_A, 0 ) );
+	//	break;
 
 	case KEY_ESCAPE:
 		// close active menu if there is one, else navigate back

@@ -416,8 +416,8 @@ void SpinnerControl::ApplySettings(KeyValues *inResourceData)
 {
 	BaseClass::ApplySettings(inResourceData);
 
-	m_InactiveColor = inResourceData->GetColor( "inactiveColor", Color( 64, 64, 64, 255 ) );
-	m_ActiveColor = inResourceData->GetColor( "activeColor", Color( 128, 0, 0, 255 ) );
+	m_InactiveColor = inResourceData->GetColor( "inactiveColor" );
+	m_ActiveColor = inResourceData->GetColor( "activeColor" );
 	m_LblCurrentText->SetBgColor(m_InactiveColor);
 	
 	m_LblCurrentText->SetPaintBorderEnabled( inResourceData->GetInt( "paintTextBorder", 0 ) == 1 );

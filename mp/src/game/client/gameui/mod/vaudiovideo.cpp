@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -19,6 +19,8 @@
 using namespace vgui;
 using namespace BaseModUI;
 
+static ConVar x360_audio_english( "x360_audio_english", "0" );
+
 //=============================================================================
 AudioVideo::AudioVideo(Panel *parent, const char *panelName):
 BaseClass(parent, panelName)
@@ -38,7 +40,6 @@ BaseClass(parent, panelName)
 	m_drpLanguage = NULL;
 	m_drpCaptioning = NULL;
 
-	m_drpGore = NULL;
 
 	// Store the old vocal language setting
 	m_bOldForceEnglishAudio = x360_audio_english.GetBool();
@@ -127,61 +128,33 @@ void AudioVideo::Activate()
 
 	if ( m_drpLanguage )
 	{
-		if ( !XBX_IsAudioLocalized() )
-		{
-			// hidden if we don't have an audio localization for our current non-english language
-			// the audio is in english, there is no other choice for their audio
-			m_drpLanguage->SetVisible( false );
-		}
-		else
-		{
-			// We're in a language other than english that has full audio localization (not all of them do)
-			// let them select either their native language or english for thier audio if they're not in game
-			m_drpLanguage->SetFlyout( "FlmLanguage" );
 
-			char szLanguage[ 256 ];
-			Q_snprintf( szLanguage, sizeof( szLanguage ), "#GameUI_Language_%s", XBX_GetLanguageString() );
+		// We're in a language other than english that has full audio localization (not all of them do)
+		// let them select either their native language or english for thier audio if they're not in game
+		m_drpLanguage->SetFlyout( "FlmLanguage" );
 
-			FlyoutMenu *pFlyout = m_drpLanguage->GetCurrentFlyout();
-			if ( pFlyout )
-			{
-				Button *pCurrentLanguageButton = pFlyout->FindChildButtonByCommand( "CurrentXBXLanguage" );
+		char szLanguage[ 256 ];
+		Q_snprintf( szLanguage, sizeof( szLanguage ), "#GameUI_Language_%s", XBX_GetLanguageString() );
 
-				if ( pCurrentLanguageButton )
-				{
-					pCurrentLanguageButton->SetText( szLanguage );
-					pCurrentLanguageButton->SetCommand( szLanguage );
-					pFlyout->SetListener( this );
-				}
-			}
-
-			m_drpLanguage->SetCurrentSelection( ( x360_audio_english.GetBool() ) ? ( "#GameUI_Language_English" ) : ( szLanguage ) );
-
-			// Can't change language while in game
-			m_drpLanguage->SetEnabled( !engine->IsInGame() || GameUI().IsInBackgroundLevel() );
-		}
-	}
-	
-	if ( m_drpGore )
-	{
-		ConVarRef z_wound_client_disabled ( "z_wound_client_disabled" );
-
-		if ( z_wound_client_disabled.GetBool() )
-		{
-			m_drpGore->SetCurrentSelection( "#L4D360UI_Gore_Low" );
-		}
-		else
-		{
-			m_drpGore->SetCurrentSelection( "#L4D360UI_Gore_High" );
-		}
-
-		FlyoutMenu *pFlyout = m_drpGore->GetCurrentFlyout();
+		FlyoutMenu *pFlyout = m_drpLanguage->GetCurrentFlyout();
 		if ( pFlyout )
 		{
-			pFlyout->SetListener( this );
-		}
-	}
+			Button *pCurrentLanguageButton = pFlyout->FindChildButtonByCommand( "CurrentXBXLanguage" );
 
+			if ( pCurrentLanguageButton )
+			{
+				pCurrentLanguageButton->SetText( szLanguage );
+				pCurrentLanguageButton->SetCommand( szLanguage );
+				pFlyout->SetListener( this );
+			}
+		}
+
+		m_drpLanguage->SetCurrentSelection( ( x360_audio_english.GetBool() ) ? ( "#GameUI_Language_English" ) : ( szLanguage ) );
+
+		// Can't change language while in game
+		m_drpLanguage->SetEnabled( !engine->IsInGame() || GameUI().IsInBackgroundLevel() );
+	}
+	
 	m_bDirtyVideoConfig = false;
 
 	UpdateFooter();
@@ -229,11 +202,6 @@ void AudioVideo::OnThink()
 		needsActivate = true;
 	}
 
-	if ( !m_drpGore )
-	{
-		m_drpGore = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpGore" ) );
-		needsActivate = true;
-	}
 
 	if ( needsActivate )
 	{
@@ -345,18 +313,6 @@ void AudioVideo::OnCommand(const char *command)
 		ConVarRef cc_subtitles("cc_subtitles");
 		closecaption.SetValue( 1 );
 		cc_subtitles.SetValue( 0 );
-		m_bDirtyVideoConfig = true;
-	}
-	else if ( !Q_stricmp( command, "#L4D360UI_Gore_High" ) )
-	{
-		ConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
-		z_wound_client_disabled.SetValue( 0 );
-		m_bDirtyVideoConfig = true;
-	}
-	else if ( !Q_stricmp( command, "#L4D360UI_Gore_Low" ) )
-	{
-		ConVarRef z_wound_client_disabled( "z_wound_client_disabled" );
-		z_wound_client_disabled.SetValue( 1 );
 		m_bDirtyVideoConfig = true;
 	}
 	else if ( StringHasPrefix( command, "#GameUI_Language_" ) )

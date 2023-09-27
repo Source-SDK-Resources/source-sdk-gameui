@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -14,6 +14,7 @@
 #include "vgui/ISurface.h"
 #include "VGenericConfirmation.h"
 #include "materialsystem/materialsystem_config.h"
+#include "nb_header_footer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -50,13 +51,20 @@ BaseClass(parent, panelName)
 	m_drpGamepadSwapSticks = NULL;
 
 	m_btnCancel = NULL;
+
+	m_pHeaderFooter = new CNB_Header_Footer(this, "HeaderFooter");
+	m_pHeaderFooter->SetTitle("");
+	m_pHeaderFooter->SetHeaderEnabled(false);
+	m_pHeaderFooter->SetFooterEnabled(true);
+	m_pHeaderFooter->SetGradientBarEnabled(true);
+	m_pHeaderFooter->SetGradientBarPos(100, 310);
 }
 
 //=============================================================================
 KeyboardMouse::~KeyboardMouse()
 {
 	GameUI().AllowEngineHideGameUI();
-	UpdateFooter( false );
+	UpdateFooter(  );
 }
 
 //=============================================================================
@@ -207,18 +215,10 @@ void KeyboardMouse::Activate()
 		}
 	}
 
-	UpdateFooter( true );
-
-	if ( m_btnEditBindings )
-	{
-		if ( m_ActiveControl )
-			m_ActiveControl->NavigateFrom( );
-		m_btnEditBindings->NavigateTo();
-		m_ActiveControl = m_btnEditBindings;
-	}
+	UpdateFooter(  );
 }
 
-void KeyboardMouse::UpdateFooter( bool bEnableCloud )
+void KeyboardMouse::UpdateFooter( )
 {
 	if ( !BaseModUI::CBaseModPanel::GetSingletonPtr() )
 		return;
@@ -226,11 +226,9 @@ void KeyboardMouse::UpdateFooter( bool bEnableCloud )
 	CBaseModFooterPanel *footer = BaseModUI::CBaseModPanel::GetSingleton().GetFooterPanel();
 	if ( footer )
 	{
-		footer->SetButtons( FB_ABUTTON | FB_BBUTTON, FF_AB_ONLY, false );
-		footer->SetButtonText( FB_ABUTTON, "#L4D360UI_Select" );
-		footer->SetButtonText( FB_BBUTTON, "#L4D360UI_Controller_Done" );
-
-		footer->SetShowCloud( bEnableCloud );
+		footer->SetButtons(FB_ABUTTON | FB_BBUTTON, FF_AB_ONLY, false);
+		footer->SetButtonText(FB_ABUTTON, "#L4D360UI_Select");
+		footer->SetButtonText(FB_BBUTTON, "#L4D360UI_Controller_Done");
 	}
 }
 
@@ -314,17 +312,7 @@ void KeyboardMouse::OnThink()
 
 void KeyboardMouse::OnKeyCodePressed(KeyCode code)
 {
-	switch ( GetBaseButtonCode( code ) )
-	{
-	case KEY_XBUTTON_B:
-		// Ready to write that data... go ahead and nav back
-		BaseClass::OnKeyCodePressed(code);
-		break;
-
-	default:
-		BaseClass::OnKeyCodePressed(code);
-		break;
-	}
+	BaseClass::OnKeyCodePressed(code);
 }
 
 //=============================================================================
@@ -333,7 +321,7 @@ void KeyboardMouse::OnCommand(const char *command)
 	if( Q_stricmp( "#L4D360UI_Controller_Edit_Keys_Buttons", command ) == 0 )
 	{
 		FlyoutMenu::CloseActiveMenu();
-		CBaseModPanel::GetSingleton().OpenKeyBindingsDialog( this );
+		CBaseModPanel::GetSingleton().OpenWindow(WT_KEYBOARD, this, true);
 	}
 	else if( Q_stricmp( "MouseYInvertEnabled", command ) == 0 )
 	{
@@ -456,7 +444,7 @@ void KeyboardMouse::OnNotifyChildFocus( vgui::Panel* child )
 
 void KeyboardMouse::OnFlyoutMenuClose( vgui::Panel* flyTo )
 {
-	UpdateFooter( true );
+	UpdateFooter(  );
 }
 
 void KeyboardMouse::OnFlyoutMenuCancelled()
@@ -473,7 +461,7 @@ Panel* KeyboardMouse::NavigateBack()
 
 void KeyboardMouse::PaintBackground()
 {
-	BaseClass::DrawDialogBackground( "#L4D360UI_KeyboardMouse", NULL, "#L4D360UI_Controller_Desc", NULL, NULL, true );
+	//BaseClass::DrawDialogBackground( "#L4D360UI_KeyboardMouse", NULL, "#L4D360UI_Controller_Desc", NULL, NULL, true );
 }
 
 void KeyboardMouse::ApplySchemeSettings( vgui::IScheme *pScheme )

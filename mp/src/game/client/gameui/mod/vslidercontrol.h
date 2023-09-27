@@ -4,7 +4,6 @@
 #include "basemodui.h"
 #include "vgui/mousecode.h"
 
-class ConVarRef;
 
 namespace BaseModUI
 {

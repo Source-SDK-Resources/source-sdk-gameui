@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -18,6 +18,8 @@
 #include "cdll_util.h"
 #include "nb_header_footer.h"
 #include "vgui_controls/ImagePanel.h"
+#include "steam/steam_api.h"
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -362,11 +364,11 @@ void Audio::Activate()
 
 		if ( m_sldTransmitVolume )
 		{
-			bool bMicVolumeFound = m_pVoiceTweak->IsControlFound( MicrophoneVolume );
+			//bool bMicVolumeFound = m_pVoiceTweak->IsControlFound( MicrophoneVolume );
 			float micVolume = m_pVoiceTweak->GetControlFloat( MicrophoneVolume );
 			m_sldTransmitVolume->SetCurrentValue( (int)( 100.0f * micVolume ) );
 			m_sldTransmitVolume->ResetSliderPosAndDefaultMarkers();
-			m_sldTransmitVolume->SetEnabled( bVoiceEnabled && bMicVolumeFound );
+			m_sldTransmitVolume->SetEnabled(bVoiceEnabled); // && bMicVolumeFound );
 		}
 
 		if ( m_sldRecieveVolume )
@@ -739,7 +741,7 @@ void Audio::OnCommand(const char *command)
 		voice_modenable.SetValue( 1 );
 		voice_enable.SetValue( 1 );
 
-		bool bMicVolumeFound = m_pVoiceTweak->IsControlFound( MicrophoneVolume );
+		//bool bMicVolumeFound = m_pVoiceTweak->IsControlFound( MicrophoneVolume );
 
 		if ( voice_vox.GetBool() )
 		{
@@ -747,7 +749,7 @@ void Audio::OnCommand(const char *command)
 			voice_vox.SetValue( 1 );
 		}
 
-		SetControlEnabled( "SldVoiceTransmitVolume", bMicVolumeFound );
+		SetControlEnabled( "SldVoiceTransmitVolume", true ); //bMicVolumeFound );
 		SetControlEnabled( "SldVoiceReceiveVolume", true );
 		SetControlEnabled( "DrpBoostMicrophone", true );
 		SetControlVisible( "MicMeter", true );
@@ -915,7 +917,7 @@ Panel* Audio::NavigateBack()
 
 void Audio::UseSelectedLanguage()
 {
-	m_pchUpdatedAudioLanguage = GetLanguageName( m_nSelectedAudioLanguage );
+	m_pchUpdatedAudioLanguage = GetLanguageVGUILocalization( m_nSelectedAudioLanguage );
 }
 
 void Audio::ResetLanguage()
@@ -998,10 +1000,10 @@ void Audio::EndTestMicrophone()
 		m_pMicMeterIndicator->SetVisible( false );
 	}
 
-	bool bMicVolumeFound = m_pVoiceTweak->IsControlFound( MicrophoneVolume );
+	//bool bMicVolumeFound = m_pVoiceTweak->IsControlFound( MicrophoneVolume );
 
 	SetControlEnabled( "DrpVoiceCommunication", true );
-	SetControlEnabled( "SldVoiceTransmitVolume", bMicVolumeFound );
+	SetControlEnabled( "SldVoiceTransmitVolume", true );//bMicVolumeFound );
 	SetControlEnabled( "SldVoiceReceiveVolume", true );
 	SetControlEnabled( "DrpBoostMicrophone", true );
 }

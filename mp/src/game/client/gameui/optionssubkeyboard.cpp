@@ -449,7 +449,7 @@ void COptionsSubKeyboard::FillInCurrentBindings( void )
 				ButtonCode_t currentBC = (ButtonCode_t)gameuifuncs->GetButtonCodeForBind( currentKey );
 
 				// If we're using a joystick, joystick bindings override keyboard ones
-				bool bShouldOverride = bJoystick && bIsJoystickCode && !IsJoystickCode(currentBC);
+				bool bShouldOverride = bJoystick && !IsJoystickCode(currentBC);
 
 				if ( !bShouldOverride )
 					continue;

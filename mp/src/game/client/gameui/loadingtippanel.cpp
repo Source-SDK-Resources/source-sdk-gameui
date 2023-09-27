@@ -171,6 +171,7 @@ void CLoadingTipPanel::PaintBackground( void )
 
 void PrecacheLoadingTipIcons()
 {
+	/*
 	TitleAchievementsDescription_t const *desc = g_pMatchFramework->GetMatchTitle()->DescribeTitleAchievements();
 	for ( ; desc->m_szAchievementName; ++desc )
 	{
@@ -182,4 +183,5 @@ void PrecacheLoadingTipIcons()
 			vgui::surface()->DrawSetTextureFile( nImageId, imageString, true, false );	
 		}
 	}
+	*/
 }

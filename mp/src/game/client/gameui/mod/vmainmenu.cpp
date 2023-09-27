@@ -20,7 +20,7 @@
 #include "vgui_controls/ImagePanel.h"
 #include "vgui_controls/Image.h"
 
-#include "steam/isteamremotestorage.h"
+#include "steam/steam_api.h"
 #include "materialsystem/materialsystem_config.h"
 
 #include "ienginevgui.h"
@@ -29,7 +29,6 @@
 #include "tier0/icommandline.h"
 #include "fmtstr.h"
 
-#include "matchmaking/swarm/imatchext_swarm.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -39,9 +38,6 @@ using namespace BaseModUI;
 
 //=============================================================================
 static ConVar ui_old_options_menu( "ui_old_options_menu", "0", FCVAR_HIDDEN, "Brings up the old tabbed options dialog from Keyboard/Mouse when set to 1." );
-static ConVar ui_play_online_browser( "ui_play_online_browser", "1", FCVAR_RELEASE, "Whether play online displays a browser or plain search dialog." );
-
-ConVar asw_show_all_singleplayer_maps( "asw_show_all_singleplayer_maps", "0", FCVAR_NONE, "If set, offline practice option on the main menu will show all maps." );
 
 void OpenGammaDialog( VPANEL parent );
 
@@ -74,119 +70,7 @@ MainMenu::~MainMenu()
 void MainMenu::OnCommand( const char *command )
 {
 	bool bOpeningFlyout = false;
-
-	if ( char const *szCustomMatch = StringAfterPrefix( command, "CustomMatch_" ) )
-	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() )
-			return;
-
-		KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" system { "
-				" network LIVE "
-			" } "
-			" game { "
-				" mode = "
-			" } "
-			" options { "
-				" action custommatch "
-			" } "
-			);
-		KeyValues::AutoDelete autodelete( pSettings );
-
-		pSettings->SetString( "game/mode", szCustomMatch );
-
-		CBaseModPanel::GetSingleton().OpenWindow(
-			ui_play_online_browser.GetBool() ? WT_FOUNDPUBLICGAMES : WT_GAMESETTINGS,
-			this, true, pSettings );
-	}
-	else if ( char const *szFriendsMatch = StringAfterPrefix( command, "FriendsMatch_" ) )
-	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() )
-			return;
-
-		if ( StringHasPrefix( szFriendsMatch, "team" ) )
-			// Team games require to be signed in to LIVE
-			return;
-
-		KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" game { "
-				" mode = "
-			" } "
-			);
-		KeyValues::AutoDelete autodelete( pSettings );
-
-		pSettings->SetString( "game/mode", szFriendsMatch );
-
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-		CBaseModPanel::GetSingleton().OpenWindow( WT_ALLGAMESEARCHRESULTS, this, true, pSettings );
-	}	
-	else if ( char const *szGroupServer = StringAfterPrefix( command, "GroupServer_" ) )
-	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() )
-			return;
-
-		KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" game { "
-				// " mode = "
-			" } "
-			" options { "
-				" action groupserver "
-			" } "
-			);
-		KeyValues::AutoDelete autodelete( pSettings );
-
-		if ( *szGroupServer )
-			pSettings->SetString( "game/mode", szGroupServer );
-
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-		CBaseModPanel::GetSingleton().OpenWindow( WT_STEAMGROUPSERVERS, this, true, pSettings );
-	}
-	else if ( char const *szLeaderboards = StringAfterPrefix( command, "Leaderboards_" ) )
-	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() )
-			return;
-
-		KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" game { "
-				" mode = "
-			" } "
-			);
-		KeyValues::AutoDelete autodelete( pSettings );
-
-		pSettings->SetString( "game/mode", szLeaderboards );
-
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-		CBaseModPanel::GetSingleton().OpenWindow( WT_LEADERBOARD, this, true, pSettings );
-	}
-	else if( !Q_strcmp( command, "VersusSoftLock" ) )
-	{
-		OnCommand( "FlmVersusFlyout" );
-		return;
-	}
-	else if ( !Q_strcmp( command, "SurvivalCheck" ) )
-	{
-		OnCommand( "FlmSurvivalFlyout" );
-		return;
-	}
-	else if ( !Q_strcmp( command, "ScavengeCheck" ) )
-	{
-		OnCommand( "FlmScavengeFlyout" );
-		return;
-	}
-	else if ( !Q_strcmp( command, "DeveloperCommentary" ) )
+	if ( !Q_strcmp( command, "DeveloperCommentary" ) )
 	{
 		// Explain the rules of commentary
 		GenericConfirmation* confirmation = 
@@ -367,6 +251,7 @@ void MainMenu::OnCommand( const char *command )
 			for ( int iChild = 0; iChild < GetChildCount(); iChild++ )
 			{
 				bool bFound = false;
+				/*
 				GameModes *pGameModes = dynamic_cast< GameModes *>( GetChild( iChild ) );
 				if ( pGameModes )
 				{
@@ -383,7 +268,7 @@ void MainMenu::OnCommand( const char *command )
 							break;
 						}
 					}
-				}
+				}*/
 
 				if ( !bFound )
 				{
@@ -438,24 +323,6 @@ void MainMenu::OnKeyCodePressed( KeyCode code )
 	case KEY_XBUTTON_B:
 		// Capture the B key so it doesn't play the cancel sound effect
 		break;
-	case KEY_XBUTTON_X:
-		{
-			QuickJoinPanel *pQuickJoin = dynamic_cast<QuickJoinPanel*>( FindChildByName( "PnlQuickJoin" ) );
-			if ( pQuickJoin && pQuickJoin->ShouldBeVisible() )
-			{
-				// X shortcut only works if the panel is showing
-				OnCommand( "SeeAll" );
-			}
-
-			break;
-		}
-
-	case KEY_XBUTTON_BACK:
-		break;
-
-	case KEY_XBUTTON_INACTIVE_START:
-		break;
-
 	default:
 		BaseClass::OnKeyCodePressed( code );
 		break;
@@ -465,22 +332,6 @@ void MainMenu::OnKeyCodePressed( KeyCode code )
 //=============================================================================
 void MainMenu::OnThink()
 {
-	// need to change state of flyout if user suddenly disconnects
-	// while flyout is open
-	BaseModUI::FlyoutMenu *flyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmCampaignFlyout" ) );
-	if ( flyout )
-	{
-		BaseModHybridButton *pButton = dynamic_cast< BaseModHybridButton* >( flyout->FindChildButtonByCommand( "QuickMatchCoOp" ) );
-		if ( pButton )
-		{
-			pButton->SetText( "#L4D360UI_QuickStart" );
-			if ( m_iQuickJoinHelpText != MMQJHT_QUICKSTART )
-			{
-				pButton->SetHelpText( "#L4D360UI_QuickMatch_Offline_Tip" );
-				m_iQuickJoinHelpText = MMQJHT_QUICKSTART;
-			}
-		}
-	}
 
 	FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
 	if ( pFlyout )
@@ -530,40 +381,15 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	LoadControlSettings( "Resource/UI/BaseModUI/MainMenu.res" );
+	const char *pSettings = "Resource/UI/BaseModUI/MainMenu.res";
+	LoadControlSettings( pSettings );
+
+//	BaseModHybridButton *button = dynamic_cast< BaseModHybridButton* >( FindChildByName( "BtnPlaySolo" ) );
 
 
-	FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
-	if ( pFlyout )
-	{
-		bool bUsesCloud = false;
-
-		ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
-			SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
-
-		int32 availableBytes, totalBytes = 0;
-		if ( pRemoteStorage && pRemoteStorage->GetQuota( &totalBytes, &availableBytes ) )
-		{
-			if ( totalBytes > 0 )
-			{
-				bUsesCloud = true;
-			}
-		}
-
-		pFlyout->SetControlEnabled( "BtnCloud", bUsesCloud );
-	}
+	//FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
 
 	SetFooterState();
-
-	vgui::Panel *firstPanel = FindChildByName( "BtnCoOp" );
-	if ( firstPanel )
-	{
-		if ( m_ActiveControl )
-		{
-			m_ActiveControl->NavigateFrom( );
-		}
-		firstPanel->NavigateTo();
-	}
 
 }
 
@@ -608,6 +434,11 @@ CON_COMMAND_F( openserverbrowser, "Opens server browser", 0 )
 		KeyValues *pSchemeKV = new KeyValues( "SetCustomScheme" );
 		pSchemeKV->SetString( "SchemeName", "SwarmServerBrowserScheme" );
 		g_VModuleLoader.PostMessageToAllModules( pSchemeKV );
+#else
+		KeyValues *pSchemeKV = new KeyValues( "SetCustomScheme" );
+		pSchemeKV->SetString( "SchemeName", "SourceScheme" );
+		g_VModuleLoader.PostMessageToAllModules( pSchemeKV );
 #endif
 	}
 }
+

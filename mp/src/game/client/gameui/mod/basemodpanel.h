@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -13,8 +13,9 @@
 #include "tier1/utllinkedlist.h"
 #include "../OptionsDialog.h"
 #include "../OptionsSubKeyboard.h"
-#include "avi/ibik.h"
 
+
+class IMaterial;
 class COptionsDialog;
 
 // must supply some non-trivial time to let the movie startup smoothly
@@ -40,6 +41,7 @@ namespace BaseModUI
 		WT_INGAMEKICKPLAYERLIST,
 		WT_VOTEOPTIONS,
 		WT_KEYBOARDMOUSE,
+		WT_KEYBOARD,
 		WT_LOADINGPROGRESSBKGND,
 		WT_LOADINGPROGRESS,
 		WT_MAINMENU,
@@ -126,7 +128,6 @@ namespace BaseModUI
 		void OnLevelLoadingStarted( char const *levelName, bool bShowProgressDialog );
 		void OnLevelLoadingFinished( KeyValues *kvEvent );
 		bool UpdateProgressBar(float progress, const char *statusText);
-		void OnCreditsFinished(void);
 
 		void SetHelpText( const char* helpText );
 		void SetOkButtonEnabled( bool enabled );
@@ -188,8 +189,6 @@ namespace BaseModUI
 		bool m_bWarmRestartMode;
 		bool m_bClosingAllWindows;
 
-		float m_flBlurScale;
-		float m_flLastBlurTime;
 
 		CUtlString m_backgroundMusic;
 		int m_nBackgroundMusicGUID;

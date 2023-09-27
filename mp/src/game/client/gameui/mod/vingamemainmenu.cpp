@@ -146,7 +146,7 @@ void InGameMainMenu::OnCommand( const char *command )
 	else if( Q_stricmp( "#L4D360UI_Controller_Edit_Keys_Buttons", command ) == 0 )
 	{
 		FlyoutMenu::CloseActiveMenu();
-		CBaseModPanel::GetSingleton().OpenKeyBindingsDialog( this );
+		CBaseModPanel::GetSingleton().OpenWindow(WT_KEYBOARD, this, true);
 	}
 	else if (!Q_strcmp(command, "MultiplayerSettings"))
 	{
@@ -181,7 +181,7 @@ void InGameMainMenu::OnCommand( const char *command )
 			}
 			else
 			{
-				ShowPlayerList();
+				// TODO: c_asw_concommands... -> ShowPlayerList();
 			}
 			engine->ClientCmd("gameui_hide");
 			return;
@@ -272,41 +272,11 @@ void InGameMainMenu::OnClose()
 
 void InGameMainMenu::OnThink()
 {
-	bool bCanInvite = false;
-	bool bInFinale = false;
 	
-	if ( bCanInvite )
-	{
-		bCanInvite = !bInFinale;
-	}
+
+	bool bCanInvite = gpGlobals->maxClients > 1;
 
 	SetControlEnabled( "BtnInviteFriends", bCanInvite );
-	SetControlEnabled( "BtnLeaderboard", !Q_stricmp( szGameMode, "survival" ) );
-
-	bool bCanGoIdle = !Q_stricmp( "campaign", szGameMode ) || !Q_stricmp( "single_mission", szGameMode );
-
-	// TODO: determine if player can go idle
-#if 0
-	if ( bCanGoIdle )
-	{
-		int iLocalPlayerTeam;
-		if ( !GameClientExports()->GetPlayerTeamIdByUserId( -1, iLocalPlayerTeam ) || iLocalPlayerTeam != GameClientExports()->GetTeamId_Survivor() )
-		{
-			bCanGoIdle = false;
-		}
-		else
-		{
-			int iNumAliveHumanPlayersOnTeam = GameClientExports()->GetNumPlayersAliveHumanPlayersOnTeam( iLocalPlayerTeam );
-
-			if ( iNumAliveHumanPlayersOnTeam <= 1 )
-			{
-				bCanGoIdle = false;
-			}
-		}
-	}
-#endif
-
-	SetControlEnabled( "BtnGoIdle", bCanGoIdle );
 
 	FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
 	if ( pFlyout )
@@ -338,40 +308,12 @@ void InGameMainMenu::PerformLayout( void )
 {
 	BaseClass::PerformLayout();
 
-	
-	bool bPlayOffline = true;
-	
-	bool bInCommentary = engine->IsInCommentaryMode();
+	// Ozxy: Make this make more sense later
+	bool bCanInvite = gpGlobals->maxClients > 1;
+	bool bCanVote = gpGlobals->maxClients > 1;
 
-	bool bCanInvite = false;
 	SetControlEnabled( "BtnInviteFriends", bCanInvite );
 
-	bool bCanVote = true;
-
-	if ( bInCommentary )
-	{
-		bCanVote = false;
-	}
-
-	if ( gpGlobals->maxClients <= 1 )
-	{
-		bCanVote = false;
-	}
-
-	/*	// this block used to restrict IDLE players from starting a vote
-	else
-	{
-		int iLocalPlayerTeam;
-		if ( GameClientExports()->GetPlayerTeamIdByUserId( -1, iLocalPlayerTeam ) )
-		{
-			if ( iLocalPlayerTeam != GameClientExports()->GetTeamId_Survivor() &&
-				 iLocalPlayerTeam != GameClientExports()->GetTeamId_Infected() )
-			{
-				bCanVote = false;
-			}
-		}
-
-	}*/
 
 	vgui::Button *pVoteButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnCallAVote" ) );
 	if ( pVoteButton )
@@ -404,16 +346,12 @@ void InGameMainMenu::PerformLayout( void )
 	if ( flyout )
 	{
 		flyout->SetListener( this );
-		
-		bool bSinglePlayer = true;
 
 		Button *pButton = flyout->FindChildButtonByCommand( "ReturnToLobby" );
 		if ( pButton )
 		{
 			static ConVarRef r_sv_hosting_lobby( "sv_hosting_lobby", true );
-			bool bEnabled = r_sv_hosting_lobby.IsValid() && r_sv_hosting_lobby.GetBool() &&
-				// Don't allow return to lobby if playing local singleplayer (it has no lobby)
-				!( bPlayOffline && bSinglePlayer );
+			bool bEnabled = r_sv_hosting_lobby.IsValid() && r_sv_hosting_lobby.GetBool();
 			pButton->SetEnabled( bEnabled );
 		}
 
@@ -421,7 +359,7 @@ void InGameMainMenu::PerformLayout( void )
 		if ( pButton )
 		{
 			// Don't allow kick player in local games (nobody to kick)
-			pButton->SetEnabled( !bPlayOffline );
+			pButton->SetEnabled( bCanVote );
 		}
 	}
 

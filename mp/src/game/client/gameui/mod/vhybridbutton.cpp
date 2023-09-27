@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -16,7 +16,6 @@
 #include "vgui/ilocalize.h"
 #include "VDropDownMenu.h"
 #include "VSliderControl.h"
-#include "gamemodes.h"
 
 #include <ctype.h>
 

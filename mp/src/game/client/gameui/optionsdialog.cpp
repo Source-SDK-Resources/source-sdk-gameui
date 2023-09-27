@@ -26,7 +26,9 @@
 #include "OptionsSubVoice.h"
 #include "OptionsSubMultiplayer.h"
 #include "OptionsSubDifficulty.h"
+#if 0
 #include "OptionsSubPortal.h"
+#endif
 #include "ModInfo.h"
 
 using namespace vgui;
@@ -60,10 +62,12 @@ COptionsDialog::COptionsDialog(vgui::Panel *parent, OptionsDialogTabStyle iTabSt
 			AddPage(new COptionsSubDifficulty(this), "#GameUI_Difficulty");
 		}
 
+#if 0
 		if ( ModInfo().HasPortals() )
 		{
 			AddPage(new COptionsSubPortal(this), "#GameUI_Portal");
 		}
+#endif
 
 		AddPage(new COptionsSubKeyboard(this), "#GameUI_Keyboard");
 		AddPage(new COptionsSubMouse(this), "#GameUI_Mouse");

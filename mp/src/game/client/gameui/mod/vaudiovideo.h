@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -51,8 +51,6 @@ private:
 	SliderControl* m_sldMusicVolume;
 	DropDownMenu* m_drpLanguage;
 	DropDownMenu* m_drpCaptioning;
-
-	DropDownMenu* m_drpGore;
 
 	bool m_bOldForceEnglishAudio;
 	bool m_bDirtyVideoConfig;

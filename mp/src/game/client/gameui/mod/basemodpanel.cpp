@@ -50,6 +50,8 @@
 #include "fmtstr.h"
 #include "smartptr.h"
 #include "nb_header_footer.h"
+#include "cdll_client_int.h"
+#include "steam/steam_api.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -57,9 +59,10 @@
 using namespace BaseModUI;
 using namespace vgui;
 
+extern ISoundEmitterSystemBase* soundemitterbase;
+
 //setup in GameUI_Interface.cpp
 extern const char *COM_GetModDirectory( void );
-extern IGameConsole *IGameConsole();
 
 //=============================================================================
 CBaseModPanel* CBaseModPanel::m_CFactoryBasePanel = 0;
@@ -75,36 +78,13 @@ ConVar ui_lobby_noresults_create_msg_time( "ui_lobby_noresults_create_msg_time",
 
 //=============================================================================
 CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
-	m_bClosingAllWindows( false ),
+	m_bClosingAllWindows( false )
 {
 #if !defined( NOSTEAM )
 	// Set Steam overlay position
 	if ( steamapicontext && steamapicontext->SteamUtils() )
 	{
 		steamapicontext->SteamUtils()->SetOverlayNotificationPosition( k_EPositionTopRight );
-	}
-
-	// Set special DLC parameters mask
-	static ConVarRef mm_dlcs_mask_extras( "mm_dlcs_mask_extras" );
-	if ( mm_dlcs_mask_extras.IsValid() && steamapicontext && steamapicontext->SteamUtils() )
-	{
-		int iDLCmask = mm_dlcs_mask_extras.GetInt();
-
-		// Low Violence and Germany (or bordering countries) = CS.GUNS
-		char const *cc = steamapicontext->SteamUtils()->GetIPCountry();
-		char const *ccGuns = ":DE:DK:PL:CZ:AT:CH:FR:LU:BE:NL:";
-		if ( engine->IsLowViolence() && Q_stristr( ccGuns, CFmtStr( ":%s:", cc ) ) )
-		{
-			// iDLCmask |= ( 1 << ? );
-		}
-
-		// PreOrder DLC AppId Ownership = BAT
-		if ( steamapicontext->SteamApps()->BIsSubscribedApp( 565 ) )
-		{
-			// iDLCmask |= ( 1 << ? );
-		}
-
-		mm_dlcs_mask_extras.SetValue( iDLCmask );
 	}
 
 #endif
@@ -144,9 +124,6 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 	m_bWarmRestartMode = false;
 	m_ExitingFrameCount = 0;
 
-	m_flBlurScale = 0;
-	m_flLastBlurTime = 0;
-
 	m_iBackgroundImageID = -1;
 	m_iProductImageID = -1;
 
@@ -158,7 +135,6 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 	m_flMovieFadeInTime = 0.0f;
 	m_pBackgroundMaterial = NULL;
 	m_pBackgroundTexture = NULL;
-
 }
 
 //=============================================================================
@@ -178,6 +154,7 @@ CBaseModPanel::~CBaseModPanel()
 
 	surface()->DestroyTextureID( m_iBackgroundImageID );
 	surface()->DestroyTextureID( m_iProductImageID );
+
 }
 
 //=============================================================================
@@ -256,10 +233,6 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			m_Frames[wt] = new GenericConfirmation(this, "GenericConfirmation");
 			break;
 
-		case WT_INGAMEDIFFICULTYSELECT:
-			m_Frames[wt] = new InGameDifficultySelect(this, "InGameDifficultySelect");
-			break;
-
 		case WT_INGAMEMAINMENU:
 			m_Frames[wt] = new InGameMainMenu(this, "InGameMainMenu");
 			break;
@@ -273,6 +246,10 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_KEYBOARDMOUSE:
+			m_Frames[wt] = new KeyboardMouse(this, "KeyboardMouse");
+			break;
+
+		case WT_KEYBOARD:
 			m_Frames[wt] = new VKeyboard(this, "VKeyboard");
 			break;
 
@@ -746,13 +723,10 @@ void CBaseModPanel::OpenFrontScreen()
 {
 	WINDOW_TYPE frontWindow = WT_MAINMENU;
 
-	if( frontWindow != WT_NONE )
+	if( GetActiveWindowType() != frontWindow )
 	{
-		if( GetActiveWindowType() != frontWindow )
-		{
-			CloseAllWindows();
-			OpenWindow( frontWindow, NULL );
-		}
+		CloseAllWindows();
+		OpenWindow( frontWindow, NULL );
 	}
 }
 
@@ -768,6 +742,7 @@ void CBaseModPanel::RunFrame()
 
 	CBaseModFrame::RunFrameOnListeners();
 
+
 	if ( m_DelayActivation )
 	{
 		m_DelayActivation--;
@@ -780,40 +755,6 @@ void CBaseModPanel::RunFrame()
 			OnGameUIActivated();
 		}
 	}
-
-	bool bDoBlur = true;
-	WINDOW_TYPE wt = GetActiveWindowType();
-	switch ( wt )
-	{
-	case WT_NONE:
-	case WT_MAINMENU:
-	case WT_LOADINGPROGRESSBKGND:
-	case WT_LOADINGPROGRESS:
-	case WT_AUDIOVIDEO:
-		bDoBlur = false;
-		break;
-	}
-	if ( enginevguifuncs && !enginevguifuncs->IsGameUIVisible())
-	{
-		// attract screen might be open, but not topmost due to notification dialogs
-		bDoBlur = false;
-	}
-
-	if ( !bDoBlur )
-	{
-		bDoBlur = GameClientExports()->ClientWantsBlurEffect();
-	}
-
-	float nowTime = Plat_FloatTime();
-	float deltaTime = nowTime - m_flLastBlurTime;
-	if ( deltaTime > 0 )
-	{
-		m_flLastBlurTime = nowTime;
-		m_flBlurScale += deltaTime * bDoBlur ? 0.05f : -0.05f;
-		m_flBlurScale = clamp( m_flBlurScale, 0, 0.85f );
-		engine->SetBlurFade( m_flBlurScale );
-	}
-
 }
 
 
@@ -821,7 +762,6 @@ void CBaseModPanel::RunFrame()
 void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProgressDialog )
 {
 	Assert( !m_LevelLoading );
-
 
 	CloseAllWindows();
 
@@ -838,87 +778,31 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 	
 	bool bShowPoster = false;
 	char chGameMode[64] = {0};
-
-	//
-	// If playing on listen server then "levelName" is set to the map being loaded,
-	// so it is authoritative - it might be a background map or a real level.
-	//
-	if ( levelName )
-	{
-		// Derive the mission info from the server game details
-		KeyValues *pGameSettings = g_pMatchFramework->GetMatchNetworkMsgController()->GetActiveServerGameDetails( NULL );
-		if ( !pGameSettings )
-		{
-			// In this particular case we need to speculate about game details
-			// this happens when user types "map c5m2 versus easy" from console, so there's no
-			// active server spawned yet, nor is the local client connected to any server.
-			// We have to force server DLL to apply the map command line to the settings and then
-			// speculatively construct the settings key.
-			if ( IServerGameDLL *pServerDLL = ( IServerGameDLL * ) g_pMatchFramework->GetMatchExtensions()->GetRegisteredExtensionInterface( INTERFACEVERSION_SERVERGAMEDLL ) )
-			{
-				KeyValues *pApplyServerSettings = new KeyValues( "::ExecGameTypeCfg" );
-				KeyValues::AutoDelete autodelete_pApplyServerSettings( pApplyServerSettings );
-
-				pApplyServerSettings->SetString( "map/mapname", levelName );
-
-				pServerDLL->ApplyGameSettings( pApplyServerSettings );
-			}
-
-			static ConVarRef r_mp_gamemode( "mp_gamemode" );
-			if ( r_mp_gamemode.IsValid() )
-			{
-				pGameSettings = new KeyValues( "CmdLineSettings" );
-				pGameSettings->SetString( "game/mode", r_mp_gamemode.GetString() );
-			}
-		}
-		
-		KeyValues::AutoDelete autodelete_pGameSettings( pGameSettings );
-		if ( pGameSettings )
-		{
-			// It is critical to get map info by the actual levelname that is being loaded, because
-			// for level transitions the server is still in the old map and the game settings returned
-			// will reflect the old state of the server.
-			pChapterInfo = g_pMatchExtSwarm->GetMapInfoByBspName( pGameSettings, levelName, &pMissionInfo );
-			Q_strncpy( chGameMode, pGameSettings->GetString( "game/mode", "" ), ARRAYSIZE( chGameMode ) );
-		}
-	}
 	
-	IMatchSession *pSession = g_pMatchFramework->GetMatchSession();
-	if ( !pChapterInfo && pSession  )
-	{
-		if ( KeyValues *pSettings = pSession->GetSessionSettings() )
-		{
-			pChapterInfo = g_pMatchExtSwarm->GetMapInfo( pSettings, &pMissionInfo );
-			Q_strncpy( chGameMode, pSettings->GetString( "game/mode", "" ), ARRAYSIZE( chGameMode ) );
-		}
-	}
 
 	//
 	// If we are just loading into some unknown map, then fake chapter information
 	// (static lifetime of fake keyvalues so that we didn't worry about ownership)
 	//
-	if ( !pMissionInfo )
-	{
-		static KeyValues *s_pFakeMissionInfo = new KeyValues( "" );
-		pMissionInfo = s_pFakeMissionInfo;
-		pMissionInfo->SetString( "displaytitle", "#L4D360UI_Lobby_Unknown_Campaign" );
-	}
-	if ( !pChapterInfo )
-	{
-		static KeyValues *s_pFakeChapterInfo = new KeyValues( "1" );
-		pChapterInfo = s_pFakeChapterInfo;
-		pChapterInfo->SetString( "displayname", levelName ? levelName : "#L4D360UI_Lobby_Unknown_Campaign" );
-		pChapterInfo->SetString( "map", levelName ? levelName : "" );
-	}
+	static KeyValues *s_pFakeMissionInfo = new KeyValues( "" );
+	pMissionInfo = s_pFakeMissionInfo;
+	pMissionInfo->SetString( "displaytitle", "#L4D360UI_Lobby_Unknown_Campaign" );
+	static KeyValues *s_pFakeChapterInfo = new KeyValues( "1" );
+	pChapterInfo = s_pFakeChapterInfo;
+	pChapterInfo->SetString( "displayname", levelName ? levelName : "#L4D360UI_Lobby_Unknown_Campaign" );
+	pChapterInfo->SetString( "map", levelName ? levelName : "" );
 	
 	//
 	// If we are transitioning maps from a real level then we don't want poster.
 	// We always want the poster when loading the first chapter of a campaign (vote for restart)
 	//
-	bShowPoster = true; //( !GameUI().IsInLevel() ||
-					//GameModeIsSingleChapter( chGameMode ) ||
-					//( pChapterInfo && pChapterInfo->GetInt( "chapter" ) == 1 ) ) &&
-		//pLoadingProgress->ShouldShowPosterForLevel( pMissionInfo, pChapterInfo );
+	bShowPoster = !GameUI().IsInLevel();
+	/*
+	*			Sears: commented this and left IsInLevel so that we dont poster each time we do loading screens.
+				//GameModeIsSingleChapter( chGameMode ) ||
+				//( pChapterInfo && pChapterInfo->GetInt( "chapter" ) == 1 ) ) &&
+				//pLoadingProgress->ShouldShowPosterForLevel( pMissionInfo, pChapterInfo );
+	*/
 
 	LoadingProgress::LoadingType type;
 	if ( bShowPoster )
@@ -929,48 +813,8 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 
 		const char *pPlayerNames[NUM_LOADING_CHARACTERS] = { NULL, NULL, NULL, NULL };
 		const char *pAvatarNames[NUM_LOADING_CHARACTERS] = { "", "", "", "" };
-
 		unsigned char botFlags = 0xFF;
 
-		if ( IMatchSession *pSession = g_pMatchFramework->GetMatchSession() )
-		{
-			KeyValues *pSettings = pSession->GetSessionSettings();
-			if ( pSettings )
-				pSettings = pSettings->FindKey( "members" );
-
-			int numMachines = pSettings->GetInt( "numMachines", 0 );
-			for ( int iMachine = 0; iMachine < numMachines; ++ iMachine )
-			{
-				char chMachine[32];
-				sprintf( chMachine, "machine%d", iMachine );
-				KeyValues *pMachine = pSettings->FindKey( chMachine );
-
-				int numPlayers = pMachine->GetInt( "numPlayers", 0 );
-				for ( int iPlayer = 0; iPlayer < numPlayers; ++ iPlayer )
-				{
-					char chPlayer[32];
-					sprintf( chPlayer, "player%d", iPlayer );
-					KeyValues *pPlayer = pMachine->FindKey( chPlayer );
-
-					XUID xuidPlayer = pPlayer->GetUint64( "xuid", 0ull );
-					char const *szPlayerName = pPlayer->GetString( "name", "" );
-					char const *szAvatar = pPlayer->GetString( "game/avatar", "" );
-
-					// Find the avatar
-					int iAvatar;
-					for ( iAvatar = 0; iAvatar < ARRAYSIZE( pAvatarNames ); ++ iAvatar )
-					{
-						if ( !Q_stricmp( pAvatarNames[iAvatar], szAvatar ) )
-							break;
-					}
-					if ( iAvatar < ARRAYSIZE( pPlayerNames ) )
-					{
-						pPlayerNames[ iAvatar ] = szPlayerName;
-						botFlags &= ~(1 << iAvatar);
-					}
-				}
-			}
-		}
 		pLoadingProgress->SetPosterData( pMissionInfo, pChapterInfo, pPlayerNames, botFlags, chGameMode );
 	}
 	else if ( GameUI().IsInLevel() && !GameUI().IsInBackgroundLevel() )
@@ -1189,7 +1033,7 @@ void CBaseModPanel::ApplySchemeSettings(IScheme *pScheme)
 	surface()->GetScreenSize( screenWide, screenTall );
 
 	char filename[MAX_PATH];
-	V_snprintf( filename, sizeof( filename ), "VGUI/swarm/loading/BGFX01" ); // TODO: engine->GetStartupImage( filename, sizeof( filename ), screenWide, screenTall );
+	V_snprintf( filename, sizeof( filename ), "VGUI/loading/bg_loaddefault" ); // TODO: engine->GetStartupImage( filename, sizeof( filename ), screenWide, screenTall );
 	m_iBackgroundImageID = surface()->CreateNewTextureID();
 	surface()->DrawSetTextureFile( m_iBackgroundImageID, filename, true, false );
 
@@ -1262,16 +1106,6 @@ void CBaseModPanel::PaintBackground()
 		int wide, tall;
 		GetSize( wide, tall );
 
-		if ( engine->IsTransitioningToLoad() )
-		{
-			// ensure the background is clear
-			// the loading progress is about to take over in a few frames
-			// this keeps us from flashing a different graphic
-			surface()->DrawSetColor( 0, 0, 0, 255 );
-			surface()->DrawSetTexture( m_iBackgroundImageID );
-			surface()->DrawTexturedRect( 0, 0, wide, tall );
-		}
-		else
 		{
 			ActivateBackgroundEffects();
 

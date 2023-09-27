@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: Implements all the functions exported by the GameUI dll
 //
@@ -32,10 +32,8 @@
 
 #include "GameConsole.h"
 #include "LoadingDialog.h"
-#include "CDKeyEntryDialog.h"
 #include "ModInfo.h"
 #include "game/client/IGameClientExports.h"
-#include "materialsystem/imaterialsystem.h"
 #include "iachievementmgr.h"
 #include "IGameUIFuncs.h"
 #include "IEngineVGUI.h"
@@ -55,27 +53,23 @@
 #include "tier3/tier3.h"
 #include "matsys_controls/matsyscontrols.h"
 #include "steam/steam_api.h"
-#include "protocol.h"
 
-#if defined( SWARM_DLL )
-
-#include "mod/basemodpanel.h"
 #include "mod/basemodui.h"
-typedef BaseModUI::CBaseModPanel UI_BASEMOD_PANEL_CLASS;
-inline UI_BASEMOD_PANEL_CLASS & GetUiBaseModPanelClass() { return UI_BASEMOD_PANEL_CLASS::GetSingleton(); }
-inline UI_BASEMOD_PANEL_CLASS & ConstructUiBaseModPanelClass() { return * new UI_BASEMOD_PANEL_CLASS(); }
-class IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 
+#if defined( DML_CLIENT_DLL )
 
+#include "dml/gameui/dml_panel.h"
+#include "dml/gameui/dml_gamedata.h"
+typedef DMLUI::CDML_Panel UI_BASEMOD_PANEL_CLASS;
 
 #else
 
-#include "BasePanel.h"
-typedef CBasePanel UI_BASEMOD_PANEL_CLASS;
-inline UI_BASEMOD_PANEL_CLASS & GetUiBaseModPanelClass() { return *BasePanel(); }
-inline UI_BASEMOD_PANEL_CLASS & ConstructUiBaseModPanelClass() { return *BasePanelSingleton(); }
+#include "mod/basemodpanel.h"
+typedef BaseModUI::CBaseModPanel UI_BASEMOD_PANEL_CLASS;
 
 #endif
+inline UI_BASEMOD_PANEL_CLASS & GetUiBaseModPanelClass() { return (UI_BASEMOD_PANEL_CLASS&)UI_BASEMOD_PANEL_CLASS::GetSingleton(); }
+inline UI_BASEMOD_PANEL_CLASS & ConstructUiBaseModPanelClass() { return *new UI_BASEMOD_PANEL_CLASS(); }
 
 #include "tier0/dbg.h"
 #include "engine/IEngineSound.h"
@@ -88,7 +82,6 @@ IEngineVGui *enginevguifuncs = NULL;
 vgui::ISurface *enginesurfacefuncs = NULL;
 IAchievementMgr *achievementmgr = NULL;
 
-class CGameUI;
 CGameUI *g_pGameUI = NULL;
 
 class CLoadingDialog;
@@ -164,7 +157,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 	enginesound = (IEngineSound *)factory(IENGINESOUND_CLIENT_INTERFACE_VERSION, NULL);
 	engine = (IVEngineClient *)factory( VENGINE_CLIENT_INTERFACE_VERSION, NULL );
-	bik = (IBik*)factory( BIK_INTERFACE_VERSION, NULL );
 
 	SteamAPI_InitSafe();
 	steamapicontext->Init();
@@ -185,7 +177,9 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	enginevguifuncs = (IEngineVGui *)factory( VENGINE_VGUI_VERSION, NULL );
 	enginesurfacefuncs = (vgui::ISurface *)factory(VGUI_SURFACE_INTERFACE_VERSION, NULL);
 	gameuifuncs = (IGameUIFuncs *)factory( VENGINE_GAMEUIFUNCS_VERSION, NULL );
+
 	bFailed = !enginesurfacefuncs || !gameuifuncs || !enginevguifuncs;
+
 	if ( bFailed )
 	{
 		Error( "CGameUI::Initialize() failed to get necessary interfaces\n" );
@@ -206,6 +200,7 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 	vgui::VPANEL rootpanel = enginevguifuncs->GetPanel( PANEL_GAMEUIDLL );
 	factoryBasePanel.SetParent( rootpanel );
+
 }
 
 void CGameUI::PostInit()
@@ -679,11 +674,11 @@ void CGameUI::OnDisconnectFromServer( uint8 eSteamLoginFailure )
 //-----------------------------------------------------------------------------
 // Purpose: activates the loading dialog on level load start
 //-----------------------------------------------------------------------------
-void CGameUI::OnLevelLoadingStarted( const char *levelName, bool bShowProgressDialog )
+void CGameUI::OnLevelLoadingStarted(bool bShowProgressDialog )
 {
 	g_VModuleLoader.PostMessageToAllModules( new KeyValues( "LoadingStarted" ) );
-
-	GetUiBaseModPanelClass().OnLevelLoadingStarted( levelName, bShowProgressDialog );
+	
+	GetUiBaseModPanelClass().OnLevelLoadingStarted( engine->GetLevelName(), bShowProgressDialog );
 	ShowLoadingBackgroundDialog();
 
 	if ( bShowProgressDialog )
@@ -705,6 +700,7 @@ void CGameUI::OnLevelLoadingFinished(bool bError, const char *failureReason, con
 	// notify all the modules
 	g_VModuleLoader.PostMessageToAllModules( new KeyValues( "LoadingFinished" ) );
 
+	GetUiBaseModPanelClass().OnLevelLoadingFinished( new KeyValues( "LoadingFinished" ) );
 	HideLoadingBackgroundDialog();
 
 
@@ -719,7 +715,7 @@ bool CGameUI::UpdateProgressBar(float progress, const char *statusText)
 	return GetUiBaseModPanelClass().UpdateProgressBar(progress, statusText);
 }
 
-
+/*
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -738,7 +734,7 @@ void CGameUI::SetProgressLevelName( const char *levelName )
 		// TODO: g_hLoadingDialog->SetLevelName( levelName );
 	}
 }
-
+*/
 
 //-----------------------------------------------------------------------------
 // Purpose: 

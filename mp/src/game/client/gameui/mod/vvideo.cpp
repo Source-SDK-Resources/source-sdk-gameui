@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -14,7 +14,8 @@
 #include "gameui_util.h"
 #include "vgui/ISurface.h"
 #include "modes.h"
-#include "videocfg/videocfg.h"
+#include "filesystem.h"
+#include "cdll_client_int.h"
 #include "VGenericConfirmation.h"
 #include "nb_header_footer.h"
 #include "materialsystem/materialsystem_config.h"
@@ -46,6 +47,8 @@ void SetFlyoutButtonText( const char *pchCommand, FlyoutMenu *pFlyout, const cha
 	}
 }
 
+/*
+
 void AcceptPagedPoolMemWarningCallback()
 {
 	Video *self = static_cast<Video*>( CBaseModPanel::GetSingleton().GetWindow( WT_VIDEO ) );
@@ -54,7 +57,6 @@ void AcceptPagedPoolMemWarningCallback()
 		self->OpenPagedPoolMem();
 	}
 }
-
 void PagedPoolMemOpenned( DropDownMenu *pDropDownMenu, FlyoutMenu *pFlyoutMenu )
 {
 	GenericConfirmation* confirmation = 
@@ -70,6 +72,7 @@ void PagedPoolMemOpenned( DropDownMenu *pDropDownMenu, FlyoutMenu *pFlyoutMenu )
 
 	confirmation->SetUsageData(data);
 }
+*/
 
 
 //=============================================================================
@@ -90,18 +93,19 @@ BaseClass(parent, panelName)
 	m_drpAspectRatio = NULL;
 	m_drpResolution = NULL;
 	m_drpDisplayMode = NULL;
-	m_drpLockMouse = NULL;
+	//m_drpLockMouse = NULL;
 
 	m_btnAdvanced = NULL;
 
 	m_drpModelDetail = NULL;
-	m_drpPagedPoolMem = NULL;
+	m_drpTextureDetail = NULL;
+	//m_drpPagedPoolMem = NULL;
 	m_drpAntialias = NULL;
 	m_drpFiltering = NULL;
 	m_drpVSync = NULL;
 	m_drpQueuedMode = NULL;
 	m_drpShaderDetail = NULL;
-	m_drpCPUDetail = NULL;
+	//m_drpCPUDetail = NULL;
 
 	m_btnUseRecommended = NULL;
 	m_btnCancel = NULL;
@@ -134,12 +138,15 @@ void Video::PerformLayout()
 
 void Video::OpenPagedPoolMem( void )
 {
+	/*
 	if ( m_drpPagedPoolMem )
 	{
 		m_drpPagedPoolMem->SetOpenCallback( NULL );
 		m_drpPagedPoolMem->OnCommand( "FlmPagedPoolMem" );
 	}
+	*/
 }
+
 
 //=============================================================================
 void Video::SetupActivateData( void )
@@ -149,13 +156,16 @@ void Video::SetupActivateData( void )
 	m_iResolutionHeight = config.m_VideoMode.m_Height;
 	m_iAspectRatio = GetScreenAspectMode( m_iResolutionWidth, m_iResolutionHeight );
 	m_bWindowed = config.Windowed();
-	m_bNoBorder = config.NoWindowBorder();
+	//m_bNoBorder = config.NoWindowBorder();
 
-	ConVarRef gpu_mem_level( "gpu_mem_level" );
-	m_iModelTextureDetail = clamp( gpu_mem_level.GetInt(), 0, 2);
+	ConVarRef r_rootlod( "r_rootlod" );
+	ConVarRef mat_picmip("mat_picmip");
 
-	ConVarRef mem_level( "mem_level" );
-	m_iPagedPoolMem = clamp( mem_level.GetInt(), 0, 2);
+	m_iModelDetail = clamp(r_rootlod.GetInt(), 0, 2);
+	m_iTextureDetail = clamp(mat_picmip.GetInt(), -1, 4);
+
+	//ConVarRef mem_level( "mem_level" );
+	//m_iPagedPoolMem = clamp( mem_level.GetInt(), 0, 2);
 
 	ConVarRef mat_antialias( "mat_antialias" );
 	ConVarRef mat_aaquality( "mat_aaquality" );
@@ -168,55 +178,64 @@ void Video::SetupActivateData( void )
 	ConVarRef mat_vsync( "mat_vsync" );
 	m_bVSync = mat_vsync.GetBool();
 
-	ConVarRef mat_triplebuffered( "mat_triplebuffered" );
-	m_bTripleBuffered = mat_triplebuffered.GetBool();
+	//ConVarRef mat_triplebuffered( "mat_triplebuffered" );
+	//m_bTripleBuffered = mat_triplebuffered.GetBool();
 
 	ConVarRef mat_queue_mode( "mat_queue_mode" );
 	m_iQueuedMode = mat_queue_mode.GetInt();
 
-	ConVarRef gpu_level( "gpu_level" );
-	m_iGPUDetail = clamp( gpu_level.GetInt(), 0, 3 );
+	ConVarRef mat_reducefillrate( "mat_reducefillrate" );
+	m_iGPUDetail = clamp(mat_reducefillrate.GetInt(), 0, 1 );
 
-	ConVarRef cpu_level( "cpu_level" );
-	m_iCPUDetail = clamp( cpu_level.GetInt(), 0, 2 );
+	//ConVarRef cpu_level( "cpu_level" );
+	//m_iCPUDetail = clamp( cpu_level.GetInt(), 0, 2 );
 
-	ConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
-	m_bLockMouse = in_lock_mouse_to_window.GetBool();
+	//ConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
+	//m_bLockMouse = in_lock_mouse_to_window.GetBool();
 }
 
 //=============================================================================
 bool Video::SetupRecommendedActivateData( void )
 {
+#ifdef _X360
+	AssertMsg( false, "VideoCFG is not supported on 360." );
+	return false;
+#else
 	KeyValues *pConfigKeys = new KeyValues( "VideoConfig" );
 	if ( !pConfigKeys )
 		return false;
-
-	if ( !ReadCurrentVideoConfig( pConfigKeys, true ) )
+	
+	if ( !materials->GetRecommendedConfigurationInfo(0, pConfigKeys) )
 	{
 		pConfigKeys->deleteThis();
 		return false;
 	}
 
-	m_iResolutionWidth = pConfigKeys->GetInt( "setting.defaultres", 640 );
-	m_iResolutionHeight = pConfigKeys->GetInt( "setting.defaultresheight", 480 );
+	int desktopWidth, desktopHeight;
+	gameuifuncs->GetDesktopResolution(desktopWidth, desktopHeight);
+	m_iResolutionWidth = desktopWidth;
+	m_iResolutionHeight = desktopHeight;
+
 	m_iAspectRatio = GetScreenAspectMode( m_iResolutionWidth, m_iResolutionHeight );
-	m_bWindowed = !pConfigKeys->GetBool( "setting.fullscreen", true );
-	m_bNoBorder = pConfigKeys->GetBool( "setting.nowindowborder", false );
-	m_iModelTextureDetail = clamp( pConfigKeys->GetInt( "setting.gpu_mem_level", 0 ), 0, 2 );
-	m_iPagedPoolMem = clamp( pConfigKeys->GetInt( "setting.mem_level", 0 ), 0, 2 );
-	m_nAASamples = pConfigKeys->GetInt( "setting.mat_antialias", 0 );
-	m_nAAQuality = pConfigKeys->GetInt( "setting.mat_aaquality", 0 );
-	m_iFiltering = pConfigKeys->GetInt( "setting.mat_forceaniso", 1 );
-	m_bVSync = pConfigKeys->GetBool( "setting.mat_vsync", true );
-	m_bTripleBuffered = pConfigKeys->GetBool( "setting.mat_triplebuffered", false );
-	m_iGPUDetail = pConfigKeys->GetInt( "setting.gpu_level", 0 );
-	m_iCPUDetail = pConfigKeys->GetInt( "setting.cpu_level", 0 );
-	m_iQueuedMode = pConfigKeys->GetInt( "setting.mat_queue_mode", -1 );
-	m_bLockMouse = pConfigKeys->GetBool( "setting.in_lock_mouse_to_window", true );
+	m_bWindowed = false;// !pConfigKeys->GetBool("setting.fullscreen", true);
+	//m_bNoBorder = pConfigKeys->GetBool( "setting.nowindowborder", false );
+	m_iModelDetail = clamp(pConfigKeys->GetInt("ConVar.r_rootlod", 0), 0, 2);
+	m_iTextureDetail = clamp( pConfigKeys->GetInt( "ConVar.mat_picmip", 0 ), -1, 4 );
+	//m_iPagedPoolMem = clamp( pConfigKeys->GetInt( "setting.mem_level", 0 ), 0, 2 );
+	m_nAASamples = pConfigKeys->GetInt( "ConVar.mat_antialias", 0 );
+	m_nAAQuality = pConfigKeys->GetInt( "ConVar.mat_aaquality", 0 );
+	m_iFiltering = pConfigKeys->GetInt( "ConVar.mat_forceaniso", 1 );
+	m_bVSync = pConfigKeys->GetBool( "ConVar.mat_vsync", true );
+	//m_bTripleBuffered = pConfigKeys->GetBool( "setting.mat_triplebuffered", false );
+	m_iGPUDetail = pConfigKeys->GetInt( "ConVar.mat_reducefillrate", 0 );
+	//m_iCPUDetail = pConfigKeys->GetInt( "setting.cpu_level", 0 );
+	m_iQueuedMode = -1;//pConfigKeys->GetInt( "setting.mat_queue_mode", -1 );
+	//m_bLockMouse = pConfigKeys->GetBool( "setting.in_lock_mouse_to_window", true );
 
 	pConfigKeys->deleteThis();
 
 	return true;
+#endif
 }
 
 void Video::OpenThirdPartyVideoCreditsDialog()
@@ -270,11 +289,11 @@ void Video::Activate( bool bRecommendedSettings )
 	{
 		if ( m_bWindowed )
 		{
-			if ( m_bNoBorder )
-			{
-				m_drpDisplayMode->SetCurrentSelection( "#L4D360UI_VideoOptions_Windowed_NoBorder" );
-			}
-			else
+			//if ( m_bNoBorder )
+			//{
+			//	m_drpDisplayMode->SetCurrentSelection( "#L4D360UI_VideoOptions_Windowed_NoBorder" );
+			//}
+			//else
 			{
 				m_drpDisplayMode->SetCurrentSelection( "#GameUI_Windowed" );
 			}
@@ -300,6 +319,7 @@ void Video::Activate( bool bRecommendedSettings )
 		}
 	}
 
+	/*
 	if ( m_drpLockMouse )
 	{
 		if ( m_bLockMouse )
@@ -317,28 +337,7 @@ void Video::Activate( bool bRecommendedSettings )
 			pFlyout->SetListener( this );
 		}
 	}
-
-	if ( m_drpModelDetail )
-	{
-		switch ( m_iModelTextureDetail )
-		{
-		case 0:
-			m_drpModelDetail->SetCurrentSelection( "ModelDetailLow" );
-			break;
-		case 1:
-			m_drpModelDetail->SetCurrentSelection( "ModelDetailMedium" );
-			break;
-		case 2:
-			m_drpModelDetail->SetCurrentSelection( "ModelDetailHigh" );
-			break;
-		}
-
-		FlyoutMenu *pFlyout = m_drpModelDetail->GetCurrentFlyout();
-		if ( pFlyout )
-		{
-			pFlyout->SetListener( this );
-		}
-	}
+	
 
 	if ( m_drpPagedPoolMem )
 	{
@@ -361,6 +360,54 @@ void Video::Activate( bool bRecommendedSettings )
 		if ( pFlyout )
 		{
 			pFlyout->SetListener( this );
+		}
+	}
+	*/
+
+	if (m_drpModelDetail)
+	{
+		switch (m_iModelDetail)
+		{
+		case 2:
+			m_drpModelDetail->SetCurrentSelection("ModelDetailLow");
+			break;
+		case 1:
+			m_drpModelDetail->SetCurrentSelection("ModelDetailMedium");
+			break;
+		case 0:
+			m_drpModelDetail->SetCurrentSelection("ModelDetailHigh");
+			break;
+		}
+
+		FlyoutMenu* pFlyout = m_drpModelDetail->GetCurrentFlyout();
+		if (pFlyout)
+		{
+			pFlyout->SetListener(this);
+		}
+	}
+
+	if (m_drpTextureDetail)
+	{
+		switch (m_iTextureDetail)
+		{
+		case 2:
+			m_drpTextureDetail->SetCurrentSelection("TextureDetailLow");
+			break;
+		case 1:
+			m_drpTextureDetail->SetCurrentSelection("TextureDetailMedium");
+			break;
+		case 0:
+			m_drpTextureDetail->SetCurrentSelection("TextureDetailHigh");
+			break;
+		case -1:
+			m_drpTextureDetail->SetCurrentSelection("TextureDetailVeryHigh");
+			break;
+		}
+
+		FlyoutMenu* pFlyout = m_drpTextureDetail->GetCurrentFlyout();
+		if (pFlyout)
+		{
+			pFlyout->SetListener(this);
 		}
 	}
 
@@ -528,6 +575,7 @@ void Video::Activate( bool bRecommendedSettings )
 	{
 		if ( m_bVSync )
 		{
+			/*
 			if ( m_bTripleBuffered )
 			{
 				m_drpVSync->SetCurrentSelection( "VSyncTripleBuffered" );
@@ -536,6 +584,9 @@ void Video::Activate( bool bRecommendedSettings )
 			{
 				m_drpVSync->SetCurrentSelection( "VSyncEnabled" );
 			}
+			*/
+			m_drpVSync->SetCurrentSelection("VSyncEnabled");
+
 		}
 		else
 		{
@@ -552,7 +603,7 @@ void Video::Activate( bool bRecommendedSettings )
 	if ( m_drpQueuedMode )
 	{
 		// Only allow the options on multi-processor machines.
-		if ( GetCPUInformation().m_nPhysicalProcessors >= 2 )
+		if ( GetCPUInformation()->m_nPhysicalProcessors >= 2 )
 		{
 			if ( m_iQueuedMode != 0 )
 			{
@@ -579,17 +630,11 @@ void Video::Activate( bool bRecommendedSettings )
 	{
 		switch ( m_iGPUDetail )
 		{
-		case 0:
+		case 1:
 			m_drpShaderDetail->SetCurrentSelection( "ShaderDetailLow" );
 			break;
-		case 1:
-			m_drpShaderDetail->SetCurrentSelection( "ShaderDetailMedium" );
-			break;
-		case 2:
+		case 0:
 			m_drpShaderDetail->SetCurrentSelection( "ShaderDetailHigh" );
-			break;
-		case 3:
-			m_drpShaderDetail->SetCurrentSelection( "ShaderDetailVeryHigh" );
 			break;
 		}
 
@@ -600,6 +645,7 @@ void Video::Activate( bool bRecommendedSettings )
 		}
 	}
 
+	/*
 	if ( m_drpCPUDetail )
 	{
 		switch ( m_iCPUDetail )
@@ -621,6 +667,7 @@ void Video::Activate( bool bRecommendedSettings )
 			pFlyout->SetListener( this );
 		}
 	}
+	*/
 
 	UpdateFooter();
 	
@@ -660,6 +707,7 @@ void Video::OnThink()
 		needsActivate = true;
 	}
 
+	/*
 	if ( !m_drpLockMouse )
 	{
 		m_drpLockMouse = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpLockMouse" ) );
@@ -670,7 +718,20 @@ void Video::OnThink()
 	{
 		m_drpLockMouse->SetVisible( m_bWindowed );
 	}
-	
+
+	if( !m_drpPagedPoolMem )
+	{
+		m_drpPagedPoolMem = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpPagedPoolMem" ) );
+		needsActivate = true;
+	}
+
+	if( !m_drpCPUDetail )
+	{
+		m_drpCPUDetail = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpCPUDetail" ) );
+		needsActivate = true;
+	}
+	*/
+
 	if( !m_btnAdvanced )
 	{
 		m_btnAdvanced = dynamic_cast< BaseModHybridButton* >( FindChildByName( "BtnAdvanced" ) );
@@ -683,9 +744,9 @@ void Video::OnThink()
 		needsActivate = true;
 	}
 
-	if( !m_drpPagedPoolMem )
+	if (!m_drpTextureDetail)
 	{
-		m_drpPagedPoolMem = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpPagedPoolMem" ) );
+		m_drpTextureDetail = dynamic_cast<DropDownMenu*>(FindChildByName("DrpTextureDetail"));
 		needsActivate = true;
 	}
 
@@ -719,11 +780,7 @@ void Video::OnThink()
 		needsActivate = true;
 	}
 
-	if( !m_drpCPUDetail )
-	{
-		m_drpCPUDetail = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpCPUDetail" ) );
-		needsActivate = true;
-	}
+	
 
 	if( !m_btnUseRecommended )
 	{
@@ -804,24 +861,25 @@ void Video::OnCommand(const char *command)
 	else if ( !Q_strcmp( command, "#GameUI_Windowed" ) )
 	{
 		m_bWindowed = true;
-		m_bNoBorder = false;
+		//m_bNoBorder = false;
 		m_bDirtyValues = true;
 		PrepareResolutionList();
 	}
 	else if ( !Q_strcmp( command, "#L4D360UI_VideoOptions_Windowed_NoBorder" ) )
 	{
 		m_bWindowed = true;
-		m_bNoBorder = true;
+		//m_bNoBorder = true;
 		m_bDirtyValues = true;
 		PrepareResolutionList();
 	}
 	else if ( !Q_strcmp( command, "#GameUI_Fullscreen" ) )
 	{
 		m_bWindowed = false;
-		m_bNoBorder = false;
+		//m_bNoBorder = false;
 		m_bDirtyValues = true;
 		PrepareResolutionList();
 	}
+	/*
 	else if ( !Q_strcmp( command, "LockMouseEnabled" ) )
 	{
 		m_bLockMouse = true;
@@ -832,16 +890,18 @@ void Video::OnCommand(const char *command)
 		m_bLockMouse = false;
 		m_bDirtyValues = true;
 	}
+	*/
 	else if ( !Q_strcmp( command, "ShowAdvanced" ) )
 	{
 		SetControlVisible( "BtnAdvanced", false );
+		SetControlVisible( "DrpTextureDetail", true );
 		SetControlVisible( "DrpModelDetail", true );
-		SetControlVisible( "DrpPagedPoolMem", true );
+		//SetControlVisible( "DrpPagedPoolMem", true );
 		SetControlVisible( "DrpFiltering", true );
 		SetControlVisible( "DrpVSync", true );
 		SetControlVisible( "DrpQueuedMode", true );
 		SetControlVisible( "DrpShaderDetail", true );
-		SetControlVisible( "DrpCPUDetail", true );
+		//SetControlVisible( "DrpCPUDetail", true );
 
 		if ( m_drpAntialias )
 		{
@@ -874,19 +934,40 @@ void Video::OnCommand(const char *command)
 	}
 	else if ( !Q_strcmp( command, "ModelDetailHigh" ) )
 	{
-		m_iModelTextureDetail = 2;
+		m_iModelDetail = 0;
 		m_bDirtyValues = true;
 	}
 	else if ( !Q_strcmp( command, "ModelDetailMedium" ) )
 	{
-		m_iModelTextureDetail = 1;
+		m_iModelDetail = 1;
 		m_bDirtyValues = true;
 	}
 	else if ( !Q_strcmp( command, "ModelDetailLow" ) )
 	{
-		m_iModelTextureDetail = 0;
+		m_iModelDetail = 2;
 		m_bDirtyValues = true;
 	}
+	else if ( !Q_strcmp( command, "TextureDetailUltra" ) )
+	{
+		m_iTextureDetail = -1;
+		m_bDirtyValues = true;
+	}
+	else if ( !Q_strcmp( command, "TextureDetailHigh" ) )
+	{
+		m_iTextureDetail = 0;
+		m_bDirtyValues = true;
+	}
+	else if ( !Q_strcmp( command, "TextureDetailMedium" ) )
+	{
+		m_iTextureDetail = 1;
+		m_bDirtyValues = true;
+	}
+	else if ( !Q_strcmp( command, "TextureDetailLow" ) )
+	{
+		m_iTextureDetail = 2;
+		m_bDirtyValues = true;
+	}
+	/*
 	else if ( !Q_strcmp( command, "PagedPoolMemHigh" ) )
 	{
 		m_iPagedPoolMem = 2;
@@ -902,6 +983,7 @@ void Video::OnCommand(const char *command)
 		m_iPagedPoolMem = 0;
 		m_bDirtyValues = true;
 	}
+	*/
 	else if ( StringHasPrefix( command, VIDEO_ANTIALIAS_COMMAND_PREFIX ) )
 	{
 		int iCommandNumberPosition = Q_strlen( VIDEO_ANTIALIAS_COMMAND_PREFIX );
@@ -938,22 +1020,24 @@ void Video::OnCommand(const char *command)
 		m_iFiltering = 16;
 		m_bDirtyValues = true;
 	}
+	/*
 	else if ( !Q_strcmp( command, "VSyncTripleBuffered" ) )
 	{
 		m_bVSync = true;
 		m_bTripleBuffered = true;
 		m_bDirtyValues = true;
 	}
+	*/
 	else if ( !Q_strcmp( command, "VSyncEnabled" ) )
 	{
 		m_bVSync = true;
-		m_bTripleBuffered = false;
+		//m_bTripleBuffered = false;
 		m_bDirtyValues = true;
 	}
 	else if ( !Q_strcmp( command, "VSyncDisabled" ) )
 	{
 		m_bVSync = false;
-		m_bTripleBuffered = false;
+		//m_bTripleBuffered = false;
 		m_bDirtyValues = true;
 	}
 	else if ( !Q_strcmp( command, "QueuedModeEnabled" ) )
@@ -966,26 +1050,17 @@ void Video::OnCommand(const char *command)
 		m_iQueuedMode = 0;
 		m_bDirtyValues = true;
 	}
-	else if ( !Q_strcmp( command, "ShaderDetailVeryHigh" ) )
-	{
-		m_iGPUDetail = 3;
-		m_bDirtyValues = true;
-	}
 	else if ( !Q_strcmp( command, "ShaderDetailHigh" ) )
-	{
-		m_iGPUDetail = 2;
-		m_bDirtyValues = true;
-	}
-	else if ( !Q_strcmp( command, "ShaderDetailMedium" ) )
-	{
-		m_iGPUDetail = 1;
-		m_bDirtyValues = true;
-	}
-	else if ( !Q_strcmp( command, "ShaderDetailLow" ) )
 	{
 		m_iGPUDetail = 0;
 		m_bDirtyValues = true;
 	}
+	else if ( !Q_strcmp( command, "ShaderDetailLow" ) )
+	{
+		m_iGPUDetail = 1;
+		m_bDirtyValues = true;
+	}
+	/*
 	else if ( !Q_strcmp( command, "CPUDetailHigh" ) )
 	{
 		m_iCPUDetail = 2;
@@ -1001,6 +1076,7 @@ void Video::OnCommand(const char *command)
 		m_iCPUDetail = 0;
 		m_bDirtyValues = true;
 	}
+	*/
 	else if( Q_stricmp( "UseRecommended", command ) == 0 )
 	{
 		FlyoutMenu::CloseActiveMenu();
@@ -1293,11 +1369,14 @@ void Video::ApplyChanges()
 		return;
 	}
 
-	ConVarRef gpu_mem_level( "gpu_mem_level" );
-	gpu_mem_level.SetValue( m_iModelTextureDetail );
+	ConVarRef r_rootlod( "r_rootlod" );
+	r_rootlod.SetValue( m_iModelDetail );
 
-	ConVarRef mem_level( "mem_level" );
-	mem_level.SetValue( m_iPagedPoolMem );
+	ConVarRef mat_picmip("mat_picmip");
+	mat_picmip.SetValue(m_iTextureDetail);
+
+	//ConVarRef mem_level( "mem_level" );
+	//mem_level.SetValue( m_iPagedPoolMem );
 
 	ConVarRef mat_antialias( "mat_antialias" );
 	ConVarRef mat_aaquality( "mat_aaquality" );
@@ -1310,31 +1389,31 @@ void Video::ApplyChanges()
 	ConVarRef mat_vsync( "mat_vsync" );
 	mat_vsync.SetValue( m_bVSync );
 
-	ConVarRef mat_triplebuffered( "mat_triplebuffered" );
-	mat_triplebuffered.SetValue( m_bTripleBuffered );
+	//ConVarRef mat_triplebuffered( "mat_triplebuffered" );
+	//mat_triplebuffered.SetValue( m_bTripleBuffered );
 
 	ConVarRef mat_queue_mode( "mat_queue_mode" );
 	mat_queue_mode.SetValue( m_iQueuedMode );
 
-	ConVarRef cpu_level( "cpu_level" );
-	cpu_level.SetValue( m_iCPUDetail );
+	//ConVarRef cpu_level( "cpu_level" );
+	//cpu_level.SetValue( m_iCPUDetail );
 
-	ConVarRef gpu_level( "gpu_level" );
-	gpu_level.SetValue( m_iGPUDetail );
+	ConVarRef mat_reducefillrate( "mat_reducefillrate" );
+	mat_reducefillrate.SetValue( m_iGPUDetail );
 
-	ConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
-	in_lock_mouse_to_window.SetValue( m_bLockMouse );
+	//ConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
+	//in_lock_mouse_to_window.SetValue( m_bLockMouse );
 
 	// Make sure there is a resolution change
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 	if ( config.m_VideoMode.m_Width != m_iResolutionWidth || 
 		 config.m_VideoMode.m_Height != m_iResolutionHeight || 
-		 config.Windowed() != m_bWindowed ||
-		 config.NoWindowBorder() != m_bNoBorder )
+		 config.Windowed() != m_bWindowed /* ||
+		 config.NoWindowBorder() != m_bNoBorder */ )
 	{
 		// set mode
 		char szCmd[ 256 ];
-		Q_snprintf( szCmd, sizeof( szCmd ), "mat_setvideomode %i %i %i %i\n", m_iResolutionWidth, m_iResolutionHeight, m_bWindowed ? 1 : 0, m_bNoBorder ? 1 : 0 );
+		Q_snprintf( szCmd, sizeof( szCmd ), "mat_setvideomode %i %i %i\n", m_iResolutionWidth, m_iResolutionHeight, m_bWindowed ? 1 : 0 );
 		engine->ClientCmd_Unrestricted( szCmd );
 	}
 
@@ -1344,8 +1423,10 @@ void Video::ApplyChanges()
 	engine->ClientCmd_Unrestricted( VarArgs( "host_writeconfig_ss %d", XBX_GetPrimaryUserId() ) );
 	m_bDirtyValues = false;
 
-	int nAspectRatioMode = GetScreenAspectMode( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height );
-	UpdateCurrentVideoConfig( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height, nAspectRatioMode, !config.Windowed(), config.NoWindowBorder() );
+	//int nAspectRatioMode = GetScreenAspectMode( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height );
+	
+	// Ozxy: Fix it!!
+	//UpdateCurrentVideoConfig( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height, nAspectRatioMode, !config.Windowed(), config.NoWindowBorder() );
 }
 
 void Video::OnNotifyChildFocus( vgui::Panel* child )
@@ -1367,10 +1448,12 @@ void Video::OnFlyoutMenuClose( vgui::Panel* flyTo )
 {
 	UpdateFooter();
 
+	/*
 	if ( m_drpPagedPoolMem )
 	{
 		m_drpPagedPoolMem->SetOpenCallback( PagedPoolMemOpenned );
 	}
+	*/
 }
 
 void Video::OnFlyoutMenuCancelled()

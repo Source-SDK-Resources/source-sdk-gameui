@@ -11,12 +11,14 @@
 #include "basemodui.h"
 #include "VFlyoutMenu.h"
 
+class CNB_Header_Footer;
 
 namespace BaseModUI {
 
 class DropDownMenu;
 class SliderControl;
 class BaseModHybridButton;
+
 
 class KeyboardMouse : public CBaseModFrame, public FlyoutMenuListener
 {
@@ -42,7 +44,7 @@ protected:
 	virtual void OnCommand( const char *command );
 
 private:
-	void UpdateFooter( bool bEnableCloud );	
+	void UpdateFooter( );	
 
 	BaseModHybridButton	*m_btnEditBindings;
 	DropDownMenu		*m_drpMouseYInvert;
@@ -56,6 +58,8 @@ private:
 	DropDownMenu		*m_drpGamepadSwapSticks;
 
 	BaseModHybridButton	*m_btnCancel;
+
+	CNB_Header_Footer* m_pHeaderFooter;
 };
 
 };

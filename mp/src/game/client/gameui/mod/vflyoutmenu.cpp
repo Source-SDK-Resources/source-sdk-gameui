@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2008, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -529,13 +529,6 @@ void FlyoutMenu::OnKeyCodePressed( vgui::KeyCode code )
 			{
 				m_listener->OnFlyoutMenuCancelled();
 			}
-		}
-		break;
-
-	case KEY_XBUTTON_INACTIVE_START:
-		if ( CBaseModFrame *pPanel = dynamic_cast< CBaseModFrame * >( m_listener ) )
-		{
-			pPanel->OnKeyCodePressed( code );
 		}
 		break;
 

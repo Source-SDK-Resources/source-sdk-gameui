@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -1332,7 +1332,7 @@ COptionsSubVideoThirdPartyCreditsDlg::COptionsSubVideoThirdPartyCreditsDlg( vgui
 	SetProportional( true );
 
 	// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
-#ifdef SWARM_DLL
+#if defined( SDK_CLIENT_DLL ) || defined( DML_CLIENT_DLL )
 	SetScheme( "SwarmFrameScheme" );
 #endif
 

@@ -53,7 +53,7 @@ public:
 	virtual void OLD_OnConnectToServer( const char *game, int IP, int port );	// OLD: use OnConnectToServer2
 	virtual void OnConnectToServer2( const char *game, int IP, int connectionPort, int queryPort );
 	virtual void OnDisconnectFromServer( uint8 eSteamLoginFailure );
-	virtual void OnLevelLoadingStarted( const char *levelName, bool bShowProgressDialog );
+	virtual void OnLevelLoadingStarted( bool bShowProgressDialog );
 	virtual void OnLevelLoadingFinished( bool bError, const char *failureReason, const char *extendedReason );
 	virtual void OnDisconnectFromServer_OLD( uint8 eSteamLoginFailure, const char *username ) { OnDisconnectFromServer( eSteamLoginFailure ); }
 
@@ -63,12 +63,6 @@ public:
 	virtual bool SetShowProgressText( bool show );
 
 	// Allows the level loading progress to show map-specific info
-	virtual void SetProgressLevelName( const char *levelName );
-
- 	virtual void NeedConnectionProblemWaitScreen();
-
-	virtual void ShowPasswordUI( char const *pchCurrentPW );
-
  	virtual void SetProgressOnStart();
 
  	// state
@@ -81,6 +75,36 @@ public:
  	void ShowLoadingBackgroundDialog();
 	void HideLoadingBackgroundDialog();
 	bool HasLoadingBackgroundDialog();
+
+	// Singleplayer stubbing
+	virtual void ShowNewGameDialog(int chapter) {}
+
+	// Bonus map stubbing
+	virtual void BonusMapUnlock(const char* pchFileName = NULL, const char* pchMapName = NULL) {}
+	virtual void BonusMapComplete(const char* pchFileName = NULL, const char* pchMapName = NULL) {}
+	virtual void BonusMapChallengeUpdate(const char* pchFileName, const char* pchMapName, const char* pchChallengeName, int iBest) {}
+	virtual void BonusMapChallengeNames(char* pchFileName, char* pchMapName, char* pchChallengeName) {}
+	virtual void BonusMapChallengeObjectives(int& iBronze, int& iSilver, int& iGold) {}
+	virtual void BonusMapDatabaseSave(void) {}
+	virtual int BonusMapNumAdvancedCompleted(void) { return 0; }
+	virtual void BonusMapNumMedals(int piNumMedals[3]) {}
+
+	// X360 stubbing
+	virtual bool ValidateStorageDevice(int* pStorageDeviceValidated) { return false; };
+	virtual void SessionNotification(const int notification, const int param = 0) {}
+	virtual void SystemNotification(const int notification) {}
+	virtual void ShowMessageDialog(const uint nType, vgui::Panel* pOwner) {}
+	virtual void UpdatePlayerInfo(uint64 nPlayerId, const char* pName, int nTeam, byte cVoiceState, int nPlayersNeeded, bool bHost) {}
+	virtual void SessionSearchResult(int searchIdx, void* pHostData, XSESSION_SEARCHRESULT* pResult, int ping) {}
+	virtual void OnCreditsFinished(void) {}
+
+	// Custom mainmenu stubbing
+	virtual void SetMainMenuOverride(vgui::VPANEL panel) {}
+	virtual void SendMainMenuCommand(const char* pszCommand) {}
+
+	// Implement!
+	virtual void OnConfirmQuit(void) {};
+	virtual bool IsMainMenuVisible(void) { return true; };
 
 private:
 	void SendConnectedToGameMessage();
