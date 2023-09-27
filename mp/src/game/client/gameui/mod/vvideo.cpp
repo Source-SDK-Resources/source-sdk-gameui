@@ -1420,7 +1420,7 @@ void Video::ApplyChanges()
 	// apply changes
 	engine->ClientCmd_Unrestricted( "mat_savechanges\n" );
 
-	engine->ClientCmd_Unrestricted( VarArgs( "host_writeconfig_ss %d", XBX_GetPrimaryUserId() ) );
+	engine->ClientCmd_Unrestricted( "host_writeconfig" );
 	m_bDirtyValues = false;
 
 	//int nAspectRatioMode = GetScreenAspectMode( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height );

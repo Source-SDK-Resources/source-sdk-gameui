@@ -454,7 +454,7 @@ void KeyboardMouse::OnFlyoutMenuCancelled()
 //=============================================================================
 Panel* KeyboardMouse::NavigateBack()
 {
-	engine->ClientCmd_Unrestricted( VarArgs( "host_writeconfig_ss %d", XBX_GetPrimaryUserId() ) );
+	engine->ClientCmd_Unrestricted( "host_writeconfig" );
 
 	return BaseClass::NavigateBack();
 }

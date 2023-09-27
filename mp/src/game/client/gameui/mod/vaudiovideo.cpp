@@ -365,7 +365,7 @@ Panel* AudioVideo::NavigateBack()
 		// Write only video config
 		if ( CBaseModPanel::GetSingleton().IsReadyToWriteConfig() )
 		{
-			engine->ClientCmd_Unrestricted( VarArgs( "host_writeconfig_video_ss %d", XBX_GetPrimaryUserId() ) );
+			engine->ClientCmd_Unrestricted( "host_writeconfig_video" );
 		}
 	}
 
