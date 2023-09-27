@@ -340,33 +340,34 @@ void Multiplayer::OnKeyCodePressed(KeyCode code)
 //=============================================================================
 void Multiplayer::OnCommand(const char *command)
 {
+	char const* sz;
+
 	if( Q_stricmp( "#GameUI_Headphones", command ) == 0 )
 	{
 		ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
 		snd_surround_speakers.SetValue( "0" );
 	}
-	
-	else if ( char const *sz = StringAfterPrefix( command, "#GameUI_DownloadFilter_" ) )
+	else if ( sz = StringAfterPrefix( command, "#GameUI_DownloadFilter_" ); sz )
 	{
 		ConVarRef  cl_downloadfilter( "cl_downloadfilter" );
 		cl_downloadfilter.SetValue( sz );
 	}
-	else if ( char const *sz = StringAfterPrefix( command, "ColorBlind" ) )
+	else if ( sz = StringAfterPrefix( command, "ColorBlind" ); sz )
 	{
 		ConVarRef cl_colorblind( "cl_colorblind" );
 		cl_colorblind.SetValue( sz );
 	}
-	else if ( char const *sz = StringAfterPrefix( command, "GameInstructor" ) )
+	else if ( sz = StringAfterPrefix( command, "GameInstructor" ); sz )
 	{
 		ConVarRef gameinstructor_enable( "gameinstructor_enable" );
 		gameinstructor_enable.SetValue( !Q_stricmp( sz, "Enabled" ) );
 	}
-	else if ( char const *sz = StringAfterPrefix( command, "AllowFreeLook" ) )
+	else if ( sz = StringAfterPrefix( command, "AllowFreeLook" ); sz )
 	{
 		ConVarRef spec_allowroaming( "spec_allowroaming" );
 		spec_allowroaming.SetValue( !Q_stricmp( sz, "Enabled" ) );
 	}
-	else if ( char const *sz = StringAfterPrefix( command, "MpLanGames" ) )
+	else if ( sz = StringAfterPrefix( command, "MpLanGames" ); sz )
 	{
 		ConVarRef net_allow_multicast( "net_allow_multicast" );
 		net_allow_multicast.SetValue( !Q_stricmp( sz, "Enabled" ) );
@@ -493,6 +494,9 @@ void Multiplayer::InitLogoList()
 	}
 
 	FlyoutMenu *pFlyout = m_drpSpraypaint->GetCurrentFlyout();
+
+	if (!pFlyout)
+		return;
 
 	char szCurrentButton[ 32 ];
 	Q_strncpy( szCurrentButton, MULTIPLAYER_SPRAYPAINT_COMMAND_PREFIX, sizeof( szCurrentButton ) );

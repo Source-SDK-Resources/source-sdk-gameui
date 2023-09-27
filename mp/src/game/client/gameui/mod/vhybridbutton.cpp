@@ -434,17 +434,17 @@ void BaseModHybridButton::PaintButtonEx()
 
 		if ( m_bShowDropDownIndicator )
 		{
-			int textTall = vgui::surface()->GetFontTall( m_hTextFont );
+			int textTall_ = vgui::surface()->GetFontTall( m_hTextFont );
 			int textLen = 0;
 
-			int len = wcslen( szUnicode );
-			for ( int i=0;i<len;i++ )
+			int len_ = wcslen( szUnicode );
+			for ( int i=0;i<len_;i++ )
 			{
 				textLen += vgui::surface()->GetCharacterWidth( m_hTextFont, szUnicode[i] );
 			}
 
 			int imageX = x + textInsetX + textLen + m_iSelectedArrowSize / 2;
-			int imageY = y + ( textTall - m_iSelectedArrowSize ) / 2;
+			int imageY = y + ( textTall_ - m_iSelectedArrowSize ) / 2;
 
 			if ( ( imageX + m_iSelectedArrowSize ) > GetWide() )
 			{
@@ -560,21 +560,21 @@ void BaseModHybridButton::PaintButtonEx()
 			g_pVGuiLocalize->ConvertANSIToUnicode( m_DropDownSelection.String(), szUnicode, sizeof( szUnicode ) );
 			pUnicodeString = szUnicode;
 		}
-		int len = V_wcslen( pUnicodeString );
+		int len_ = V_wcslen( pUnicodeString );
 
-		int textWide, textTall;
-		surface()->GetTextSize( m_hSelectionFont, pUnicodeString, textWide, textTall );
+		int selTextWide, selTextTall;
+		surface()->GetTextSize( m_hSelectionFont, pUnicodeString, selTextWide, selTextTall );
 
 		// horizontal right justify
-		int xx = wide - textWide - textInsetX;
+		int xx = wide - selTextWide - textInsetX;
 		// vertical center within
-		int yy = ( tall - textTall )/2;
+		int yy = ( tall - selTextTall )/2;
 
 		// draw the drop down selection text
 		vgui::surface()->DrawSetTextFont( m_hSelectionFont );
 		vgui::surface()->DrawSetTextPos( xx, yy );
 		vgui::surface()->DrawSetTextColor( col );
-		vgui::surface()->DrawPrintText( pUnicodeString, len );
+		vgui::surface()->DrawPrintText( pUnicodeString, len_ );
 
 		if ( bDrawGlow )
 		{
@@ -582,7 +582,7 @@ void BaseModHybridButton::PaintButtonEx()
 			vgui::surface()->DrawSetTextColor( Color( 255, 255, 255, alpha ) );
 			vgui::surface()->DrawSetTextFont( m_hSelectionBlurFont );
 			vgui::surface()->DrawSetTextPos( xx, yy );
-			vgui::surface()->DrawPrintText( pUnicodeString, len );
+			vgui::surface()->DrawPrintText( pUnicodeString, len_ );
 		}
 	}
 }

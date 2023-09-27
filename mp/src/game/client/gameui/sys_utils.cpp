@@ -42,7 +42,7 @@ const unsigned int SYS_WAIT_ABANDONED = WAIT_ABANDONED;
 
 unsigned int Sys_WaitForSingleObject(WHANDLE mutexHandle, int milliseconds)
 {
-	return WaitForSingleObject((HANDLE)mutexHandle, milliseconds);
+	return VCRHook_WaitForSingleObject((HANDLE)mutexHandle, milliseconds);
 }
 
 unsigned int Sys_RegisterWindowMessage(const char *msgName)

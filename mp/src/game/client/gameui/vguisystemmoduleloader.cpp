@@ -9,7 +9,6 @@
 #include "VGuiSystemModuleLoader.h"
 #include "Sys_Utils.h"
 #include "IVGuiModule.h"
-#include "ServerBrowser/IServerBrowser.h"
 
 #include <vgui/IPanel.h>
 #include <vgui/ISystem.h>
@@ -97,7 +96,9 @@ bool CVGuiSystemModuleLoader::InitializeAllModules(CreateInterfaceFn *factorylis
 	// give the modules a chance to link themselves together
 	for (i = 0; i < m_Modules.Count(); i++)
 	{
-		if (!m_Modules[i].moduleInterface->PostInitialize(moduleFactories, m_Modules.Count()))
+		IVGuiModule* m = m_Modules[i].moduleInterface;
+		int s = m_Modules.Count();
+		if (!m->PostInitialize(moduleFactories, s))
 		{
 			bSuccess = false;
 			Error("Platform Error: module failed to initialize\n");
