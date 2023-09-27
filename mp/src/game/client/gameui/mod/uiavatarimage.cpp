@@ -4,7 +4,6 @@
 //
 //=====================================================================================//
 
-#include "UIGameData.h"
 #include "UIAvatarImage.h"
 #include "EngineInterface.h"
 #include "vgui/ISurface.h"

@@ -38,7 +38,6 @@ using namespace vgui;
 using namespace BaseModUI;
 
 //=============================================================================
-static ConVar connect_lobby( "connect_lobby", "", FCVAR_HIDDEN, "Sets the lobby ID to connect to on start." );
 static ConVar ui_old_options_menu( "ui_old_options_menu", "0", FCVAR_HIDDEN, "Brings up the old tabbed options dialog from Keyboard/Mouse when set to 1." );
 static ConVar ui_play_online_browser( "ui_play_online_browser", "1", FCVAR_RELEASE, "Whether play online displays a browser or plain search dialog." );
 
@@ -76,38 +75,9 @@ void MainMenu::OnCommand( const char *command )
 {
 	bool bOpeningFlyout = false;
 
-	if ( char const *szQuickMatch = StringAfterPrefix( command, "QuickMatch_" ) )
+	if ( char const *szCustomMatch = StringAfterPrefix( command, "CustomMatch_" ) )
 	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() ||
-			CUIGameData::Get()->CheckAndDisplayErrorIfNotSignedInToLive( this ) )
-			return;
-
-		KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" system { "
-				" network LIVE "
-			" } "
-			" game { "
-				" mode = "
-			" } "
-			" options { "
-				" action quickmatch "
-			" } "
-			);
-		KeyValues::AutoDelete autodelete( pSettings );
-
-		pSettings->SetString( "game/mode", szQuickMatch );
-
-		// TCR: We need to respect the default difficulty
-		if ( GameModeHasDifficulty( szQuickMatch ) )
-			pSettings->SetString( "game/difficulty", GameModeGetDefaultDifficulty( szQuickMatch ) );
-
-		g_pMatchFramework->MatchSession( pSettings );
-	}
-	else if ( char const *szCustomMatch = StringAfterPrefix( command, "CustomMatch_" ) )
-	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() ||
-			 CUIGameData::Get()->CheckAndDisplayErrorIfNotSignedInToLive( this ) )
+		if ( CheckAndDisplayErrorIfNotLoggedIn() )
 			return;
 
 		KeyValues *pSettings = KeyValues::FromString(
@@ -135,8 +105,7 @@ void MainMenu::OnCommand( const char *command )
 		if ( CheckAndDisplayErrorIfNotLoggedIn() )
 			return;
 
-		if ( StringHasPrefix( szFriendsMatch, "team" ) &&
-			CUIGameData::Get()->CheckAndDisplayErrorIfNotSignedInToLive( this ) )
+		if ( StringHasPrefix( szFriendsMatch, "team" ) )
 			// Team games require to be signed in to LIVE
 			return;
 
@@ -183,9 +152,7 @@ void MainMenu::OnCommand( const char *command )
 	}
 	else if ( char const *szLeaderboards = StringAfterPrefix( command, "Leaderboards_" ) )
 	{
-		if ( CheckAndDisplayErrorIfNotLoggedIn() ||
-			CUIGameData::Get()->CheckAndDisplayErrorIfOffline( this,
-			"#L4D360UI_MainMenu_SurvivalLeaderboards_Tip_Disabled" ) )
+		if ( CheckAndDisplayErrorIfNotLoggedIn() )
 			return;
 
 		KeyValues *pSettings = KeyValues::FromString(
@@ -218,54 +185,6 @@ void MainMenu::OnCommand( const char *command )
 	{
 		OnCommand( "FlmScavengeFlyout" );
 		return;
-	}
-	else if ( !Q_strcmp( command, "SoloPlay" ) )
-	{
-		if ( !asw_show_all_singleplayer_maps.GetBool() )
-		{
-			KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" system { "
-			" network offline "
-			" } "
-			" game { "
-			" mode single_mission "
-			" campaign jacob "
-			" mission asi-jac1-landingbay_pract "
-			" } "
-			);
-			KeyValues::AutoDelete autodelete( pSettings );
-
-			pSettings->SetString( "Game/difficulty", GameModeGetDefaultDifficulty( pSettings->GetString( "Game/mode" ) ) );
-
-			g_pMatchFramework->CreateSession( pSettings );
-
-			// Automatically start the credits session, no configuration required
-			if ( IMatchSession *pMatchSession = g_pMatchFramework->GetMatchSession() )
-			{
-				pMatchSession->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
-			}
-		}
-		else
-		{
-			KeyValues *pSettings = KeyValues::FromString(
-				"Settings",
-				" System { "
-				" network offline "
-				" } "
-				" Game { "
-				" mode campaign "
-				" campaign jacob "
-				" mission asi-jac1-landingbay_01 "
-				" } "
-				);
-			KeyValues::AutoDelete autodelete( pSettings );
-
-			// TCR: We need to respect the default difficulty
-			pSettings->SetString( "Game/difficulty", GameModeGetDefaultDifficulty( pSettings->GetString( "Game/mode" ) ) );
-
-			g_pMatchFramework->CreateSession( pSettings );
-		}
 	}
 	else if ( !Q_strcmp( command, "DeveloperCommentary" ) )
 	{
@@ -495,9 +414,6 @@ void MainMenu::OnCommand( const char *command )
 //=============================================================================
 void MainMenu::OpenMainMenuJoinFailed( const char *msg )
 {
-	// This is called when accepting an invite or joining friends game fails
-	CUIGameData::Get()->OpenWaitScreen( msg );
-	CUIGameData::Get()->CloseWaitScreen( NULL, NULL );
 }
 
 //=============================================================================
@@ -557,23 +473,11 @@ void MainMenu::OnThink()
 		BaseModHybridButton *pButton = dynamic_cast< BaseModHybridButton* >( flyout->FindChildButtonByCommand( "QuickMatchCoOp" ) );
 		if ( pButton )
 		{
-			if ( !CUIGameData::Get()->SignedInToLive() )
+			pButton->SetText( "#L4D360UI_QuickStart" );
+			if ( m_iQuickJoinHelpText != MMQJHT_QUICKSTART )
 			{
-				pButton->SetText( "#L4D360UI_QuickStart" );
-				if ( m_iQuickJoinHelpText != MMQJHT_QUICKSTART )
-				{
-					pButton->SetHelpText( "#L4D360UI_QuickMatch_Offline_Tip" );
-					m_iQuickJoinHelpText = MMQJHT_QUICKSTART;
-				}
-			}
-			else
-			{
-				pButton->SetText( "#L4D360UI_QuickMatch" );
-				if ( m_iQuickJoinHelpText != MMQJHT_QUICKMATCH )
-				{
-					pButton->SetHelpText( "#L4D360UI_QuickMatch_Tip" );
-					m_iQuickJoinHelpText = MMQJHT_QUICKMATCH;
-				}
+				pButton->SetHelpText( "#L4D360UI_QuickMatch_Offline_Tip" );
+				m_iQuickJoinHelpText = MMQJHT_QUICKSTART;
 			}
 		}
 	}
@@ -591,30 +495,6 @@ void MainMenu::OnThink()
 //=============================================================================
 void MainMenu::OnOpen()
 {
-	if ( connect_lobby.GetString()[0] )
-	{
-		// if we were launched with "+connect_lobby <lobbyid>" on the command line, join that lobby immediately
-		uint64 nLobbyID = _atoi64( connect_lobby.GetString() );
-		if ( nLobbyID != 0 )
-		{
-			KeyValues *pSettings = KeyValues::FromString(
-				"settings",
-				" system { "
-					" network LIVE "
-				" } "
-				" options { "
-					" action joinsession "
-				" } "
-				);
-			pSettings->SetUint64( "options/sessionid", nLobbyID );
-			KeyValues::AutoDelete autodelete( pSettings );
-
-			g_pMatchFramework->MatchSession( pSettings );
-		}
-		// clear the convar so we don't try to join that lobby every time we return to the main menu
-		connect_lobby.SetValue( "" );
-	}
-
 	BaseClass::OnOpen();
 
 	SetFooterState();
@@ -650,22 +530,7 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	const char *pSettings = "Resource/UI/BaseModUI/MainMenu.res";
-
-	if ( !g_pMatchFramework->GetMatchSystem() )
-	{
-		Msg( "BAD!\n" );
-	}
-	if ( !g_pMatchFramework->GetMatchSystem()->GetPlayerManager() )
-	{
-		Msg( "BAD PLAYER MANAGER!\n" );
-	}
-	if ( !g_pMatchFramework->GetMatchSystem()->GetPlayerManager()->GetLocalPlayer( 0 ) )
-	{
-		pSettings = "Resource/UI/BaseModUI/MainMenuStub.res";
-	}
-
-	LoadControlSettings( pSettings );
+	LoadControlSettings( "Resource/UI/BaseModUI/MainMenu.res" );
 
 
 	FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >( FindChildByName( "FlmOptionsFlyout" ) );
@@ -704,25 +569,6 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 
 void MainMenu::AcceptCommentaryRulesCallback() 
 {
-	if ( MainMenu *pMainMenu = static_cast< MainMenu* >( CBaseModPanel::GetSingleton().GetWindow( WT_MAINMENU ) ) )
-	{
-		KeyValues *pSettings = KeyValues::FromString(
-			"settings",
-			" system { "
-				" network offline "
-			" } "
-			" game { "
-				" mode single_mission "
-			" } "
-			" options { "
-				" play commentary "
-			" } "
-			);
-		KeyValues::AutoDelete autodelete( pSettings );
-
-		g_pMatchFramework->CreateSession( pSettings );
-	}
-
 }
 
 void MainMenu::AcceptQuitGameCallback()

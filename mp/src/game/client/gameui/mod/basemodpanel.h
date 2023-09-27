@@ -14,7 +14,6 @@
 #include "../OptionsDialog.h"
 #include "../OptionsSubKeyboard.h"
 #include "avi/ibik.h"
-#include "matchmaking/imatchframework.h"
 
 class COptionsDialog;
 
@@ -86,17 +85,13 @@ namespace BaseModUI
 	//=============================================================================
 	//
 	//=============================================================================
-	class CBaseModPanel : public vgui::EditablePanel, public IMatchEventsSink
+	class CBaseModPanel : public vgui::EditablePanel
 	{
 		DECLARE_CLASS_SIMPLE( CBaseModPanel, vgui::EditablePanel );
 
 	public:
 		CBaseModPanel();
 		~CBaseModPanel();
-
-		// IMatchEventSink implementation
-	public:
-		virtual void OnEvent( KeyValues *pEvent );
 
 	public:
 		static CBaseModPanel& GetSingleton();
@@ -171,7 +166,6 @@ namespace BaseModUI
 	private:
 		void DrawColoredText( vgui::HFont hFont, int x, int y, unsigned int color, const char *pAnsiText );
 		void DrawCopyStats();
-		void OnEngineLevelLoadingSession( KeyValues *pEvent );
 		bool ActivateBackgroundEffects();
 
 		static CBaseModPanel* m_CFactoryBasePanel;

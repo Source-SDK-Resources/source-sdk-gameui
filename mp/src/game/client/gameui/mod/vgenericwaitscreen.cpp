@@ -44,8 +44,6 @@ BaseClass( parent, panelName, false, false, false )
 	m_bClose = false;
 	m_currentDisplayText = "";
 	m_bTextSet = true;
-
-	m_pAsyncOperationAbortable = NULL;
 }
 
 //=============================================================================
@@ -163,24 +161,10 @@ void GenericWaitScreen::RunFrame()
 
 void GenericWaitScreen::SetDataSettings( KeyValues *pSettings )
 {
-	m_pAsyncOperationAbortable = ( IMatchAsyncOperation * ) pSettings->GetPtr( "options/asyncoperation", NULL );
 }
 
 void GenericWaitScreen::OnKeyCodePressed(vgui::KeyCode code)
 {
-	switch( GetBaseButtonCode( code ) )
-	{
-	case KEY_XBUTTON_B:
-		if ( m_pAsyncOperationAbortable &&
-			 AOS_RUNNING == m_pAsyncOperationAbortable->GetState() )
-		{
-			CBaseModPanel::GetSingleton().PlayUISound( UISOUND_BACK );
-			
-			m_pAsyncOperationAbortable->Abort();
-			m_pAsyncOperationAbortable = NULL;
-		}
-		break;
-	}
 }
 
 void GenericWaitScreen::PaintBackground()

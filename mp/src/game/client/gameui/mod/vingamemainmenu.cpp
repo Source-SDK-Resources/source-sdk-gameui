@@ -32,7 +32,6 @@
 using namespace vgui;
 using namespace BaseModUI;
 
-extern class IMatchSystem *matchsystem;
 extern IVEngineClient *engine;
 
 void OpenGammaDialog( VPANEL parent );
@@ -66,18 +65,10 @@ static void LeaveGameOkCallback()
 
 	engine->ExecuteClientCmd( "gameui_hide" );
 
-	if ( IMatchSession *pMatchSession = g_pMatchFramework->GetMatchSession() )
-	{
-		// Closing an active session results in disconnecting from the game.
-		g_pMatchFramework->CloseSession();
-	}
-	else
-	{
-		// On PC people can be playing via console bypassing matchmaking
-		// and required session settings, so to leave game duplicate
-		// session closure with an extra "disconnect" command.
-		engine->ExecuteClientCmd( "disconnect" );
-	}
+	// On PC people can be playing via console bypassing matchmaking
+	// and required session settings, so to leave game duplicate
+	// session closure with an extra "disconnect" command.
+	engine->ExecuteClientCmd( "disconnect" );
 
 	engine->ExecuteClientCmd( "gameui_activate" );
 
@@ -281,23 +272,16 @@ void InGameMainMenu::OnClose()
 
 void InGameMainMenu::OnThink()
 {
-	IMatchSession *pIMatchSession = g_pMatchFramework->GetMatchSession();
-	KeyValues *pGameSettings = pIMatchSession ? pIMatchSession->GetSessionSettings() : NULL;
+	bool bCanInvite = false;
+	bool bInFinale = false;
 	
-	char const *szNetwork = pGameSettings->GetString( "system/network", "offline" );
-	char const *szGameMode = pGameSettings->GetString( "game/mode", "campaign" );
-	char const *szGameState = pGameSettings->GetString( "game/state", "lobby" );
-
-	bool bCanInvite = !Q_stricmp( "LIVE", szNetwork );
-	bool bInFinale = !Q_stricmp( "finale", szGameState );
-
-	if ( bCanInvite && pIMatchSession )
+	if ( bCanInvite )
 	{
 		bCanInvite = !bInFinale;
 	}
 
 	SetControlEnabled( "BtnInviteFriends", bCanInvite );
-	SetControlEnabled( "BtnLeaderboard", CUIGameData::Get()->SignedInToLive() && !Q_stricmp( szGameMode, "survival" ) );
+	SetControlEnabled( "BtnLeaderboard", !Q_stricmp( szGameMode, "survival" ) );
 
 	bool bCanGoIdle = !Q_stricmp( "campaign", szGameMode ) || !Q_stricmp( "single_mission", szGameMode );
 
@@ -354,16 +338,12 @@ void InGameMainMenu::PerformLayout( void )
 {
 	BaseClass::PerformLayout();
 
-	IMatchSession *pIMatchSession = g_pMatchFramework->GetMatchSession();
-	KeyValues *pGameSettings = pIMatchSession ? pIMatchSession->GetSessionSettings() : NULL;
-
-	char const *szNetwork = pGameSettings->GetString( "system/network", "offline" );
-
-	bool bPlayOffline = !Q_stricmp( "offline", szNetwork );
-
+	
+	bool bPlayOffline = true;
+	
 	bool bInCommentary = engine->IsInCommentaryMode();
 
-	bool bCanInvite = !Q_stricmp( "LIVE", szNetwork );
+	bool bCanInvite = false;
 	SetControlEnabled( "BtnInviteFriends", bCanInvite );
 
 	bool bCanVote = true;
@@ -374,12 +354,6 @@ void InGameMainMenu::PerformLayout( void )
 	}
 
 	if ( gpGlobals->maxClients <= 1 )
-	{
-		bCanVote = false;
-	}
-
-	// Do not allow voting in credits map
-	if ( !Q_stricmp( pGameSettings->GetString( "game/campaign" ), "credits" ) )
 	{
 		bCanVote = false;
 	}

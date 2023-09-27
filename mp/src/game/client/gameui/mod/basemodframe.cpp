@@ -33,7 +33,6 @@ using namespace BaseModUI;
 using namespace vgui;
 
 //setup in GameUI_Interface.cpp
-extern class IMatchSystem *matchsystem;
 extern const char *COM_GetModDirectory( void );
 extern IGameUIFuncs *gameuifuncs;
 

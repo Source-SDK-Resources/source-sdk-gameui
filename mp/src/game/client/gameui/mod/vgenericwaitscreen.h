@@ -67,8 +67,6 @@ private:
 		wchar_t const *mWchMsgText;
 	};
 	CUtlVector< WaitMessage > m_MsgVector;
-
-	IMatchAsyncOperation *m_pAsyncOperationAbortable;
 };
 
 }

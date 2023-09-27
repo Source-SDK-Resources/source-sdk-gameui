@@ -36,7 +36,6 @@
 #include "ModInfo.h"
 #include "game/client/IGameClientExports.h"
 #include "materialsystem/imaterialsystem.h"
-#include "matchmaking/imatchframework.h"
 #include "iachievementmgr.h"
 #include "IGameUIFuncs.h"
 #include "IEngineVGUI.h"
@@ -186,14 +185,7 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	enginevguifuncs = (IEngineVGui *)factory( VENGINE_VGUI_VERSION, NULL );
 	enginesurfacefuncs = (vgui::ISurface *)factory(VGUI_SURFACE_INTERFACE_VERSION, NULL);
 	gameuifuncs = (IGameUIFuncs *)factory( VENGINE_GAMEUIFUNCS_VERSION, NULL );
-#ifdef SWARM_DLL
-	g_pMatchExtSwarm = ( IMatchExtSwarm * ) factory( IMATCHEXT_SWARM_INTERFACE, NULL );
-#endif
-	bFailed = !enginesurfacefuncs || !gameuifuncs || !enginevguifuncs ||
-#ifdef SWARM_DLL
-		!g_pMatchExtSwarm ||
-#endif
-		!g_pMatchFramework;
+	bFailed = !enginesurfacefuncs || !gameuifuncs || !enginevguifuncs;
 	if ( bFailed )
 	{
 		Error( "CGameUI::Initialize() failed to get necessary interfaces\n" );

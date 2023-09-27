@@ -58,7 +58,6 @@ using namespace BaseModUI;
 using namespace vgui;
 
 //setup in GameUI_Interface.cpp
-extern class IMatchSystem *matchsystem;
 extern const char *COM_GetModDirectory( void );
 extern IGameConsole *IGameConsole();
 
@@ -160,17 +159,12 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 	m_pBackgroundMaterial = NULL;
 	m_pBackgroundTexture = NULL;
 
-	// Subscribe to event notifications
-	g_pMatchFramework->GetEventsSubscription()->Subscribe( this );
 }
 
 //=============================================================================
 CBaseModPanel::~CBaseModPanel()
 {
 	ReleaseStartupGraphic();
-
-	// Unsubscribe from event notifications
-	g_pMatchFramework->GetEventsSubscription()->Unsubscribe( this );
 
 	if ( m_FooterPanel )
 	{
@@ -184,9 +178,6 @@ CBaseModPanel::~CBaseModPanel()
 
 	surface()->DestroyTextureID( m_iBackgroundImageID );
 	surface()->DestroyTextureID( m_iProductImageID );
-
-	// Shutdown UI game data
-	CUIGameData::Shutdown();
 }
 
 //=============================================================================
@@ -777,8 +768,6 @@ void CBaseModPanel::RunFrame()
 
 	CBaseModFrame::RunFrameOnListeners();
 
-	CUIGameData::Get()->RunFrame();
-
 	if ( m_DelayActivation )
 	{
 		m_DelayActivation--;
@@ -965,7 +954,6 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 
 					XUID xuidPlayer = pPlayer->GetUint64( "xuid", 0ull );
 					char const *szPlayerName = pPlayer->GetString( "name", "" );
-					szPlayerName = CUIGameData::Get()->GetPlayerName( xuidPlayer, szPlayerName );
 					char const *szAvatar = pPlayer->GetString( "game/avatar", "" );
 
 					// Find the avatar
@@ -1002,26 +990,6 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 	m_LevelLoading = true;
 }
 
-void CBaseModPanel::OnEngineLevelLoadingSession( KeyValues *pEvent )
-{
-	// We must keep the default loading poster because it will be replaced by
-	// the real campaign loading poster shortly
-	float flProgress = 0.0f;
-	if ( LoadingProgress *pLoadingProgress = static_cast<LoadingProgress*>( GetWindow( WT_LOADINGPROGRESS ) ) )
-	{
-		flProgress = pLoadingProgress->GetProgress();
-		pLoadingProgress->Close();
-		m_Frames[ WT_LOADINGPROGRESS ] = NULL;
-	}
-	CloseAllWindows( CLOSE_POLICY_DEFAULT );
-
-	// Pop up a fake bkgnd poster
-	if ( LoadingProgress *pLoadingProgress = static_cast<LoadingProgress*>( OpenWindow( WT_LOADINGPROGRESSBKGND, NULL ) ) )
-	{
-		pLoadingProgress->SetLoadingType( LoadingProgress::LT_POSTER );
-		pLoadingProgress->SetProgress( flProgress );
-	}
-}
 
 //=============================================================================
 void CBaseModPanel::OnLevelLoadingFinished( KeyValues *kvEvent )
@@ -1080,247 +1048,6 @@ void CBaseModPanel::OnLevelLoadingFinished( KeyValues *kvEvent )
 	}
 }
 
-class CMatchSessionCreationAsyncOperation : public IMatchAsyncOperation
-{
-public:
-	CMatchSessionCreationAsyncOperation() : m_eState( AOS_RUNNING ) {}
-
-public:
-	virtual bool IsFinished() { return false; }
-	virtual AsyncOperationState_t GetState() { return m_eState; }
-	virtual uint64 GetResult() { return 0ull; }
-	virtual void Abort();
-	virtual void Release() { Assert( 0 ); } // we are a global object, cannot release
-
-public:
-	IMatchAsyncOperation * Prepare() { m_eState = AOS_RUNNING; return this; }
-
-protected:
-	AsyncOperationState_t m_eState;
-}
-g_MatchSessionCreationAsyncOperation;
-
-void CMatchSessionCreationAsyncOperation::Abort()
-{
-	m_eState = AOS_ABORTING;
-	
-	Assert( g_pMatchFramework->GetMatchSession() );
-	g_pMatchFramework->CloseSession();
-
-	CBaseModPanel::GetSingleton().CloseAllWindows();
-	CBaseModPanel::GetSingleton().OpenFrontScreen();
-}
-
-void CBaseModPanel::OnEvent( KeyValues *pEvent )
-{
-	char const *szEvent = pEvent->GetName();
-
-	if ( !Q_stricmp( "OnMatchSessionUpdate", szEvent ) )
-	{
-		char const *szState = pEvent->GetString( "state", "" );
-		if ( !Q_stricmp( "ready", szState ) )
-		{
-			// Session has finished creating:
-			IMatchSession *pSession = g_pMatchFramework->GetMatchSession();
-			if ( !pSession )
-				return;
-
-			KeyValues *pSettings = pSession->GetSessionSettings();
-			if ( !pSettings )
-				return;
-
-			char const *szNetwork = pSettings->GetString( "system/network", "" );
-			int numLocalPlayers = pSettings->GetInt( "members/numPlayers", 1 );
-			
-			WINDOW_TYPE wtGameLobby = WT_GAMELOBBY;
-			if ( !Q_stricmp( "offline", szNetwork ) &&
-				 numLocalPlayers <= 1 )
-			{
-				// We have a single-player offline session
-				wtGameLobby = WT_GAMESETTINGS;
-			}
-			else
-			{
-				// Automatically start the map, no configuration required
-				pSession->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
-				return;
-			}
-
-			// We have created a session
-			CloseAllWindows();
-
-			// Special case when we are creating a public session after empty search
-			if ( !Q_stricmp( pSettings->GetString( "options/createreason" ), "searchempty" ) &&
-				 !Q_stricmp( pSettings->GetString( "system/access" ), "public" ) )
-			{
-				// We are creating a public lobby after our search turned out empty
-				char const *szWaitScreenText = "#Matchmaking_NoResultsCreating";
-				CUIGameData::Get()->OpenWaitScreen( szWaitScreenText, ui_lobby_noresults_create_msg_time.GetFloat() );
-				CUIGameData::Get()->CloseWaitScreen( NULL, NULL );
-
-				// Delete the "createreason" key from the session settings
-				pSession->UpdateSessionSettings( KeyValues::AutoDeleteInline( KeyValues::FromString( "delete",
-					" delete { options { createreason delete } } " ) ) );
-			}
-
-			CBaseModFrame *pLobbyWindow = OpenWindow( wtGameLobby, NULL, true, pSettings ); // derive from session
-			if ( CBaseModFrame *pWaitScreen = GetWindow( WT_GENERICWAITSCREEN ) )
-			{
-				// Normally "CloseAllWindows" above would take down the waitscreen, but
-				// we could pop it up for the special case of empty search results
-				pWaitScreen->SetNavBack( pLobbyWindow );
-			}
-
-			// Check for a special case when we lost connection to host and that's why we are going to lobby
-			if ( KeyValues *pOnEngineDisconnectReason = g_pMatchFramework->GetEventsSubscription()->GetEventData( "OnEngineDisconnectReason" ) )
-			{
-				if ( !Q_stricmp( "lobby", pOnEngineDisconnectReason->GetString( "disconnecthdlr" ) ) )
-				{
-					CUIGameData::Get()->OpenWaitScreen( "#L4D360UI_MsgBx_DisconnectedFromServer" );
-					CUIGameData::Get()->CloseWaitScreen( NULL, NULL );
-				}
-			}
-		}
-		else if ( !Q_stricmp( "created", szState ) )
-		{
-			//
-			// This section of code catches when we just connected to a lobby that
-			// is playing a campaign that we do not have installed.
-			// In this case we abort loading, forcefully close all windows including
-			// loading poster and game lobby and display the download info msg.
-			//
-
-			IMatchSession *pSession = g_pMatchFramework->GetMatchSession();
-			if ( !pSession )
-				return;
-
-			KeyValues *pSettings = pSession->GetSessionSettings();
-
-			KeyValues *pInfoMission = NULL;
-			// TODO:
-			KeyValues *pInfoChapter = NULL;//GetMapInfoRespectingAnyChapter( pSettings, &pInfoMission );
-
-			bool bValidMission = true;
-
-			// TODO: Check if we have the map installed by querying local mission chooser source
-
-			if ( bValidMission )
-				return;
-
-			// If we do not have a valid chapter/mission, then we need to quit
-			if ( pInfoChapter && pInfoMission &&
-				( !*pInfoMission->GetName() || pInfoMission->GetInt( "version" ) == pSettings->GetInt( "game/missioninfo/version", -1 ) ) )
-				return;
-
-			if ( pSettings )
-				pSettings = pSettings->MakeCopy();
-
-			engine->ExecuteClientCmd( "disconnect" );
-			g_pMatchFramework->CloseSession();
-
-			CloseAllWindows( CLOSE_POLICY_EVEN_MSGS | CLOSE_POLICY_EVEN_LOADING );
-			OpenFrontScreen();
-
-			const char *szCampaignWebsite = pSettings->GetString( "game/missioninfo/website", NULL );
-			if ( szCampaignWebsite && *szCampaignWebsite )
-			{
-				OpenWindow( WT_DOWNLOADCAMPAIGN,
-					GetWindow( CBaseModPanel::GetSingleton().GetActiveWindowType() ),
-					true, pSettings );
-			}
-			else
-			{
-				GenericConfirmation::Data_t data;
-
-				data.pWindowTitle = "#L4D360UI_Lobby_MissingContent";
-				data.pMessageText = "#L4D360UI_Lobby_MissingContent_Message";
-				data.bOkButtonEnabled = true;
-
-				GenericConfirmation* confirmation = 
-					static_cast< GenericConfirmation* >( OpenWindow( WT_GENERICCONFIRMATION, NULL, true ) );
-
-				confirmation->SetUsageData(data);
-			}
-		}
-		else if ( !Q_stricmp( "progress", szState ) )
-		{
-			struct WaitText_t
-			{
-				char const *m_szProgress;
-				char const *m_szText;
-				int m_eCloseAllWindowsFlags;
-			};
-
-			int eDefaultFlags = CLOSE_POLICY_EVEN_MSGS | CLOSE_POLICY_KEEP_BKGND;
-			WaitText_t arrWaits[] = {
-				{ "creating",	"#Matchmaking_creating",	eDefaultFlags },
-				{ "joining",	"#Matchmaking_joining",		eDefaultFlags },
-				{ "searching",	"#Matchmaking_searching",	eDefaultFlags },
-			};
-
-			char const *szProgress = pEvent->GetString( "progress", "" );
-			WaitText_t const *pWaitText = NULL;
-			for ( int k = 0; k < ARRAYSIZE( arrWaits ); ++ k )
-			{
-				if ( !Q_stricmp( arrWaits[k].m_szProgress, szProgress ) )
-				{
-					pWaitText = &arrWaits[k];
-					break;
-				}
-			}
-
-			// Wait screen options to cancel async process
-			KeyValues *pSettings = new KeyValues( "WaitScreen" );
-			KeyValues::AutoDelete autodelete_pSettings( pSettings );
-			pSettings->SetPtr( "options/asyncoperation", g_MatchSessionCreationAsyncOperation.Prepare() );
-
-			// For PC we don't want to cancel lobby creation
-			if ( !Q_stricmp( "creating", szProgress ) )
-				pSettings = NULL;
-
-			// Put up a wait screen
-			if ( pWaitText )
-			{
-				if ( pWaitText->m_eCloseAllWindowsFlags != -1 )
-					CloseAllWindows( pWaitText->m_eCloseAllWindowsFlags );
-
-				char const *szWaitScreenText = pWaitText->m_szText;
-				float flMinDisplayTime = 0.0f;
-				
-				if ( IMatchSession *pMatchSession = g_pMatchFramework->GetMatchSession() )
-				{
-					KeyValues *pMatchSettings = pMatchSession->GetSessionSettings();
-					if ( !Q_stricmp( szProgress, "creating" ) &&
-						 !Q_stricmp( pMatchSettings->GetString( "options/createreason" ), "searchempty" ) &&
-						 !Q_stricmp( pMatchSettings->GetString( "system/access" ), "public" ) )
-					{
-						// We are creating a public lobby after our search turned out empty
-						szWaitScreenText = "#Matchmaking_NoResultsCreating";
-					}
-				}
-
-				CUIGameData::Get()->OpenWaitScreen( szWaitScreenText, flMinDisplayTime, pSettings, 7.0f );
-			}
-			else if ( !Q_stricmp( "searchresult", szProgress ) )
-			{
-				char const *arrText[] = { "#Matchmaking_SearchResults",
-					"#Matchmaking_SearchResults1", "#Matchmaking_SearchResults2", "#Matchmaking_SearchResults3" };
-				int numResults = pEvent->GetInt( "numResults", 0 );
-				if ( numResults < 0 || numResults >= ARRAYSIZE( arrText ) )
-					numResults = 0;
-				CUIGameData::Get()->OpenWaitScreen( arrText[numResults], 0.0f, pSettings );
-			}
-		}
-	}
-	else if ( !Q_stricmp( "OnEngineLevelLoadingSession", szEvent ) )
-	{
-		OnEngineLevelLoadingSession( pEvent );
-	}
-	else if ( !Q_stricmp( "OnEngineLevelLoadingFinished", szEvent ) )
-	{
-		OnLevelLoadingFinished( pEvent );
-	}
-}
 
 //=============================================================================
 bool CBaseModPanel::UpdateProgressBar( float progress, const char *statusText )
