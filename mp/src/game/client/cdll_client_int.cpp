@@ -1216,9 +1216,11 @@ void CHLClient::Shutdown( void )
 	
 	// This call disconnects the VGui libraries which we rely on later in the shutdown path, so don't do it
 //	DisconnectTier3Libraries( );
-	DisconnectTier2Libraries( );
-	ConVar_Unregister();
-	DisconnectTier1Libraries( );
+
+	// This is now handled in CGameUI::Shutdown
+	//DisconnectTier2Libraries( );
+	//ConVar_Unregister();
+	//DisconnectTier1Libraries( );
 
 	gameeventmanager = NULL;
 
